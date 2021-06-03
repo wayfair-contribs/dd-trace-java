@@ -16,6 +16,7 @@ import datadog.trace.api.StatsDClientManager;
 import datadog.trace.api.Tracer;
 import datadog.trace.api.WithGlobalTracer;
 import datadog.trace.api.gateway.InstrumentationGateway;
+import datadog.trace.api.gateway.SubscriptionService;
 import datadog.trace.bootstrap.instrumentation.api.AgentTracer;
 import datadog.trace.context.ScopeListener;
 import datadog.trace.util.AgentTaskScheduler;
@@ -485,7 +486,7 @@ public class Agent {
 
         final Class<?> appSecSysClass =
             appSecClassLoader.loadClass("com.datadog.appsec.AppSecSystem");
-        final Method appSecInstallerMethod = appSecSysClass.getMethod("start");
+        final Method appSecInstallerMethod = appSecSysClass.getMethod("start", SubscriptionService.class);
         appSecInstallerMethod.invoke(null, gw);
         APPSEC_CLASSLOADER = appSecClassLoader;
       } catch (final Throwable ex) {

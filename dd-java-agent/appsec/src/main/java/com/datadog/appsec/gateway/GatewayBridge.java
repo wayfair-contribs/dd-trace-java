@@ -6,9 +6,9 @@ import com.datadog.appsec.event.data.KnownAddresses;
 import com.datadog.appsec.event.data.MapDataBundle;
 import com.datadog.appsec.event.data.StringKVPair;
 import datadog.trace.api.Function;
-import datadog.trace.api.function.TriConsumer;
 import datadog.trace.api.gateway.Events;
 import datadog.trace.api.gateway.Flow;
+import datadog.trace.api.gateway.RequestContext;
 import datadog.trace.api.gateway.SubscriptionService;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -38,32 +38,43 @@ public class GatewayBridge {
     subscriptionService.registerCallback(
         Events.REQUEST_STARTED,
         () -> {
-          RequestContextSupplier requestContextSupplier = new RequestContextSupplier();
-          AppSecRequestContext ctx = requestContextSupplier.getResult();
+          AppSecRequestContext ctx = new AppSecRequestContext();
           Flow flow = producerService.publishEvent(ctx, EventType.REQUEST_START);
           if (flow.getAction().isBlocking()) {
             LOG.warn("Blocking not allowed on REQUEST_STARTED event");
           }
-          return requestContextSupplier;
+          return flow;
         });
 
     subscriptionService.registerCallback(
         Events.REQUEST_ENDED,
-        (AppSecRequestContext ctx) -> {
-          Flow flow = producerService.publishEvent(ctx, EventType.REQUEST_END);
+        (RequestContext ctx) -> {
+          AppSecRequestContext asCtx = (AppSecRequestContext)ctx;
+          Flow flow = producerService.publishEvent(asCtx, EventType.REQUEST_END);
 
-          ctx.close();
+          asCtx.close();
           return flow;
         });
 
-    subscriptionService.registerCallback(Events.REQUEST_HEADER, new NewHeaderCallback());
+    subscriptionService.registerCallback(Events.REQUEST_HEADER, (RequestContext ctx, String name, String value) -> {
+      AppSecRequestContext asCtx = (AppSecRequestContext)ctx;
+      if (name.equalsIgnoreCase("cookie")) {
+        List<StringKVPair> cookies = CookieCutter.parseCookieHeader(value);
+        for (StringKVPair cookie : cookies) {
+          asCtx.addCookie(cookie);
+        }
+      } else {
+        asCtx.addHeader(name, value);
+      }
+    });
     subscriptionService.registerCallback(
         Events.REQUEST_HEADER_DONE, new HeadersDoneCallback(producerService));
 
     subscriptionService.registerCallback(
         Events.REQUEST_URI_RAW,
-        (AppSecRequestContext ctx, String s) -> {
-          ctx.setRawURI(s);
+        (RequestContext ctx, String s) -> {
+          AppSecRequestContext asCtx = (AppSecRequestContext)ctx;
+          asCtx.setRawURI(s);
           return NoopFlow.INSTANCE;
         });
   }
@@ -82,22 +93,7 @@ public class GatewayBridge {
     }
   }
 
-  private static class NewHeaderCallback
-      implements TriConsumer<AppSecRequestContext, String, String> {
-    @Override
-    public void accept(AppSecRequestContext ctx, String name, String value) {
-      if (name.equalsIgnoreCase("cookie")) {
-        List<StringKVPair> cookies = CookieCutter.parseCookieHeader(value);
-        for (StringKVPair cookie : cookies) {
-          ctx.addCookie(cookie);
-        }
-      } else {
-        ctx.addHeader(name, value);
-      }
-    }
-  }
-
-  private static class HeadersDoneCallback implements Function<AppSecRequestContext, Flow<Void>> {
+  private static class HeadersDoneCallback implements Function<RequestContext, Flow<Void>> {
     private static final Pattern QUERY_PARAM_VALUE_SPLITTER = Pattern.compile("=");
     private static final Pattern QUERY_PARAM_SPLITTER = Pattern.compile("&");
     private static final Map<String, List<String>> EMPTY_QUERY_PARAMS = Collections.emptyMap();
@@ -108,8 +104,9 @@ public class GatewayBridge {
       this.producerService = producerService;
     }
 
-    public Flow<Void> apply(AppSecRequestContext ctx) {
-      String savedRawURI = ctx.getSavedRawURI();
+    public Flow<Void> apply(RequestContext ctx) {
+      AppSecRequestContext asCtx = (AppSecRequestContext)ctx;
+      String savedRawURI = asCtx.getSavedRawURI();
       Map<String, List<String>> queryParams = EMPTY_QUERY_PARAMS;
       if (savedRawURI == null) {
         LOG.info("No saved RAW URI");
@@ -125,7 +122,7 @@ public class GatewayBridge {
 
       EventProducerService.DataSubscriberInfo dataSubscribers =
           producerService.getDataSubscribers(
-              ctx,
+              asCtx,
               KnownAddresses.HEADERS_NO_COOKIES,
               KnownAddresses.REQUEST_COOKIES,
               KnownAddresses.REQUEST_URI_RAW,
@@ -134,17 +131,17 @@ public class GatewayBridge {
       MapDataBundle bundle =
           MapDataBundle.of(
               KnownAddresses.HEADERS_NO_COOKIES,
-              ctx.getCollectedHeaders(),
+              asCtx.getCollectedHeaders(),
               KnownAddresses.REQUEST_COOKIES,
-              ctx.getCollectedCookies(),
+              asCtx.getCollectedCookies(),
               KnownAddresses.REQUEST_URI_RAW,
               savedRawURI,
               KnownAddresses.REQUEST_QUERY,
               queryParams);
 
-      ctx.finishHeaders();
+      asCtx.finishHeaders();
 
-      return producerService.publishDataEvent(dataSubscribers, ctx, bundle, false);
+      return producerService.publishDataEvent(dataSubscribers, asCtx, bundle, false);
     }
 
     private static Map<String, List<String>> parseQueryStringParams(

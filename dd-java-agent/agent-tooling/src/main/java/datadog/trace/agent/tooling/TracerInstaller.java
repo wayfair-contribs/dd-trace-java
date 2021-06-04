@@ -2,6 +2,7 @@ package datadog.trace.agent.tooling;
 
 import datadog.trace.api.Config;
 import datadog.trace.api.GlobalTracer;
+import datadog.trace.api.gateway.InstrumentationGateway;
 import datadog.trace.bootstrap.instrumentation.api.AgentTracer;
 import datadog.trace.core.CoreTracer;
 import org.slf4j.Logger;
@@ -10,10 +11,10 @@ import org.slf4j.LoggerFactory;
 public class TracerInstaller {
   private static final Logger log = LoggerFactory.getLogger(TracerInstaller.class);
   /** Register a global tracer if no global tracer is already registered. */
-  public static synchronized void installGlobalTracer() {
+  public static synchronized void installGlobalTracer(InstrumentationGateway gw) {
     if (Config.get().isTraceEnabled()) {
       if (!(GlobalTracer.get() instanceof CoreTracer)) {
-        installGlobalTracer(CoreTracer.builder().build());
+        installGlobalTracer(CoreTracer.builder().instrumentationGateway(gw).build());
       } else {
         log.debug("GlobalTracer already registered.");
       }

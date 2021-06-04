@@ -2,8 +2,10 @@ package com.datadog.appsec.event;
 
 import datadog.trace.api.gateway.Flow;
 
-public class ChangeableFlow implements Flow<Void> {
+public class ChangeableFlow<T> implements Flow<T> {
   Action action = Action.Noop.INSTANCE;
+
+  private T result;
 
   public boolean isBlocking() {
     return action.isBlocking();
@@ -19,7 +21,11 @@ public class ChangeableFlow implements Flow<Void> {
   }
 
   @Override
-  public Void getResult() {
-    return null;
+  public T getResult() {
+    return result;
+  }
+
+  public void setResult(T result) {
+    this.result = result;
   }
 }

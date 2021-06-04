@@ -167,9 +167,9 @@ public class Agent {
      */
     if (isJavaBefore9WithJFR() && appUsingCustomLogManager) {
       log.debug("Custom logger detected. Delaying Datadog Tracer initialization.");
-      registerLogManagerCallback(new InstallDatadogTracerCallback(bootstrapURL));
+      registerLogManagerCallback(new InstallDatadogTracerCallback(gw, bootstrapURL));
     } else {
-      installDatadogTracer();
+      installDatadogTracer(gw);
     }
 
     /*
@@ -283,8 +283,11 @@ public class Agent {
   }
 
   protected static class InstallDatadogTracerCallback extends ClassLoadCallBack {
-    InstallDatadogTracerCallback(final URL bootstrapURL) {
+    private final InstrumentationGateway gw;
+
+    InstallDatadogTracerCallback(final InstrumentationGateway gw, final URL bootstrapURL) {
       super(bootstrapURL);
+      this.gw = gw;
     }
 
     @Override
@@ -294,7 +297,7 @@ public class Agent {
 
     @Override
     public void execute() {
-      installDatadogTracer();
+      installDatadogTracer(gw);
     }
   }
 
@@ -357,7 +360,7 @@ public class Agent {
     }
   }
 
-  private static synchronized void installDatadogTracer() {
+  private static synchronized void installDatadogTracer(InstrumentationGateway gw) {
     if (AGENT_CLASSLOADER == null) {
       throw new IllegalStateException("Datadog agent should have been started already");
     }
@@ -367,8 +370,8 @@ public class Agent {
       // install global tracer
       final Class<?> tracerInstallerClass =
           AGENT_CLASSLOADER.loadClass("datadog.trace.agent.tooling.TracerInstaller");
-      final Method tracerInstallerMethod = tracerInstallerClass.getMethod("installGlobalTracer");
-      tracerInstallerMethod.invoke(null);
+      final Method tracerInstallerMethod = tracerInstallerClass.getMethod("installGlobalTracer", InstrumentationGateway.class);
+      tracerInstallerMethod.invoke(null, gw);
     } catch (final Throwable ex) {
       log.error("Throwable thrown while installing the Datadog Tracer", ex);
     }

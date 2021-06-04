@@ -291,8 +291,6 @@ public class CoreTracer implements AgentTracer.TracerAPI {
     }
 
     public CoreTracerBuilder() {
-      // Apply the default values from config.
-      config(Config.get());
     }
 
     public CoreTracerBuilder withProperties(final Properties properties) {
@@ -304,7 +302,6 @@ public class CoreTracer implements AgentTracer.TracerAPI {
       serviceName(config.getServiceName());
       // Explicitly skip setting writer to avoid allocating resources prematurely.
       sampler(Sampler.Builder.<DDSpan>forConfig(config));
-      instrumentationGateway(new InstrumentationGateway());
       injector(HttpCodec.createInjector(config));
       extractor(HttpCodec.createExtractor(config, config.getHeaderTags(), instrumentationGateway));
       // Explicitly skip setting scope manager because it depends on statsDClient
@@ -319,6 +316,9 @@ public class CoreTracer implements AgentTracer.TracerAPI {
     }
 
     public CoreTracer build() {
+      // Apply the default values from config.
+      config(Config.get());
+      
       return new CoreTracer(
           config,
           serviceName,

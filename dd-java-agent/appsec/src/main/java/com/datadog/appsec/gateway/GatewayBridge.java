@@ -39,7 +39,7 @@ public class GatewayBridge {
         Events.REQUEST_STARTED,
         () -> {
           AppSecRequestContext ctx = new AppSecRequestContext();
-          Flow flow = producerService.publishEvent(ctx, EventType.REQUEST_START);
+          Flow<RequestContext> flow = producerService.publishEvent(ctx, EventType.REQUEST_START);
           if (flow.getAction().isBlocking()) {
             LOG.warn("Blocking not allowed on REQUEST_STARTED event");
           }
@@ -77,20 +77,6 @@ public class GatewayBridge {
           asCtx.setRawURI(s);
           return NoopFlow.INSTANCE;
         });
-  }
-
-  private static class RequestContextSupplier implements Flow<AppSecRequestContext> {
-    private final AppSecRequestContext appSecRequestContext = new AppSecRequestContext();
-
-    @Override
-    public Action getAction() {
-      return Action.Noop.INSTANCE;
-    }
-
-    @Override
-    public AppSecRequestContext getResult() {
-      return appSecRequestContext;
-    }
   }
 
   private static class HeadersDoneCallback implements Function<RequestContext, Flow<Void>> {

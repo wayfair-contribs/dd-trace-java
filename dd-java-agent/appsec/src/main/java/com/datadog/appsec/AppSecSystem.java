@@ -2,8 +2,6 @@ package com.datadog.appsec;
 
 import com.datadog.appsec.event.EventDispatcher;
 import com.datadog.appsec.gateway.GatewayBridge;
-import com.datadog.appsec.config.AppSecConfig;
-import com.datadog.appsec.config.AppSecConfigFactory;
 import datadog.trace.api.Config;
 import datadog.trace.api.gateway.SubscriptionService;
 import java.util.ArrayList;
@@ -11,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.io.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +18,9 @@ public class AppSecSystem {
   private static final AtomicBoolean STARTED = new AtomicBoolean();
   private static final List<String> STARTED_MODULE_NAMES = new ArrayList<>();
 
-  public static void start(SubscriptionService gw) {
-    final Config config = Config.get();
   private AppSecSystem() {}
 
-  public static void start() {
+  public static void start(SubscriptionService gw) {
     Config config = Config.get();
     if (!config.isAppSecEnabled()) {
       log.debug("AppSec: disabled");

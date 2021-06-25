@@ -1,15 +1,29 @@
 version: 0.1
 events:
-  - id: rule_111
+  - id: tpj-ivk-wrx
     name: Nikto security scanner detection
     tags:
-      category: security_scanners
+      type: security_scanners
       mitre_attack: T1595
     conditions:
       - operation: match_regex
-        params:
+        parameters:
           input: $http.headers.user_agent
           regex: \(nikto/[\d\.]+\)
     transformers:
       - lowercase
+    action: log
+
+  - id: tpj-jhg-awr
+    name: Obfuscated Path Traversal Attack (/../)
+    tags:
+      type: local_file_inclusion
+      mitre_attack: T1083
+    conditions:
+      - operation: match_regex
+        parameters:
+          input: $http.server.query
+          regex: (?:^|[\\\/])\.\.(?:[\\\/]|$)
+    transformers:
+      - removeNulls
     action: log

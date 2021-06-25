@@ -54,6 +54,26 @@ public class MapDataBundle implements DataBundle {
     return new MapDataBundle(map);
   }
 
+  public static <T, U, V, W, X> MapDataBundle of (
+    Address<T> addr1,
+    T value1,
+    Address<U> addr2,
+    U value2,
+    Address<V> addr3,
+    V value3,
+    Address<W> addr4,
+    W value4,
+    Address<X> addr5,
+    X value5) {
+    Map<Address<?>, Object> map = new IdentityHashMap<>();
+    map.put(addr1, value1);
+    map.put(addr2, value2);
+    map.put(addr3, value3);
+    map.put(addr4, value4);
+    map.put(addr5, value5);
+    return new MapDataBundle(map);
+  }
+
   @Override
   public boolean hasAddress(Address<?> addr) {
     return map.containsKey(addr);

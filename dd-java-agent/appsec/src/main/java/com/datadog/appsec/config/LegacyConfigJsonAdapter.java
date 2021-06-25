@@ -51,7 +51,7 @@ public class LegacyConfigJsonAdapter {
         switch (cond.operation) {
           case MATCH_REGEX:
             operator = "@rx";
-            MatchRegexParams params = (MatchRegexParams)cond.params;
+            MatchRegexParams params = (MatchRegexParams)cond.parameters;
             input = params.input;
             // Ignore first '$' symbol
             if (input.charAt(0) == '$') {

@@ -72,11 +72,11 @@ public class AppSecConfigFactory {
               valueNode.setType(Operation.class);
               String operation = constructScalar((ScalarNode) valueNode);
 
-              // If operation is match_regex then use MatchRegexParams for params
+              // If operation is match_regex then use MatchRegexParams for parameters
               if ("match_regex".equalsIgnoreCase(operation)) {
                 NodeTuple paramsNode = node.getValue().get(1);
                 key = constructScalar((ScalarNode) paramsNode.getKeyNode());
-                if ("params".equalsIgnoreCase(key)) {
+                if ("parameters".equalsIgnoreCase(key)) {
                   valueNode = paramsNode.getValueNode();
                   valueNode.setType(MatchRegexParams.class);
                 }

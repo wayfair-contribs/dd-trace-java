@@ -72,10 +72,43 @@ public class GatewayBridge {
 
     subscriptionService.registerCallback(
         Events.REQUEST_URI_RAW,
-        (RequestContext ctx, String s) -> {
+        (RequestContext ctx, String uri) -> {
           AppSecRequestContext asCtx = (AppSecRequestContext)ctx;
-          asCtx.setRawURI(s);
-          return NoopFlow.INSTANCE;
+          asCtx.setRawURI(uri);
+          //return NoopFlow.INSTANCE;
+
+          Map<String, List<String>> queryParams = HeadersDoneCallback.EMPTY_QUERY_PARAMS;
+          int i = uri.indexOf("?");
+          if (i != -1) {
+            String qs = uri.substring(i + 1);
+            // ideally we'd have the query string as parsed by the server
+            // or at the very least the encoding used by the server
+            queryParams = HeadersDoneCallback.parseQueryStringParams(qs, StandardCharsets.UTF_8);
+          }
+
+          EventProducerService.DataSubscriberInfo dataSubscribers =
+            producerService.getDataSubscribers(
+              asCtx,
+              KnownAddresses.HEADERS_NO_COOKIES,
+              KnownAddresses.REQUEST_USER_AGENT,
+              KnownAddresses.REQUEST_COOKIES,
+              KnownAddresses.REQUEST_URI_RAW,
+              KnownAddresses.REQUEST_QUERY);
+
+          MapDataBundle bundle =
+            MapDataBundle.of(
+              KnownAddresses.HEADERS_NO_COOKIES,
+              asCtx.getCollectedHeaders(),
+              KnownAddresses.REQUEST_USER_AGENT,
+              asCtx.getUserAgent(),
+              KnownAddresses.REQUEST_COOKIES,
+              asCtx.getCollectedCookies(),
+              KnownAddresses.REQUEST_URI_RAW,
+              uri,
+              KnownAddresses.REQUEST_QUERY,
+              queryParams);
+
+          return producerService.publishDataEvent(dataSubscribers, asCtx, bundle, true);
         });
   }
 
@@ -93,7 +126,8 @@ public class GatewayBridge {
     public Flow<Void> apply(RequestContext ctx) {
       AppSecRequestContext asCtx = (AppSecRequestContext)ctx;
       String savedRawURI = asCtx.getSavedRawURI();
-      Map<String, List<String>> queryParams = EMPTY_QUERY_PARAMS;
+
+      /*Map<String, List<String>> queryParams = EMPTY_QUERY_PARAMS;
       if (savedRawURI == null) {
         LOG.info("No saved RAW URI");
         savedRawURI = "/";
@@ -110,6 +144,7 @@ public class GatewayBridge {
           producerService.getDataSubscribers(
               asCtx,
               KnownAddresses.HEADERS_NO_COOKIES,
+              KnownAddresses.REQUEST_USER_AGENT,
               KnownAddresses.REQUEST_COOKIES,
               KnownAddresses.REQUEST_URI_RAW,
               KnownAddresses.REQUEST_QUERY);
@@ -118,16 +153,20 @@ public class GatewayBridge {
           MapDataBundle.of(
               KnownAddresses.HEADERS_NO_COOKIES,
               asCtx.getCollectedHeaders(),
+              KnownAddresses.REQUEST_USER_AGENT,
+              asCtx.getUserAgent(),
               KnownAddresses.REQUEST_COOKIES,
               asCtx.getCollectedCookies(),
               KnownAddresses.REQUEST_URI_RAW,
               savedRawURI,
               KnownAddresses.REQUEST_QUERY,
-              queryParams);
+              queryParams);*/
 
       asCtx.finishHeaders();
 
-      return producerService.publishDataEvent(dataSubscribers, asCtx, bundle, false);
+      return NoopFlow.INSTANCE;
+
+      //return producerService.publishDataEvent(dataSubscribers, asCtx, bundle, false);
     }
 
     private static Map<String, List<String>> parseQueryStringParams(

@@ -24,6 +24,7 @@ public class AppSecRequestContext
   private final ConcurrentHashMap<Address<?>, Object> persistentData = new ConcurrentHashMap<>();
 
   private String savedRawURI;
+  private String userAgent;
   private CaseInsensitiveMap<List<String>> collectedHeaders = new CaseInsensitiveMap<>();
   private List<StringKVPair> collectedCookies = new ArrayList<StringKVPair>(4);
 
@@ -67,17 +68,17 @@ public class AppSecRequestContext
   /* Interface for use of GatewayBridge */
 
   String getSavedRawURI() {
-    if (collectedHeaders == null) {
+    /*if (collectedHeaders == null) {
       throw new IllegalStateException("Headers finished, collection not possible anymore");
-    }
+    }*/
     return savedRawURI;
   }
 
   void setRawURI(String savedRawURI) {
-    if (collectedHeaders == null) {
+    /*if (collectedHeaders == null) {
       LOG.warn("Saw raw URI after headers have finished");
       return;
-    }
+    }*/
     this.savedRawURI = savedRawURI;
   }
 
@@ -92,6 +93,10 @@ public class AppSecRequestContext
       collectedHeaders.put(name, strings);
     }
     strings.add(value);
+
+    if ("user-agent".equalsIgnoreCase(name) && value != null) {
+      this.userAgent = value;
+    }
   }
 
   void addCookie(StringKVPair cookie) {
@@ -108,17 +113,21 @@ public class AppSecRequestContext
     this.collectedCookies = null;
   }
 
+  String getUserAgent() {
+    return this.userAgent;
+  }
+
   CaseInsensitiveMap<List<String>> getCollectedHeaders() {
-    if (collectedHeaders == null) {
+    /*if (collectedHeaders == null) {
       throw new IllegalStateException("Headers finished, collection not possible anymore");
-    }
+    }*/
     return collectedHeaders;
   }
 
   List<StringKVPair> getCollectedCookies() {
-    if (collectedCookies == null) {
+    /*if (collectedCookies == null) {
       throw new IllegalStateException("Headers finished, collection not possible anymore");
-    }
+    }*/
     return collectedCookies;
   }
 

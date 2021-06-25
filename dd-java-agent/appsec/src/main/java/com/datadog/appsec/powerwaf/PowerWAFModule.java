@@ -2,6 +2,8 @@ package com.datadog.appsec.powerwaf;
 
 import com.datadog.appsec.AppSecModule;
 import com.datadog.appsec.AppSecSystem;
+import com.datadog.appsec.config.AppSecConfig;
+import com.datadog.appsec.config.AppSecConfigFactory;
 import com.datadog.appsec.event.ChangeableFlow;
 import com.datadog.appsec.event.OrderedCallback;
 import com.datadog.appsec.event.data.Address;
@@ -9,10 +11,13 @@ import com.datadog.appsec.event.data.DataBundle;
 import com.datadog.appsec.event.data.KnownAddresses;
 import com.datadog.appsec.gateway.AppSecRequestContext;
 import com.google.auto.service.AutoService;
+import datadog.trace.api.Config;
 import datadog.trace.api.gateway.Flow;
 import io.sqreen.powerwaf.Powerwaf;
 import io.sqreen.powerwaf.PowerwafContext;
 import io.sqreen.powerwaf.exception.AbstractPowerwafException;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -67,6 +72,7 @@ public class PowerWAFModule implements AppSecModule {
     ADDRESSES_OF_INTEREST.add(KnownAddresses.REQUEST_URI_RAW);
     ADDRESSES_OF_INTEREST.add(KnownAddresses.REQUEST_QUERY);
     ADDRESSES_OF_INTEREST.add(KnownAddresses.HEADERS_NO_COOKIES);
+    ADDRESSES_OF_INTEREST.add(KnownAddresses.REQUEST_USER_AGENT);
     ADDRESSES_OF_INTEREST.add(KnownAddresses.REQUEST_COOKIES);
     ADDRESSES_OF_INTEREST.add(KnownAddresses.REQUEST_PATH_PARAMS);
     ADDRESSES_OF_INTEREST.add(KnownAddresses.REQUEST_BODY_RAW);
@@ -75,19 +81,30 @@ public class PowerWAFModule implements AppSecModule {
   private final PowerwafContext ctx;
 
   public PowerWAFModule() {
-    this("waf.json");
+    this(Config.get().getAppSecConfigFile());
   }
 
-  public PowerWAFModule(String resourceName) {
+  public PowerWAFModule(String fileName) {
     PowerwafContext ctx = null;
 
     if (!LibSqreenInitialization.ONLINE) {
       LOG.warn("In-app WAF initialization failed");
     } else {
+
+      String wafConf;
+
+      // Check if file exist
+      File file = new File(fileName);
       try {
-        String wafDef = loadWAFJson(resourceName);
+        if (file.exists()) {
+          // Load from file
+          wafConf = loadWAFYamlFile(fileName);
+        } else {
+          // Load from resource
+          wafConf = loadWAFJsonResource("waf.json");
+        }
         String uniqueId = UUID.randomUUID().toString();
-        ctx = Powerwaf.createContext(uniqueId, Collections.singletonMap(RULE_NAME, wafDef));
+        ctx = Powerwaf.createContext(uniqueId, Collections.singletonMap(RULE_NAME, wafConf));
       } catch (IOException e) {
         LOG.error("Error reading WAF atom", e);
       } catch (AbstractPowerwafException e) {
@@ -276,7 +293,7 @@ public class PowerWAFModule implements AppSecModule {
     }
   }
 
-  private String loadWAFJson(String resourceName) throws IOException {
+  private String loadWAFJsonResource(String resourceName) throws IOException {
     try (InputStream is = getClass().getClassLoader().getResourceAsStream(resourceName)) {
       if (is == null) {
         throw new IOException("Resource " + resourceName + " not found");
@@ -292,5 +309,10 @@ public class PowerWAFModule implements AppSecModule {
         return str;
       }
     }
+  }
+
+  private String loadWAFYamlFile(String filename) throws IOException {
+    AppSecConfig config = AppSecConfigFactory.fromYamlFile(new File(filename));
+    return AppSecConfigFactory.toLegacyFormat(config);
   }
 }

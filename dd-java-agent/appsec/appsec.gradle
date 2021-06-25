@@ -18,8 +18,12 @@ dependencies {
 
   annotationProcessor deps.autoserviceProcessor
   compileOnly deps.autoserviceAnnotation
+  compileOnly group: 'org.yaml', name: 'snakeyaml', version: '1.28'
+  compileOnly group: 'com.squareup.moshi', name: 'moshi', version: '1.9.2'
 
   testImplementation deps.bytebuddy
+  testCompile group: 'org.yaml', name: 'snakeyaml', version: '1.28'
+  testCompile group: 'com.squareup.moshi', name: 'moshi', version: '1.9.2'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8

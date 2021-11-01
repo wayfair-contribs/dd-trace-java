@@ -23,7 +23,7 @@ dependencies {
   api deps.slf4j
   implementation project(':internal-api')
   implementation project(':communication')
-  implementation group: 'io.sqreen', name: 'libsqreen', version: '3.0.2'
+  implementation group: 'io.sqreen', name: 'libsqreen', version: '3.0.3'
   implementation group: 'com.squareup.moshi', name: 'moshi', version: versions.moshi
 
   annotationProcessor deps.autoserviceProcessor
@@ -82,7 +82,7 @@ jsonSchema2Pojo {
 
   // Whether to use the 'title' property of the schema to decide the class name (if not
   // set to true, the filename and property names are used).
-  useTitleAsClassname = false
+  useTitleAsClassname = true
   sourceType = 'jsonschema'
 
 

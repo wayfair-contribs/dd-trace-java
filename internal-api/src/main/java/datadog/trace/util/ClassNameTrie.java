@@ -205,11 +205,20 @@ public final class ClassNameTrie {
       return trieLength == 0;
     }
 
+    /** Allow querying while the class-name trie is being built. */
+    public int apply(String key) {
+      return ClassNameTrie.apply(trieData, longJumps, key);
+    }
+
     public ClassNameTrie buildTrie() {
       return new ClassNameTrie(
           Arrays.copyOfRange(trieData, 0, trieLength),
           Arrays.copyOfRange(longJumps, 0, longJumpCount));
     }
+
+    public void readFrom(Path cachePath) {}
+
+    public void writeTo(Path cachePath) {}
 
     /** Reads a class-name mapping file into the current builder */
     public void readClassNameMapping(Path triePath) throws IOException {

@@ -27,9 +27,8 @@ public class CachedExcludes {
         if (Files.isReadable(cachePath)) {
           excludes.readFrom(cachePath);
         }
-        if (Files.isWritable(cachePath)) {
-          Runtime.getRuntime().addShutdownHook(new PersistHook(cachePath));
-        }
+        Files.createDirectories(cachePath.toAbsolutePath().getParent());
+        Runtime.getRuntime().addShutdownHook(new PersistHook(cachePath));
       } catch (IllegalStateException ex) {
         // cannot add shutdown hook as JVM is shutting down
       } catch (Exception e) {
@@ -40,8 +39,16 @@ public class CachedExcludes {
     }
   }
 
+  public static boolean isEnabled() {
+    return excludes != null;
+  }
+
   public static boolean isExcluded(String name) {
     return excludes != null && excludes.apply(name) > 0;
+  }
+
+  public static void exclude(String name) {
+    excludes.put(name, 1);
   }
 
   private static class PersistHook extends Thread {

@@ -5,6 +5,8 @@ import static net.bytebuddy.matcher.ElementMatchers.isDefaultFinalizer;
 
 import datadog.trace.agent.tooling.bytebuddy.DDCachingPoolStrategy;
 import datadog.trace.agent.tooling.bytebuddy.matcher.DDElementMatchers;
+import datadog.trace.agent.tooling.bytebuddy.matcher.CachedExcludes;
+import datadog.trace.agent.tooling.bytebuddy.matcher.GlobalIgnores;
 import datadog.trace.agent.tooling.context.FieldBackedContextProvider;
 import datadog.trace.api.Config;
 import datadog.trace.bootstrap.FieldBackedContextAccessor;
@@ -306,6 +308,8 @@ public class AgentInstaller {
   }
 
   private static class ClassLoadListener implements AgentBuilder.Listener {
+    private static final boolean isExcludeCachingEnabled = CachedExcludes.isEnabled();
+
     @Override
     public void onDiscovery(
         final String typeName,
@@ -326,7 +330,14 @@ public class AgentInstaller {
         final TypeDescription typeDescription,
         final ClassLoader classLoader,
         final JavaModule javaModule,
-        final boolean b) {}
+        final boolean b) {
+      if (isExcludeCachingEnabled) {
+        String name = typeDescription.getActualName();
+        if (!GlobalIgnores.isIgnored(name, false)) {
+          CachedExcludes.exclude(name);
+        }
+      }
+    }
 
     @Override
     public void onError(

@@ -226,6 +226,7 @@ import static datadog.trace.api.config.TraceInstrumentationConfig.SERVLET_ROOT_C
 import static datadog.trace.api.config.TraceInstrumentationConfig.TEMP_JARS_CLEAN_ON_BOOT;
 import static datadog.trace.api.config.TraceInstrumentationConfig.TRACE_ANNOTATIONS;
 import static datadog.trace.api.config.TraceInstrumentationConfig.TRACE_CLASSES_EXCLUDE;
+import static datadog.trace.api.config.TraceInstrumentationConfig.TRACE_CLASSES_EXCLUDE_CACHE;
 import static datadog.trace.api.config.TraceInstrumentationConfig.TRACE_CLASSES_EXCLUDE_FILE;
 import static datadog.trace.api.config.TraceInstrumentationConfig.TRACE_CLASSLOADERS_EXCLUDE;
 import static datadog.trace.api.config.TraceInstrumentationConfig.TRACE_CODESOURCES_EXCLUDE;
@@ -373,6 +374,7 @@ public class Config {
   private final Map<String, String> jmxTags;
   private final List<String> excludedClasses;
   private final String excludedClassesFile;
+  private final String excludedClassesCache;
   private final Set<String> excludedClassLoaders;
   private final List<String> excludedCodeSources;
   private final Map<String, String> requestHeaderTags;
@@ -726,6 +728,7 @@ public class Config {
 
     excludedClasses = tryMakeImmutableList(configProvider.getList(TRACE_CLASSES_EXCLUDE));
     excludedClassesFile = configProvider.getString(TRACE_CLASSES_EXCLUDE_FILE);
+    excludedClassesCache = configProvider.getString(TRACE_CLASSES_EXCLUDE_CACHE);
     excludedClassLoaders = tryMakeImmutableSet(configProvider.getList(TRACE_CLASSLOADERS_EXCLUDE));
     excludedCodeSources = tryMakeImmutableList(configProvider.getList(TRACE_CODESOURCES_EXCLUDE));
 
@@ -1266,6 +1269,10 @@ public class Config {
 
   public String getExcludedClassesFile() {
     return excludedClassesFile;
+  }
+
+  public String getExcludedClassesCache() {
+    return excludedClassesCache;
   }
 
   public Set<String> getExcludedClassLoaders() {
@@ -2490,6 +2497,8 @@ public class Config {
         + excludedClasses
         + ", excludedClassesFile="
         + excludedClassesFile
+        + ", excludedClassesCache="
+        + excludedClassesCache
         + ", excludedClassLoaders="
         + excludedClassLoaders
         + ", excludedCodeSources="

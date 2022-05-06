@@ -20,6 +20,7 @@ public final class TraceInstrumentationConfig {
   public static final String TRACE_METHODS = "trace.methods";
   public static final String TRACE_CLASSES_EXCLUDE = "trace.classes.exclude";
   public static final String TRACE_CLASSES_EXCLUDE_FILE = "trace.classes.exclude.file";
+  public static final String TRACE_CLASSES_EXCLUDE_CACHE = "trace.classes.exclude.cache";
   public static final String TRACE_CLASSLOADERS_EXCLUDE = "trace.classloaders.exclude";
   public static final String TRACE_CODESOURCES_EXCLUDE = "trace.codesources.exclude";
   public static final String TRACE_TESTS_ENABLED = "trace.tests.enabled";

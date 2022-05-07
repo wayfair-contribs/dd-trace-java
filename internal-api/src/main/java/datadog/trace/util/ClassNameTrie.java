@@ -1,5 +1,9 @@
 package datadog.trace.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -216,9 +220,43 @@ public final class ClassNameTrie {
           Arrays.copyOfRange(longJumps, 0, longJumpCount));
     }
 
-    public void readFrom(Path cachePath) {}
+    public void readFrom(Path cachePath) {
+      try (DataInputStream in =
+          new DataInputStream(new BufferedInputStream(Files.newInputStream(cachePath)))) {
+        trieLength = in.readInt();
+        if (trieData.length < trieLength) {
+          trieData = new char[trieLength];
+        }
+        for (int i = 0; i < trieLength; i++) {
+          trieData[i] = in.readChar();
+        }
+        int longJumpLength = in.readInt();
+        if (longJumps.length < longJumpLength) {
+          longJumps = new int[longJumpLength];
+        }
+        for (int i = 0; i < longJumpLength; i++) {
+          longJumps[i] = in.readInt();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
 
-    public void writeTo(Path cachePath) {}
+    public void writeTo(Path cachePath) {
+      try (DataOutputStream out =
+          new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(cachePath)))) {
+        out.writeInt(trieLength);
+        for (char c : trieData) {
+          out.writeChar(c);
+        }
+        out.writeInt(longJumps.length);
+        for (int j : longJumps) {
+          out.writeInt(j);
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
 
     /** Reads a class-name mapping file into the current builder */
     public void readClassNameMapping(Path triePath) throws IOException {

@@ -333,7 +333,7 @@ public class AgentInstaller {
         final boolean b) {
       if (isExcludeCachingEnabled) {
         String name = typeDescription.getActualName();
-        if (!GlobalIgnores.isIgnored(name, false)) {
+        if (!GlobalIgnores.isIgnored(name, false) && !name.contains("Proxy")) {
           CachedExcludes.exclude(name);
         }
       }

@@ -28,6 +28,7 @@ public class GlobalIgnoresMatcher implements AgentBuilder.RawMatcher {
       JavaModule module,
       Class<?> classBeingRedefined,
       ProtectionDomain protectionDomain) {
+if (protectionDomain!=null){System.err.println(">>>>  "+protectionDomain.getCodeSource());}
     if (ClassLoaderMatchers.skipClassLoader(classLoader)) {
       return true;
     }

@@ -230,11 +230,11 @@ public final class ClassNameTrie {
         for (int i = 0; i < trieLength; i++) {
           trieData[i] = in.readChar();
         }
-        jumpsLength = in.readInt();
-        if (longJumps.length < jumpsLength) {
-          longJumps = new int[jumpsLength];
+        longJumpCount = in.readInt();
+        if (longJumps.length < longJumpCount) {
+          longJumps = new int[longJumpCount];
         }
-        for (int i = 0; i < jumpsLength; i++) {
+        for (int i = 0; i < longJumpCount; i++) {
           longJumps[i] = in.readInt();
         }
       } catch (Exception e) {
@@ -250,9 +250,9 @@ public final class ClassNameTrie {
         for (int i = 0; i < trieLength; i++) {
           out.writeChar(trieData[i]);
         }
-        System.err.println("JMP " + jumpsLength);
-        out.writeInt(jumpsLength);
-        for (int i = 0; i < jumpsLength; i++) {
+        System.err.println("JMP " + longJumpCount);
+        out.writeInt(longJumpCount);
+        for (int i = 0; i < longJumpCount; i++) {
           out.writeInt(longJumps[i]);
         }
       } catch (Exception e) {

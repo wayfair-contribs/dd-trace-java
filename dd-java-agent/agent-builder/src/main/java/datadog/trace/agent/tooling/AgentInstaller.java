@@ -331,7 +331,7 @@ public class AgentInstaller {
         final ClassLoader classLoader,
         final JavaModule javaModule,
         final boolean b) {
-      if (isExcludeCachingEnabled) {
+      if (isExcludeCachingEnabled && typeDescription.getSuperClass() != null) {
         String name = typeDescription.getActualName();
         if (!GlobalIgnores.isIgnored(name, false) && !name.contains("Proxy")) {
           CachedExcludes.exclude(name);

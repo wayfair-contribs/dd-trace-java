@@ -44,11 +44,18 @@ public class CachedExcludes {
   }
 
   public static boolean isExcluded(String name) {
-    return excludes != null && excludes.apply(name) > 0;
+    if (excludes != null) {
+      synchronized (excludes) {
+        return excludes.apply(name) > 0;
+      }
+    }
+    return false;
   }
 
   public static void exclude(String name) {
-    excludes.put(name, 1);
+    synchronized (excludes) {
+      excludes.put(name, 1);
+    }
   }
 
   private static class PersistHook extends Thread {
@@ -61,7 +68,9 @@ public class CachedExcludes {
 
     @Override
     public void run() {
-      excludes.writeTo(cachePath);
+      synchronized (excludes) {
+        excludes.writeTo(cachePath);
+      }
     }
   }
 }

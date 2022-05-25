@@ -2,23 +2,28 @@ package datadog.trace.agent.tooling.bytebuddy.matcher.memoizing;
 
 import datadog.trace.api.function.Function;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.bytebuddy.matcher.ElementMatcher;
 
-public final class MemoizingMatchers<T> {
+public final class MemoizingMatchers<T, M> {
 
-  public interface Result {
-    boolean matches(int localMatcherId);
+  public interface State<M> {
+    boolean matches(int matcherId);
 
     boolean merging();
+
+    void memoize(int matcherId, ElementMatcher<M> matcher);
 
     void merge();
   }
 
-  public static final Result NO_MATCHES =
-      new Result() {
+  @SuppressWarnings("rawtypes")
+  private static final State NO_MATCHES =
+      new State() {
         @Override
-        public boolean matches(int localMatcherId) {
+        public boolean matches(int matcherId) {
           return false;
         }
 
@@ -28,46 +33,117 @@ public final class MemoizingMatchers<T> {
         }
 
         @Override
+        public void memoize(int matcherId, ElementMatcher matcher) {}
+
+        @Override
         public void merge() {}
       };
 
-  final List<ElementMatcher<? super T>> matchers = new ArrayList<>();
+  final List<MemoizingMatcher> matchers = new ArrayList<>();
 
-  final Function<T, Result> results;
+  final AtomicInteger nextMatcherId;
 
-  public MemoizingMatchers(Function<T, Result> results) {
-    this.results = results;
+  final Function<T, State<M>> stateFunction;
+
+  public MemoizingMatchers(Function<T, State<M>> stateFunction) {
+    this(new AtomicInteger(), stateFunction);
   }
 
-  public ElementMatcher.Junction<T> memoize(ElementMatcher.Junction<T> matcher) {
-    final int localMatcherId = matchers.size();
-    matchers.add(matcher);
-    return new MemoizingMatcher(localMatcherId);
+  public MemoizingMatchers(AtomicInteger nextMatcherId, Function<T, State<M>> stateFunction) {
+    this.nextMatcherId = nextMatcherId;
+    this.stateFunction = stateFunction;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <M> State<M> noMatches() {
+    return NO_MATCHES;
+  }
+
+  public ElementMatcher.Junction<T> memoize(ElementMatcher<M> matcher) {
+    MemoizingMatcher memoizingMatcher = new MemoizingMatcher(matcher);
+    matchers.add(memoizingMatcher);
+    return memoizingMatcher;
   }
 
   private final class MemoizingMatcher extends ElementMatcher.Junction.AbstractBase<T> {
-    private final int localMatcherId;
+    private final int matcherId = nextMatcherId.getAndIncrement();
 
-    MemoizingMatcher(int localMatcherId) {
-      this.localMatcherId = localMatcherId;
+    private final ElementMatcher<M> matcher;
+
+    public MemoizingMatcher(ElementMatcher<M> matcher) {
+      this.matcher = matcher;
     }
 
     @Override
     public boolean matches(T target) {
-      Result result = results.apply(target);
-      if (result.merging()) {
-        mergeMatches(target, result);
+      State<M> state = stateFunction.apply(target);
+      if (state.merging()) {
+        for (MemoizingMatcher m : matchers) {
+          state.memoize(m.matcherId, m.matcher);
+        }
+        state.merge();
       }
-      return result.matches(localMatcherId);
+      return state.matches(matcherId);
+    }
+  }
+
+  public abstract static class Merging<M> implements State<M> {
+    private final BitSet matches;
+
+    protected final M matchee;
+
+    public Merging(M matchee) {
+      this(matchee, new BitSet());
     }
 
-    private void mergeMatches(final T target, final Result result) {
-      for (int i = 0, len = matchers.size(); i < len; i++) {
-        if (matchers.get(i).matches(target)) {
-          result.matches(i);
-        }
-      }
-      result.merge();
+    public Merging(M matchee, BitSet matches) {
+      this.matches = matches;
+      this.matchee = matchee;
     }
+
+    @Override
+    public final boolean matches(int matcherId) {
+      return matches.get(matcherId);
+    }
+
+    @Override
+    public final boolean merging() {
+      return true;
+    }
+
+    @Override
+    public void memoize(int matcherId, ElementMatcher<M> matcher) {
+      if (matcher.matches(matchee)) {
+        matches.set(matcherId);
+      }
+    }
+
+    protected final State<M> merged() {
+      return new Merged<>(matches);
+    }
+  }
+
+  static final class Merged<M> implements State<M> {
+    private final BitSet matches;
+
+    Merged(BitSet matches) {
+      this.matches = matches;
+    }
+
+    @Override
+    public boolean matches(int matcherId) {
+      return matches.get(matcherId);
+    }
+
+    @Override
+    public boolean merging() {
+      return false;
+    }
+
+    @Override
+    public void memoize(int matcherId, ElementMatcher<M> matcher) {}
+
+    @Override
+    public void merge() {}
   }
 }

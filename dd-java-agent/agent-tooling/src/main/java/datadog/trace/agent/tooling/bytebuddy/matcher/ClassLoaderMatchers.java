@@ -6,7 +6,6 @@ import static net.bytebuddy.matcher.ElementMatchers.any;
 
 import datadog.trace.agent.tooling.WeakCaches;
 import datadog.trace.agent.tooling.bytebuddy.matcher.memoizing.MemoizingMatchers;
-import datadog.trace.agent.tooling.bytebuddy.matcher.memoizing.MergingResult;
 import datadog.trace.api.Config;
 import datadog.trace.api.Tracer;
 import datadog.trace.api.function.Function;
@@ -134,31 +133,31 @@ public final class ClassLoaderMatchers {
     }
   }
 
-  static final WeakCache<ClassLoader, MemoizingMatchers.Result> memoizedResults =
+  static final WeakCache<ClassLoader, MemoizingMatchers.State<ClassLoader>> memoizedStates =
       WeakCaches.newWeakCache(32);
 
-  static final Function<ClassLoader, MemoizingMatchers.Result> memoizeResult =
-      new Function<ClassLoader, MemoizingMatchers.Result>() {
+  static final Function<ClassLoader, MemoizingMatchers.State<ClassLoader>> memoizeFunction =
+      new Function<ClassLoader, MemoizingMatchers.State<ClassLoader>>() {
         @Override
-        public MemoizingMatchers.Result apply(final ClassLoader input) {
-          return new MergingResult<ClassLoader>() {
+        public MemoizingMatchers.State<ClassLoader> apply(ClassLoader input) {
+          return new MemoizingMatchers.Merging<ClassLoader>(input) {
             @Override
             public void merge() {
-              memoizedResults.put(input, merged());
+              memoizedStates.put(matchee, merged());
             }
           };
         }
       };
 
-  static final MemoizingMatchers<ClassLoader> memoizingMatchers =
+  static final MemoizingMatchers<ClassLoader, ClassLoader> memoizingMatchers =
       new MemoizingMatchers<>(
-          new Function<ClassLoader, MemoizingMatchers.Result>() {
+          new Function<ClassLoader, MemoizingMatchers.State<ClassLoader>>() {
             @Override
-            public MemoizingMatchers.Result apply(ClassLoader input) {
+            public MemoizingMatchers.State<ClassLoader> apply(ClassLoader input) {
               if (BOOTSTRAP_CLASSLOADER == input) {
-                return MemoizingMatchers.NO_MATCHES;
+                return MemoizingMatchers.noMatches();
               }
-              return memoizedResults.computeIfAbsent(input, memoizeResult);
+              return memoizedStates.computeIfAbsent(input, memoizeFunction);
             }
           });
 

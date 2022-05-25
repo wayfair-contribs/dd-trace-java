@@ -5,8 +5,11 @@ import static datadog.trace.util.Strings.getResourceName;
 import static net.bytebuddy.matcher.ElementMatchers.any;
 
 import datadog.trace.agent.tooling.WeakCaches;
+import datadog.trace.agent.tooling.bytebuddy.matcher.memoizing.MemoizingMatchers;
+import datadog.trace.agent.tooling.bytebuddy.matcher.memoizing.MergingResult;
 import datadog.trace.api.Config;
 import datadog.trace.api.Tracer;
+import datadog.trace.api.function.Function;
 import datadog.trace.bootstrap.PatchLogger;
 import datadog.trace.bootstrap.WeakCache;
 import java.util.Arrays;
@@ -19,7 +22,8 @@ public final class ClassLoaderMatchers {
 
   public static final ElementMatcher<ClassLoader> ANY_CLASS_LOADER = any();
 
-  private static final ClassLoader BOOTSTRAP_CLASSLOADER = null;
+  static final ClassLoader BOOTSTRAP_CLASSLOADER = null;
+
   private static final String DATADOG_CLASSLOADER_NAME =
       "datadog.trace.bootstrap.DatadogClassLoader";
   private static final String DATADOG_DELEGATE_CLASSLOADER_NAME =
@@ -87,9 +91,8 @@ public final class ClassLoaderMatchers {
    * @param classNames list of names to match. returns true if empty.
    * @return true if class is available as a resource and not the bootstrap classloader.
    */
-  public static ElementMatcher.Junction.AbstractBase<ClassLoader> hasClassesNamed(
-      final String... classNames) {
-    return new ClassLoaderHasClassesNamedMatcher(classNames);
+  public static ElementMatcher.Junction<ClassLoader> hasClassesNamed(String... classNames) {
+    return memoizingMatchers.memoize(new ClassLoaderHasClassesNamedMatcher(classNames));
   }
 
   /**
@@ -99,9 +102,8 @@ public final class ClassLoaderMatchers {
    * @param className the className to match.
    * @return true if class is available as a resource and not the bootstrap classloader.
    */
-  public static ElementMatcher.Junction.AbstractBase<ClassLoader> hasClassesNamed(
-      final String className) {
-    return new ClassLoaderHasClassNamedMatcher(className);
+  public static ElementMatcher.Junction<ClassLoader> hasClassesNamed(String className) {
+    return memoizingMatchers.memoize(new ClassLoaderHasClassNamedMatcher(className));
   }
 
   /**
@@ -132,43 +134,36 @@ public final class ClassLoaderMatchers {
     }
   }
 
-  private abstract static class ClassLoaderHasNameMatcher
-      extends ElementMatcher.Junction.AbstractBase<ClassLoader> {
+  static final WeakCache<ClassLoader, MemoizingMatchers.Result> memoizedResults =
+      WeakCaches.newWeakCache(32);
 
-    // Initialize this lazily because of startup ordering and muzzle plugin usage patterns
-    private volatile WeakCache<ClassLoader, Boolean> cacheHolder = null;
-
-    protected WeakCache<ClassLoader, Boolean> getCache() {
-      if (cacheHolder == null) {
-        synchronized (this) {
-          if (cacheHolder == null) {
-            cacheHolder = WeakCaches.newWeakCache(25);
-          }
+  static final Function<ClassLoader, MemoizingMatchers.Result> memoizeResult =
+      new Function<ClassLoader, MemoizingMatchers.Result>() {
+        @Override
+        public MemoizingMatchers.Result apply(final ClassLoader input) {
+          return new MergingResult<ClassLoader>() {
+            @Override
+            public void merge() {
+              memoizedResults.put(input, merged());
+            }
+          };
         }
-      }
-      return cacheHolder;
-    }
+      };
 
-    @Override
-    public boolean matches(final ClassLoader cl) {
-      if (cl == BOOTSTRAP_CLASSLOADER) {
-        // Can't match the bootstrap classloader.
-        return false;
-      }
-      final Boolean cached;
-      WeakCache<ClassLoader, Boolean> cache = getCache();
-      if ((cached = cache.getIfPresent(cl)) != null) {
-        return cached;
-      }
-      final boolean value = checkMatch(cl);
-      cache.put(cl, value);
-      return value;
-    }
+  static final MemoizingMatchers<ClassLoader> memoizingMatchers =
+      new MemoizingMatchers<>(
+          new Function<ClassLoader, MemoizingMatchers.Result>() {
+            @Override
+            public MemoizingMatchers.Result apply(ClassLoader input) {
+              if (BOOTSTRAP_CLASSLOADER == input) {
+                return MemoizingMatchers.NO_MATCHES;
+              }
+              return memoizedResults.computeIfAbsent(input, memoizeResult);
+            }
+          });
 
-    protected abstract boolean checkMatch(ClassLoader cl);
-  }
-
-  private static class ClassLoaderHasClassesNamedMatcher extends ClassLoaderHasNameMatcher {
+  private static class ClassLoaderHasClassesNamedMatcher
+      extends ElementMatcher.Junction.AbstractBase<ClassLoader> {
 
     private final String[] resources;
 
@@ -179,7 +174,7 @@ public final class ClassLoaderMatchers {
       }
     }
 
-    protected boolean checkMatch(final ClassLoader cl) {
+    public boolean matches(final ClassLoader cl) {
       PROBING_CLASSLOADER.begin();
       try {
         for (final String resource : resources) {
@@ -201,7 +196,8 @@ public final class ClassLoaderMatchers {
     }
   }
 
-  private static class ClassLoaderHasClassNamedMatcher extends ClassLoaderHasNameMatcher {
+  private static class ClassLoaderHasClassNamedMatcher
+      extends ElementMatcher.Junction.AbstractBase<ClassLoader> {
 
     private final String resource;
 
@@ -209,7 +205,7 @@ public final class ClassLoaderMatchers {
       resource = getResourceName(className);
     }
 
-    protected boolean checkMatch(final ClassLoader cl) {
+    public boolean matches(final ClassLoader cl) {
       PROBING_CLASSLOADER.begin();
       try {
         return cl.getResource(resource) != null;

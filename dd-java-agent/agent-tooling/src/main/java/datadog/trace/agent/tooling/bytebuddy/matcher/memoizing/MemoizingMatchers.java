@@ -87,18 +87,18 @@ public final class MemoizingMatchers<T, M> {
     }
   }
 
-  public abstract static class Merging<M> implements State<M> {
-    private final BitSet matches;
+  public abstract static class Merging<T, M> implements State<M> {
+    protected final BitSet matches;
 
-    protected final M matchee;
+    protected final T target;
 
-    public Merging(M matchee) {
-      this(matchee, new BitSet());
+    public Merging(T target) {
+      this(target, new BitSet());
     }
 
-    public Merging(M matchee, BitSet matches) {
+    public Merging(T target, BitSet matches) {
       this.matches = matches;
-      this.matchee = matchee;
+      this.target = target;
     }
 
     @Override
@@ -112,8 +112,9 @@ public final class MemoizingMatchers<T, M> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void memoize(int matcherId, ElementMatcher<M> matcher) {
-      if (matcher.matches(matchee)) {
+      if (matcher.matches((M) target)) {
         matches.set(matcherId);
       }
     }

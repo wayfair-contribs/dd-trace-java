@@ -140,10 +140,10 @@ public final class ClassLoaderMatchers {
       new Function<ClassLoader, MemoizingMatchers.State<ClassLoader>>() {
         @Override
         public MemoizingMatchers.State<ClassLoader> apply(ClassLoader input) {
-          return new MemoizingMatchers.Merging<ClassLoader>(input) {
+          return new MemoizingMatchers.Merging<ClassLoader, ClassLoader>(input) {
             @Override
             public void merge() {
-              memoizedStates.put(matchee, merged());
+              memoizedStates.put(target, merged());
             }
           };
         }

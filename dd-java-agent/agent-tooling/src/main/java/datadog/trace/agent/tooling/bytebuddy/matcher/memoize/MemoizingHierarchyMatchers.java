@@ -145,15 +145,7 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
   @Override
   public ElementMatcher.Junction<MethodDescription> hasSuperMethod(
       ElementMatcher<? super MethodDescription> matcher) {
-    return new SafeSuperMethodMatcher(
-        typeMatchers.memoize(
-            new Function<TypeDescription, MethodList<? extends MethodDescription>>() {
-              @Override
-              public MethodList<? extends MethodDescription> apply(TypeDescription input) {
-                return input.getDeclaredMethods();
-              }
-            },
-            whereAny(matcher)));
+    return new SafeSuperMethodMatcher(declaresMethod(matcher));
   }
 
   static final class SafeHierarchyMatcher

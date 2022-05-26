@@ -5,10 +5,9 @@ import static datadog.trace.util.Strings.getResourceName;
 import static net.bytebuddy.matcher.ElementMatchers.any;
 
 import datadog.trace.agent.tooling.WeakCaches;
-import datadog.trace.agent.tooling.bytebuddy.matcher.memoizing.MemoizingMatchers;
+import datadog.trace.agent.tooling.bytebuddy.matcher.memoize.MemoizingMatchers;
 import datadog.trace.api.Config;
 import datadog.trace.api.Tracer;
-import datadog.trace.api.function.Function;
 import datadog.trace.bootstrap.PatchLogger;
 import datadog.trace.bootstrap.WeakCache;
 import java.util.Arrays;
@@ -133,31 +132,23 @@ public final class ClassLoaderMatchers {
     }
   }
 
-  static final WeakCache<ClassLoader, MemoizingMatchers.State<ClassLoader>> memoizedStates =
+  static final WeakCache<ClassLoader, MemoizingMatchers.Matches> memoizedMatches =
       WeakCaches.newWeakCache(32);
 
-  static final Function<ClassLoader, MemoizingMatchers.State<ClassLoader>> memoizeFunction =
-      new Function<ClassLoader, MemoizingMatchers.State<ClassLoader>>() {
-        @Override
-        public MemoizingMatchers.State<ClassLoader> apply(ClassLoader input) {
-          return new MemoizingMatchers.Merging<ClassLoader, ClassLoader>(input) {
-            @Override
-            public void merge() {
-              memoizedStates.put(target, merged());
-            }
-          };
-        }
-      };
-
-  static final MemoizingMatchers<ClassLoader, ClassLoader> memoizingMatchers =
+  static final MemoizingMatchers<ClassLoader> memoizingMatchers =
       new MemoizingMatchers<>(
-          new Function<ClassLoader, MemoizingMatchers.State<ClassLoader>>() {
+          new MemoizingMatchers.Exchange<ClassLoader>() {
             @Override
-            public MemoizingMatchers.State<ClassLoader> apply(ClassLoader input) {
-              if (BOOTSTRAP_CLASSLOADER == input) {
-                return MemoizingMatchers.noMatches();
+            public MemoizingMatchers.Matches get(ClassLoader target) {
+              if (BOOTSTRAP_CLASSLOADER == target) {
+                return MemoizingMatchers.NO_MATCHES;
               }
-              return memoizedStates.computeIfAbsent(input, memoizeFunction);
+              return memoizedMatches.getIfPresent(target);
+            }
+
+            @Override
+            public void set(ClassLoader target, MemoizingMatchers.Matches matches) {
+              memoizedMatches.put(target, matches);
             }
           });
 

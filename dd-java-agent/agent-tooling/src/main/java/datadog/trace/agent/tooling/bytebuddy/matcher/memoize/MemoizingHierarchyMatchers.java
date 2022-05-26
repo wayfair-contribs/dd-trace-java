@@ -11,7 +11,9 @@ import net.bytebuddy.description.NamedElement;
 import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.field.FieldList;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.method.MethodList;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.description.type.TypeList;
 import net.bytebuddy.matcher.ElementMatcher;
 
 public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Supplier {
@@ -38,7 +40,14 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
   @Override
   public ElementMatcher.Junction<TypeDescription> declaresAnnotation(
       ElementMatcher<? super NamedElement> matcher) {
-    return none();
+    return typeMatchers.memoize(
+        new Function<TypeDescription, TypeList>() {
+          @Override
+          public TypeList apply(TypeDescription input) {
+            return input.getDeclaredAnnotations().asTypeList();
+          }
+        },
+        whereAny(matcher));
   }
 
   @Override
@@ -57,7 +66,14 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
   @Override
   public ElementMatcher.Junction<TypeDescription> declaresMethod(
       ElementMatcher<? super MethodDescription> matcher) {
-    return null;
+    return typeMatchers.memoize(
+        new Function<TypeDescription, MethodList<? extends MethodDescription>>() {
+          @Override
+          public MethodList<? extends MethodDescription> apply(TypeDescription input) {
+            return input.getDeclaredMethods();
+          }
+        },
+        whereAny(matcher));
   }
 
   @Override

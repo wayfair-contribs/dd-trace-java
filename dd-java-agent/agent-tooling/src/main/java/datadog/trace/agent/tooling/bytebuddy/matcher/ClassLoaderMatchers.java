@@ -140,9 +140,6 @@ public final class ClassLoaderMatchers {
           new MemoizingMatchers.Exchange<ClassLoader>() {
             @Override
             public MemoizingMatchers.Matches get(ClassLoader target) {
-              if (BOOTSTRAP_CLASSLOADER == target) {
-                return MemoizingMatchers.NO_MATCHES;
-              }
               return memoizedMatches.getIfPresent(target);
             }
 
@@ -153,7 +150,7 @@ public final class ClassLoaderMatchers {
           });
 
   private static class ClassLoaderHasClassesNamedMatcher
-      extends ElementMatcher.Junction.AbstractBase<ClassLoader> {
+      extends ElementMatcher.Junction.ForNonNullValues<ClassLoader> {
 
     private final String[] resources;
 
@@ -164,7 +161,8 @@ public final class ClassLoaderMatchers {
       }
     }
 
-    public boolean matches(final ClassLoader cl) {
+    @Override
+    protected boolean doMatch(ClassLoader cl) {
       PROBING_CLASSLOADER.begin();
       try {
         for (final String resource : resources) {
@@ -187,7 +185,7 @@ public final class ClassLoaderMatchers {
   }
 
   private static class ClassLoaderHasClassNamedMatcher
-      extends ElementMatcher.Junction.AbstractBase<ClassLoader> {
+      extends ElementMatcher.Junction.ForNonNullValues<ClassLoader> {
 
     private final String resource;
 
@@ -195,7 +193,7 @@ public final class ClassLoaderMatchers {
       resource = getResourceName(className);
     }
 
-    public boolean matches(final ClassLoader cl) {
+    protected boolean doMatch(ClassLoader cl) {
       PROBING_CLASSLOADER.begin();
       try {
         return cl.getResource(resource) != null;

@@ -21,14 +21,6 @@ public final class MemoizingMatchers<T> {
     void set(T target, Matches matches);
   }
 
-  public static final Matches NO_MATCHES =
-      new Matches() {
-        @Override
-        public boolean matches(int matcherId) {
-          return false;
-        }
-      };
-
   @SuppressWarnings("rawtypes")
   private static final Function identity =
       new Function() {
@@ -65,7 +57,7 @@ public final class MemoizingMatchers<T> {
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  private final class RecordingMatcher extends ElementMatcher.Junction.AbstractBase<T> {
+  private final class RecordingMatcher extends ElementMatcher.Junction.ForNonNullValues<T> {
     private final int matcherId = nextMatcherId.getAndIncrement();
 
     private final ElementMatcher matcher;
@@ -75,11 +67,12 @@ public final class MemoizingMatchers<T> {
     }
 
     @Override
-    public boolean matches(T target) {
+    protected boolean doMatch(T target) {
       Matches matches = exchange.get(target);
       if (null != matches) {
         return matches.matches(matcherId);
       }
+
       BitSet bits = new BitSet();
       for (Map.Entry<Function<T, ?>, List<RecordingMatcher>> e : extractorsAndMatchers.entrySet()) {
         Object matchee = e.getKey().apply(target);

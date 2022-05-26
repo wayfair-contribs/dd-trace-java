@@ -56,7 +56,9 @@ public final class WebServiceInstrumentation extends Instrumenter.Tracing
         isMethod()
             .and(isPublic())
             .and(not(isStatic()))
-            .and(hasSuperMethod(isDeclaredBy(declaresAnnotation(named(WEB_SERVICE_ANNOTATION_NAME))))),
+            .and(
+                hasSuperMethod(
+                    isDeclaredBy(declaresAnnotation(named(WEB_SERVICE_ANNOTATION_NAME))))),
         getClass().getName() + "$InvokeAdvice");
   }
 

@@ -2,13 +2,11 @@ package datadog.trace.agent.tooling.bytebuddy.matcher.memoize;
 
 import static net.bytebuddy.matcher.ElementMatchers.isInterface;
 import static net.bytebuddy.matcher.ElementMatchers.not;
-import static net.bytebuddy.matcher.ElementMatchers.whereAny;
 
 import datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers;
 import datadog.trace.api.function.Function;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -105,45 +103,44 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
   @Override
   public ElementMatcher.Junction<TypeDescription> declaresAnnotation(
       ElementMatcher<? super NamedElement> matcher) {
-    return typeMatchers.memoize(extractAnnotations, whereAny(matcher));
+    return typeMatchers.memoize(extractAnnotations, matcher);
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> declaresField(
       ElementMatcher<? super FieldDescription> matcher) {
-    return typeMatchers.memoize(extractFields, whereAny(matcher));
+    return typeMatchers.memoize(extractFields, matcher);
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> declaresMethod(
       ElementMatcher<? super MethodDescription> matcher) {
-    return typeMatchers.memoize(extractMethods, whereAny(matcher));
+    return typeMatchers.memoize(extractMethods, matcher);
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> extendsClass(
       ElementMatcher<? super TypeDescription> matcher) {
-    return not(isInterface())
-        .and(hierarchyMatchers.memoize(extractSuperClasses, whereAny(matcher)));
+    return not(isInterface()).and(hierarchyMatchers.memoize(extractSuperClasses, matcher));
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> implementsInterface(
       ElementMatcher<? super TypeDescription> matcher) {
     return not(isInterface())
-        .and(hierarchyMatchers.memoize(extractSuperTypes, whereAny(isInterface().and(matcher))));
+        .and(hierarchyMatchers.memoize(extractSuperTypes, isInterface().and(matcher)));
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> hasInterface(
       ElementMatcher<? super TypeDescription> matcher) {
-    return hierarchyMatchers.memoize(extractSuperTypes, whereAny(isInterface().and(matcher)));
+    return hierarchyMatchers.memoize(extractSuperTypes, isInterface().and(matcher));
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> hasSuperType(
       ElementMatcher<? super TypeDescription> matcher) {
-    return not(isInterface()).and(hierarchyMatchers.memoize(extractSuperTypes, whereAny(matcher)));
+    return not(isInterface()).and(hierarchyMatchers.memoize(extractSuperTypes, matcher));
   }
 
   @Override
@@ -234,10 +231,10 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
   static final class SafeSuperMethodMatcher
       extends ElementMatcher.Junction.ForNonNullValues<MethodDescription> {
 
-    private final ElementMatcher<TypeDescription> oneLevelMatcher;
+    private final ElementMatcher<TypeDescription> declaresMethodMatcher;
 
-    SafeSuperMethodMatcher(ElementMatcher<TypeDescription> oneLevelMatcher) {
-      this.oneLevelMatcher = oneLevelMatcher;
+    SafeSuperMethodMatcher(ElementMatcher<TypeDescription> declaresMethodMatcher) {
+      this.declaresMethodMatcher = declaresMethodMatcher;
     }
 
     @Override

@@ -1,9 +1,12 @@
 package datadog.trace.agent.tooling.bytebuddy.matcher.memoize;
 
 import datadog.trace.api.function.Function;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,7 +49,7 @@ public final class MemoizingMatchers<T> {
   }
 
   public <M> ElementMatcher.Junction<T> memoize(
-      Function<T, M> extractor, ElementMatcher<? super M> matcher) {
+      Function<T, ? extends Iterable<? extends M>> extractor, ElementMatcher<? super M> matcher) {
     List<RecordingMatcher> matchers = extractorsAndMatchers.get(extractor);
     if (null == matchers) {
       extractorsAndMatchers.put(extractor, matchers = new ArrayList<>());
@@ -74,11 +77,29 @@ public final class MemoizingMatchers<T> {
       }
 
       BitSet bits = new BitSet();
-      for (Map.Entry<Function<T, ?>, List<RecordingMatcher>> e : extractorsAndMatchers.entrySet()) {
-        Object matchee = e.getKey().apply(target);
-        for (RecordingMatcher m : e.getValue()) {
-          if (m.matcher.matches(matchee)) {
-            bits.set(m.matcherId);
+      for (Map.Entry<Function<T, ?>, List<RecordingMatcher>> entry :
+          extractorsAndMatchers.entrySet()) {
+        Object matchee = entry.getKey().apply(target);
+        if (matchee == target || !(matchee instanceof Iterable<?>)) {
+          for (RecordingMatcher recordingMatcher : entry.getValue()) {
+            if (recordingMatcher.matcher.matches(matchee)) {
+              bits.set(recordingMatcher.matcherId);
+            }
+          }
+        } else {
+          Deque<RecordingMatcher> pendingMatchers = new ArrayDeque<>(entry.getValue());
+          for (Object item : ((Iterable<?>) matchee)) {
+            Iterator<RecordingMatcher> itr = pendingMatchers.iterator();
+            if (!itr.hasNext()) {
+              break;
+            }
+            while (itr.hasNext()) {
+              RecordingMatcher recordingMatcher = itr.next();
+              if (recordingMatcher.matcher.matches(item)) {
+                bits.set(recordingMatcher.matcherId);
+                itr.remove();
+              }
+            }
           }
         }
       }

@@ -24,12 +24,10 @@ import net.bytebuddy.matcher.ElementMatcher;
 
 public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Supplier {
 
-  // private final Map<ElementMatcher<ClassLoader>, BitSet> classLoaderMasks = new HashMap<>();
-
-  static final ConcurrentMap<String, MemoizingMatchers.Matches> memoizedTypeMatches =
+  final ConcurrentMap<String, MemoizingMatchers.Matches> memoizedTypeMatches =
       new ConcurrentHashMap<>();
 
-  private final MemoizingMatchers<TypeDescription> typeMatchers =
+  final MemoizingMatchers<TypeDescription> typeMatchers =
       new MemoizingMatchers<>(
           new MemoizingMatchers.Exchange<TypeDescription>() {
             @Override
@@ -43,10 +41,10 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
             }
           });
 
-  static final ConcurrentMap<String, MemoizingMatchers.Matches> memoizedHierarchyMatches =
+  final ConcurrentMap<String, MemoizingMatchers.Matches> memoizedHierarchyMatches =
       new ConcurrentHashMap<>();
 
-  private final MemoizingMatchers<TypeDescription> hierarchyMatchers =
+  final MemoizingMatchers<TypeDescription> hierarchyMatchers =
       new MemoizingMatchers<>(
           new MemoizingMatchers.Exchange<TypeDescription>() {
             @Override
@@ -59,6 +57,13 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
               memoizedHierarchyMatches.putIfAbsent(target.getName(), matches);
             }
           });
+
+  public MemoizingHierarchyMatchers() {
+    memoizedTypeMatches.put("java.lang.Object", MemoizingMatchers.NO_MATCHES);
+    memoizedTypeMatches.put("java.io.Serializable", MemoizingMatchers.NO_MATCHES);
+    memoizedHierarchyMatches.put("java.lang.Object", MemoizingMatchers.NO_MATCHES);
+    memoizedHierarchyMatches.put("java.io.Serializable", MemoizingMatchers.NO_MATCHES);
+  }
 
   static final Function<TypeDescription, TypeList> extractAnnotations =
       new Function<TypeDescription, TypeList>() {
@@ -81,14 +86,6 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
         @Override
         public MethodList<? extends MethodDescription> apply(TypeDescription input) {
           return input.getDeclaredMethods();
-        }
-      };
-
-  static final Function<TypeDescription, Iterable<TypeDescription>> extractSuperClasses =
-      new Function<TypeDescription, Iterable<TypeDescription>>() {
-        @Override
-        public Iterable<TypeDescription> apply(TypeDescription input) {
-          return new SafeSuperClassIterable(input);
         }
       };
 
@@ -120,21 +117,21 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
 
   @Override
   public ElementMatcher.Junction<TypeDescription> extendsClass(
-      ElementMatcher<? super TypeDescription> matcher) {
-    return not(isInterface()).and(hierarchyMatchers.memoize(extractSuperClasses, matcher));
+      ElementMatcher.Junction<? super TypeDescription> matcher) {
+    return not(isInterface()).and(hierarchyMatchers.memoize(extractSuperTypes, matcher.and(not(isInterface()))));
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> implementsInterface(
-      ElementMatcher<? super TypeDescription> matcher) {
+      ElementMatcher.Junction<? super TypeDescription> matcher) {
     return not(isInterface())
-        .and(hierarchyMatchers.memoize(extractSuperTypes, isInterface().and(matcher)));
+        .and(hierarchyMatchers.memoize(extractSuperTypes, matcher.and(isInterface())));
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> hasInterface(
-      ElementMatcher<? super TypeDescription> matcher) {
-    return hierarchyMatchers.memoize(extractSuperTypes, isInterface().and(matcher));
+      ElementMatcher.Junction<? super TypeDescription> matcher) {
+    return hierarchyMatchers.memoize(extractSuperTypes, matcher.and(isInterface()));
   }
 
   @Override
@@ -147,41 +144,6 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
   public ElementMatcher.Junction<MethodDescription> hasSuperMethod(
       ElementMatcher<? super MethodDescription> matcher) {
     return new SafeSuperMethodMatcher(declaresMethod(matcher));
-  }
-
-  static final class SafeSuperClassIterable implements Iterable<TypeDescription> {
-    final TypeDescription typeDescription;
-
-    SafeSuperClassIterable(TypeDescription typeDescription) {
-      this.typeDescription = typeDescription;
-    }
-
-    @Override
-    public Iterator<TypeDescription> iterator() {
-      return new Iterator<TypeDescription>() {
-        TypeDescription next = typeDescription;
-
-        @Override
-        public boolean hasNext() {
-          return null != next;
-        }
-
-        @Override
-        public TypeDescription next() {
-          if (!hasNext()) {
-            throw new NoSuchElementException();
-          }
-          TypeDescription result = next;
-          next = safeSuperClass(next);
-          return result;
-        }
-
-        @Override
-        public void remove() {
-          throw new UnsupportedOperationException();
-        }
-      };
-    }
   }
 
   static final class SafeSuperTypeIterable implements Iterable<TypeDescription> {
@@ -209,13 +171,13 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
             throw new NoSuchElementException();
           }
           TypeDescription result = next;
+          hierarchy.addAll(safeInterfaces(result));
           if (!result.isInterface()) {
             TypeDescription superClass = safeSuperClass(result);
             if (null != superClass) {
               hierarchy.add(superClass);
             }
           }
-          hierarchy.addAll(safeInterfaces(result));
           next = hierarchy.poll();
           return result;
         }

@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 
 public final class MemoizingMatchers<T> {
@@ -23,6 +25,13 @@ public final class MemoizingMatchers<T> {
 
     void set(T target, Matches matches);
   }
+
+  public static final Matches NO_MATCHES = new Matches() {
+    @Override
+    public boolean matches(int matcherId) {
+      return false;
+    }
+  };
 
   @SuppressWarnings("rawtypes")
   private static final Function identity =
@@ -79,16 +88,25 @@ public final class MemoizingMatchers<T> {
       BitSet bits = new BitSet();
       for (Map.Entry<Function<T, ?>, List<RecordingMatcher>> entry :
           extractorsAndMatchers.entrySet()) {
-        Object matchee = entry.getKey().apply(target);
-        if (matchee == target || !(matchee instanceof Iterable<?>)) {
+        Object extracted = entry.getKey().apply(target);
+        if (extracted == target || !(extracted instanceof Iterable<?>)) {
           for (RecordingMatcher recordingMatcher : entry.getValue()) {
-            if (recordingMatcher.matcher.matches(matchee)) {
+            if (recordingMatcher.matcher.matches(extracted)) {
               bits.set(recordingMatcher.matcherId);
             }
           }
         } else {
           Deque<RecordingMatcher> pendingMatchers = new ArrayDeque<>(entry.getValue());
-          for (Object item : ((Iterable<?>) matchee)) {
+          for (Object item : ((Iterable<?>) extracted)) {
+            if (item instanceof TypeDescription) {
+              Matches cachedMatches = exchange.get((T) item);
+              if (null != cachedMatches) {
+                if (cachedMatches instanceof Memoized) {
+                  bits.or(((Memoized) cachedMatches).matches);
+                }
+                continue;
+              }
+            }
             Iterator<RecordingMatcher> itr = pendingMatchers.iterator();
             if (!itr.hasNext()) {
               break;
@@ -103,13 +121,17 @@ public final class MemoizingMatchers<T> {
           }
         }
       }
-      exchange.set(target, new Memoized(bits));
+      if (bits.isEmpty()) {
+        exchange.set(target, NO_MATCHES);
+      } else {
+        exchange.set(target, new Memoized(bits));
+      }
       return bits.get(matcherId);
     }
   }
 
   static final class Memoized implements Matches {
-    private final BitSet matches;
+    final BitSet matches;
 
     Memoized(BitSet matches) {
       this.matches = matches;

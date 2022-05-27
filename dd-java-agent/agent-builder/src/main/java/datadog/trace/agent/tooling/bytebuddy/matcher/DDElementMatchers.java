@@ -40,19 +40,19 @@ public class DDElementMatchers implements HierarchyMatchers.Supplier {
 
   @Override
   public ElementMatcher.Junction<TypeDescription> extendsClass(
-      ElementMatcher<? super TypeDescription> matcher) {
+      ElementMatcher.Junction<? super TypeDescription> matcher) {
     return new SafeHasSuperTypeMatcher<>(matcher, false, true, false);
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> implementsInterface(
-      ElementMatcher<? super TypeDescription> matcher) {
+      ElementMatcher.Junction<? super TypeDescription> matcher) {
     return new SafeHasSuperTypeMatcher<>(matcher, true, true, true);
   }
 
   @Override
   public ElementMatcher.Junction<TypeDescription> hasInterface(
-      ElementMatcher<? super TypeDescription> matcher) {
+      ElementMatcher.Junction<? super TypeDescription> matcher) {
     return new SafeHasSuperTypeMatcher<>(matcher, true, false, true);
   }
 

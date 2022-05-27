@@ -1,5 +1,6 @@
 package datadog.trace.agent.tooling.bytebuddy.matcher.memoize;
 
+import static net.bytebuddy.matcher.ElementMatchers.hasSignature;
 import static net.bytebuddy.matcher.ElementMatchers.isInterface;
 import static net.bytebuddy.matcher.ElementMatchers.not;
 
@@ -18,11 +19,19 @@ import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.field.FieldList;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.method.MethodList;
+import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeList;
 import net.bytebuddy.matcher.ElementMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Supplier {
+  static final Logger log = LoggerFactory.getLogger(MemoizingHierarchyMatchers.class);
+
+  public static void registerAsSupplier() {
+    HierarchyMatchers.registerIfAbsent(new MemoizingHierarchyMatchers());
+  }
 
   final ConcurrentMap<String, MemoizingMatchers.Matches> memoizedTypeMatches =
       new ConcurrentHashMap<>();
@@ -57,13 +66,6 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
               memoizedHierarchyMatches.putIfAbsent(target.getName(), matches);
             }
           });
-
-  public MemoizingHierarchyMatchers() {
-    memoizedTypeMatches.put("java.lang.Object", MemoizingMatchers.NO_MATCHES);
-    memoizedTypeMatches.put("java.io.Serializable", MemoizingMatchers.NO_MATCHES);
-    memoizedHierarchyMatches.put("java.lang.Object", MemoizingMatchers.NO_MATCHES);
-    memoizedHierarchyMatches.put("java.io.Serializable", MemoizingMatchers.NO_MATCHES);
-  }
 
   static final Function<TypeDescription, TypeList> extractAnnotations =
       new Function<TypeDescription, TypeList>() {
@@ -118,7 +120,8 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
   @Override
   public ElementMatcher.Junction<TypeDescription> extendsClass(
       ElementMatcher.Junction<? super TypeDescription> matcher) {
-    return not(isInterface()).and(hierarchyMatchers.memoize(extractSuperTypes, matcher.and(not(isInterface()))));
+    return not(isInterface())
+        .and(hierarchyMatchers.memoize(extractSuperTypes, matcher.and(not(isInterface()))));
   }
 
   @Override
@@ -156,9 +159,9 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
     @Override
     public Iterator<TypeDescription> iterator() {
       return new Iterator<TypeDescription>() {
-        Deque<TypeDescription> hierarchy = new ArrayDeque<>();
+        private final Deque<TypeDescription> hierarchy = new ArrayDeque<>();
 
-        TypeDescription next = typeDescription;
+        private TypeDescription next = typeDescription;
 
         @Override
         public boolean hasNext() {
@@ -171,13 +174,11 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
             throw new NoSuchElementException();
           }
           TypeDescription result = next;
-          hierarchy.addAll(safeInterfaces(result));
-          if (!result.isInterface()) {
-            TypeDescription superClass = safeSuperClass(result);
-            if (null != superClass) {
-              hierarchy.add(superClass);
-            }
+          TypeDescription superClass = safeSuperClass(result);
+          if (null != superClass) {
+            hierarchy.add(superClass);
           }
+          hierarchy.addAll(safeInterfaces(result));
           next = hierarchy.poll();
           return result;
         }
@@ -201,24 +202,80 @@ public final class MemoizingHierarchyMatchers implements HierarchyMatchers.Suppl
 
     @Override
     protected boolean doMatch(MethodDescription target) {
+      if (target.isConstructor()) {
+        return false;
+      }
+      ElementMatcher<MethodDescription> signatureMatcher = hasSignature(target.asSignatureToken());
+      for (TypeDescription t : new SafeSuperTypeIterable(safeErasure(target.getDeclaringType()))) {
+        if (declaresMethodMatcher.matches(t)) {
+          for (MethodDescription m : t.getDeclaredMethods()) {
+            if (signatureMatcher.matches(m)) {
+              return true;
+            }
+          }
+        }
+      }
       return false;
     }
   }
 
   static TypeDescription safeSuperClass(TypeDescription typeDescription) {
-    return safeErasure(typeDescription.getSuperClass());
+    try {
+      return safeErasure(typeDescription.getSuperClass());
+    } catch (Exception e) {
+      logException("{} trying to get super class for target {}: {}", typeDescription, e);
+      return null;
+    }
   }
 
   static List<TypeDescription> safeInterfaces(TypeDescription typeDescription) {
     List<TypeDescription> interfaces = new ArrayList<>();
-    Iterator<TypeDescription.Generic> itr = typeDescription.getInterfaces().iterator();
-    while (itr.hasNext()) {
-      interfaces.add(safeErasure(itr.next()));
+    try {
+      Iterator<TypeDescription.Generic> itr = typeDescription.getInterfaces().iterator();
+      while (itr.hasNext()) {
+        try {
+          interfaces.add(safeErasure(itr.next()));
+        } catch (Exception e) {
+          logException("{} trying to get interface for target {}: {}", typeDescription, e);
+        }
+      }
+    } catch (Exception e) {
+      logException("{} trying to get interfaces for target {}: {}", typeDescription, e);
     }
     return interfaces;
   }
 
-  static TypeDescription safeErasure(TypeDescription.Generic generic) {
-    return null != generic ? generic.asErasure() : null;
+  static TypeDescription safeErasure(TypeDefinition typeDefinition) {
+    if (null != typeDefinition) {
+      try {
+        return typeDefinition.asErasure();
+      } catch (Exception e) {
+        logException("{} trying to get erasure for target {}: {}", typeDefinition, e);
+      }
+    }
+    return null;
+  }
+
+  static void logException(String message, TypeDefinition typeDefinition, Exception e) {
+    if (log.isDebugEnabled()) {
+      log.debug(
+          message,
+          e.getClass().getSimpleName(),
+          safeTypeDefinitionName(typeDefinition),
+          e.getMessage());
+    }
+  }
+
+  static String safeTypeDefinitionName(final TypeDefinition typeDefinition) {
+    try {
+      return typeDefinition.getTypeName();
+    } catch (IllegalStateException ex) {
+      String message = ex.getMessage();
+      if (message.startsWith("Cannot resolve type description for ")) {
+        return message.replace("Cannot resolve type description for ", "");
+      } else {
+        return "?";
+      }
+    }
   }
 }

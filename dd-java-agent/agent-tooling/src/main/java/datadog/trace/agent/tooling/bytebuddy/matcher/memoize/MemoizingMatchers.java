@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 
@@ -26,12 +25,13 @@ public final class MemoizingMatchers<T> {
     void set(T target, Matches matches);
   }
 
-  public static final Matches NO_MATCHES = new Matches() {
-    @Override
-    public boolean matches(int matcherId) {
-      return false;
-    }
-  };
+  public static final Matches NO_MATCHES =
+      new Matches() {
+        @Override
+        public boolean matches(int matcherId) {
+          return false;
+        }
+      };
 
   @SuppressWarnings("rawtypes")
   private static final Function identity =

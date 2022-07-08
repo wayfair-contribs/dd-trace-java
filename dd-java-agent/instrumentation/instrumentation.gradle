@@ -115,6 +115,8 @@ tasks.register('generateInstrumenterTrie', JavaExec) {
 }
 
 compileJava.dependsOn 'generateInstrumenterTrie'
+packageSources.dependsOn 'generateInstrumenterTrie'
+sourcesJar.dependsOn 'generateInstrumenterTrie'
 
 tasks.named('shadowJar').configure {
   duplicatesStrategy = DuplicatesStrategy.FAIL

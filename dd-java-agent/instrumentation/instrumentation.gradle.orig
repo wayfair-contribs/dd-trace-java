@@ -101,21 +101,6 @@ dependencies {
   implementation project(':dd-java-agent:agent-installer')
 }
 
-tasks.register('generateInstrumenterTrie', JavaExec) {
-  group = 'Build'
-  description = 'Generate InstrumenterTrie'
-  classpath = configurations.runtimeClasspath
-  mainClass = 'datadog.trace.agent.tooling.bytebuddy.InstrumenterTrieGenerator'
-  def javaDir = buildDir.toPath().resolve('generated/sources/tries/java/main')
-  def javaFile = file(javaDir.resolve('datadog/trace/agent/tooling/bytebuddy/InstrumenterTrie.java'))
-  args = [javaDir]
-  sourceSets.main.java.srcDirs += [javaDir]
-  inputs.files(classpath)
-  outputs.file(javaFile)
-}
-
-compileJava.dependsOn 'generateInstrumenterTrie'
-
 tasks.named('shadowJar').configure {
   duplicatesStrategy = DuplicatesStrategy.FAIL
   dependencies deps.excludeShared

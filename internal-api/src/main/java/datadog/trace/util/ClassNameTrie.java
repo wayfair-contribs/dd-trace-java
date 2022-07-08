@@ -757,7 +757,11 @@ public final class ClassNameTrie {
       Files.write(javaPath, lines, StandardCharsets.UTF_8);
     }
 
-    /** Writes the Java form of the trie as a series of lines. */
+    /**
+     * Writes the Java form of the trie as a series of lines.
+     *
+     * @return {@code true} if the trie contains long-jumps
+     */
     public static boolean generateJavaTrie(
         List<String> lines, String prefix, ClassNameTrie.Builder trie) {
       boolean hasLongJumps = trie.longJumpCount > 0;

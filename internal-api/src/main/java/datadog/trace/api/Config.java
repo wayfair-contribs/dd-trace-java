@@ -231,6 +231,7 @@ import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_OUTLI
 import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_OUTLINE_POOL_SIZE;
 import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_TYPE_POOL_SIZE;
 import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_USE_LOADCLASS;
+import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_USE_MEMOIZATION;
 import static datadog.trace.api.config.TraceInstrumentationConfig.RUNTIME_CONTEXT_FIELD_INJECTION;
 import static datadog.trace.api.config.TraceInstrumentationConfig.SERIALVERSIONUID_FIELD_INJECTION;
 import static datadog.trace.api.config.TraceInstrumentationConfig.SERVLET_ASYNC_TIMEOUT_ERROR;
@@ -574,6 +575,7 @@ public class Config {
   private final int resolverOutlinePoolSize;
   private final int resolverTypePoolSize;
   private final boolean resolverUseLoadClassEnabled;
+  private final boolean resolverUseMemoizationEnabled;
 
   private final String jdbcPreparedStatementClassName;
   private final String jdbcConnectionClassName;
@@ -1186,6 +1188,7 @@ public class Config {
     resolverTypePoolSize =
         configProvider.getInteger(RESOLVER_TYPE_POOL_SIZE, DEFAULT_RESOLVER_TYPE_POOL_SIZE);
     resolverUseLoadClassEnabled = configProvider.getBoolean(RESOLVER_USE_LOADCLASS, true);
+    resolverUseMemoizationEnabled = configProvider.getBoolean(RESOLVER_USE_MEMOIZATION, true);
 
     cwsEnabled = configProvider.getBoolean(CWS_ENABLED, DEFAULT_CWS_ENABLED);
     cwsTlsRefresh = configProvider.getInteger(CWS_TLS_REFRESH, DEFAULT_CWS_TLS_REFRESH);
@@ -1939,6 +1942,10 @@ public class Config {
 
   public boolean isResolverUseLoadClassEnabled() {
     return resolverUseLoadClassEnabled;
+  }
+
+  public boolean isResolverUseMemoizationEnabled() {
+    return resolverUseMemoizationEnabled;
   }
 
   public String getJdbcPreparedStatementClassName() {
@@ -2898,6 +2905,8 @@ public class Config {
         + resolverTypePoolSize
         + ", resolverUseLoadClassEnabled="
         + resolverUseLoadClassEnabled
+        + ", resolverUseMemoizationEnabled="
+        + resolverUseMemoizationEnabled
         + ", jdbcPreparedStatementClassName='"
         + jdbcPreparedStatementClassName
         + '\''

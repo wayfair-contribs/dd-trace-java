@@ -28,8 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Built-in bytebuddy-based instrumentation for the datadog javaagent.
  *
- * <p>It is strongly recommended to extend {@link Default} rather than implement this interface
- * directly.
+ * <p>Instrumentations should extend {@link Default} rather than implement this interface directly.
  */
 public interface Instrumenter {
   /**
@@ -201,7 +200,7 @@ public interface Instrumenter {
       return null;
     }
 
-    /** @return Class names of helpers to inject into the user's classloader */
+    /** Helper classes to inject into the target classloader */
     public String[] helperClassNames() {
       return new String[0];
     }
@@ -221,25 +220,17 @@ public interface Instrumenter {
       return null;
     }
 
-    /**
-     * A type matcher used to match the classloader under transform.
-     *
-     * <p>This matcher needs to either implement equality checks or be the same for different
-     * instrumentations that share context stores to avoid enabling the context store
-     * instrumentations multiple times.
-     *
-     * @return A type matcher used to match the classloader under transform.
-     */
+    /** Override this to limit the class-loaders where the instrumentation applies. */
     public ElementMatcher<ClassLoader> classLoaderMatcher() {
       return ANY_CLASS_LOADER;
     }
 
-    /** @return A transformer for further transformation of the class */
+    /** Override this to apply further transformations to the class */
     public AdviceTransformer transformer() {
       return null;
     }
 
-    /** @return A type matcher used to ignore some methods when applying transformation. */
+    /** Override this to ignore additional methods when applying the transformation. */
     public ElementMatcher<? super MethodDescription> methodIgnoreMatcher() {
       // By default ByteBuddy will skip all methods that are synthetic at the top level, but since
       // we need to instrument some synthetic methods in Scala and changed that, we make the default
@@ -247,12 +238,7 @@ public interface Instrumenter {
       return isSynthetic();
     }
 
-    /**
-     * Context stores to define for this instrumentation. Are added to matching class loaders.
-     *
-     * <p>A map of {class-name -> context-class-name}. Keys (and their subclasses) will be
-     * associated with a context of the value.
-     */
+    /** Context stores used by this instrumentation, described as a map of key to context types. */
     public Map<String, String> contextStore() {
       return emptyMap();
     }

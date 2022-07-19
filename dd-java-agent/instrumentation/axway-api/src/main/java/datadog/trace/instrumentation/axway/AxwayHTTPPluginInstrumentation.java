@@ -18,11 +18,6 @@ public final class AxwayHTTPPluginInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("com.vordel.dwe.http.ServerTransaction", int.class.getName());
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {
       "com.vordel.dwe.http.HTTPPlugin",
@@ -39,6 +34,11 @@ public final class AxwayHTTPPluginInstrumentation extends Instrumenter.Tracing
       packageName + ".HTTPPluginAdvice",
       packageName + ".ServerTransactionAdvice",
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("com.vordel.dwe.http.ServerTransaction", int.class.getName());
   }
 
   @Override

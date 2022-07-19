@@ -22,6 +22,11 @@ public class RequestFinishInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String instrumentedType() {
+    return "com.ibm.ws.webcontainer.srt.SRTServletRequest";
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".HttpServletExtractAdapter",
@@ -30,11 +35,6 @@ public class RequestFinishInstrumentation extends Instrumenter.Tracing
       packageName + ".LibertyDecorator",
       packageName + ".RequestURIDataAdapter",
     };
-  }
-
-  @Override
-  public String instrumentedType() {
-    return "com.ibm.ws.webcontainer.srt.SRTServletRequest";
   }
 
   @Override

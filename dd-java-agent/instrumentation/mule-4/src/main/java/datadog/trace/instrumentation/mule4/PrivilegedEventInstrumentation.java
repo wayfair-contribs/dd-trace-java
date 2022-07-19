@@ -31,6 +31,11 @@ public final class PrivilegedEventInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {packageName + ".CurrentEventHelper"};
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     return singletonMap(
         "org.mule.runtime.api.event.EventContext",
@@ -41,10 +46,5 @@ public final class PrivilegedEventInstrumentation extends Instrumenter.Tracing
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         named("setCurrentEvent"), packageName + ".PrivilegedEventSetCurrentAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {packageName + ".CurrentEventHelper"};
   }
 }

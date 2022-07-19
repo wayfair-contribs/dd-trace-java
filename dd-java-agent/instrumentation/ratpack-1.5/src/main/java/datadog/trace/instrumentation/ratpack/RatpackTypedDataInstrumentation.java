@@ -23,16 +23,16 @@ public class RatpackTypedDataInstrumentation extends Instrumenter.AppSec
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return Collections.singletonMap(
-        "ratpack.http.internal.ByteBufBackedTypedData", Boolean.class.getName());
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".GetTextCharSequenceSupplier",
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return Collections.singletonMap(
+        "ratpack.http.internal.ByteBufBackedTypedData", Boolean.class.getName());
   }
 
   @Override

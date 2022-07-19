@@ -51,11 +51,6 @@ public class GrpcServerBuilderInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("io.grpc.ServerBuilder", Boolean.class.getName());
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".GrpcServerDecorator",
@@ -65,6 +60,11 @@ public class GrpcServerBuilderInstrumentation extends Instrumenter.Tracing
       packageName + ".TracingServerInterceptor$TracingServerCall",
       packageName + ".TracingServerInterceptor$TracingServerCallListener",
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("io.grpc.ServerBuilder", Boolean.class.getName());
   }
 
   @Override

@@ -33,11 +33,6 @@ public final class AsyncCompletionHandlerInstrumentation extends Instrumenter.Tr
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("com.ning.http.client.AsyncHandler", Pair.class.getName());
-  }
-
-  @Override
   protected boolean defaultEnabled() {
     return false;
   }
@@ -50,6 +45,11 @@ public final class AsyncCompletionHandlerInstrumentation extends Instrumenter.Tr
   @Override
   public String[] helperClassNames() {
     return new String[] {packageName + ".ClientDecorator"};
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("com.ning.http.client.AsyncHandler", Pair.class.getName());
   }
 
   @Override

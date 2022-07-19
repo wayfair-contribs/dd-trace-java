@@ -22,19 +22,19 @@ public class HttpServerResponseEndHandlerInstrumentation extends Instrumenter.Tr
   }
 
   @Override
+  public String[] knownMatchingTypes() {
+    return new String[] {
+      "io.vertx.core.http.impl.Http1xServerResponse", "io.vertx.core.http.impl.Http2ServerResponse "
+    };
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".EndHandlerWrapper",
       packageName + ".RouteHandlerWrapper",
       packageName + ".VertxDecorator",
       packageName + ".VertxDecorator$VertxURIDataAdapter",
-    };
-  }
-
-  @Override
-  public String[] knownMatchingTypes() {
-    return new String[] {
-      "io.vertx.core.http.impl.Http1xServerResponse", "io.vertx.core.http.impl.Http2ServerResponse "
     };
   }
 

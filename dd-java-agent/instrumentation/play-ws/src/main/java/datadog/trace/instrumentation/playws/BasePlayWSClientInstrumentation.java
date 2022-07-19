@@ -29,6 +29,16 @@ public abstract class BasePlayWSClientInstrumentation extends Instrumenter.Traci
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {
+      "datadog.trace.instrumentation.playws.PlayWSClientDecorator",
+      "datadog.trace.instrumentation.playws.HeadersInjectAdapter",
+      packageName + ".AsyncHandlerWrapper",
+      packageName + ".StreamedAsyncHandlerWrapper"
+    };
+  }
+
+  @Override
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         isMethod()
@@ -37,15 +47,5 @@ public abstract class BasePlayWSClientInstrumentation extends Instrumenter.Traci
             .and(takesArgument(0, named("play.shaded.ahc.org.asynchttpclient.Request")))
             .and(takesArgument(1, named("play.shaded.ahc.org.asynchttpclient.AsyncHandler"))),
         getClass().getName() + "$ClientAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {
-      "datadog.trace.instrumentation.playws.PlayWSClientDecorator",
-      "datadog.trace.instrumentation.playws.HeadersInjectAdapter",
-      packageName + ".AsyncHandlerWrapper",
-      packageName + ".StreamedAsyncHandlerWrapper"
-    };
   }
 }

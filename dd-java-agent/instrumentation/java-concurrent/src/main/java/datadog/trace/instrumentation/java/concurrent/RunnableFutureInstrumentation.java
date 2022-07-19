@@ -53,34 +53,6 @@ public final class RunnableFutureInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("java.util.concurrent.RunnableFuture", State.class.getName());
-  }
-
-  @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    // instrument any FutureTask or TrustedListenableFutureTask constructor,
-    // but only instrument the PromiseTask constructor with a Callable argument
-    transformation.applyAdvice(
-        isConstructor()
-            .and(
-                isDeclaredBy(
-                        named("java.util.concurrent.FutureTask")
-                            .or(
-                                nameEndsWith(
-                                    "com.google.common.util.concurrent.TrustedListenableFutureTask")))
-                    .or(
-                        isDeclaredBy(nameEndsWith(".netty.util.concurrent.PromiseTask"))
-                            .and(takesArgument(1, named(Callable.class.getName()))))),
-        getClass().getName() + "$Construct");
-    transformation.applyAdvice(isConstructor(), getClass().getName() + "$Construct");
-    transformation.applyAdvice(isMethod().and(named("run")), getClass().getName() + "$Run");
-    transformation.applyAdvice(
-        isMethod().and(namedOneOf("cancel", "set", "setException")),
-        getClass().getName() + "$Cancel");
-  }
-
-  @Override
   public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
     // This is a footprint optimisation, not required for correctness.
     // exclude as many known task implementations as possible because
@@ -124,6 +96,34 @@ public final class RunnableFutureInstrumentation extends Instrumenter.Tracing
             "play.shaded.ahc.io.netty.util.concurrent.PromiseTask",
             "play.shaded.ahc.io.netty.util.concurrent.RunnableScheduledFutureTask",
             "play.shaded.ahc.io.netty.util.concurrent.ScheduledFutureTask"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("java.util.concurrent.RunnableFuture", State.class.getName());
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    // instrument any FutureTask or TrustedListenableFutureTask constructor,
+    // but only instrument the PromiseTask constructor with a Callable argument
+    transformation.applyAdvice(
+        isConstructor()
+            .and(
+                isDeclaredBy(
+                        named("java.util.concurrent.FutureTask")
+                            .or(
+                                nameEndsWith(
+                                    "com.google.common.util.concurrent.TrustedListenableFutureTask")))
+                    .or(
+                        isDeclaredBy(nameEndsWith(".netty.util.concurrent.PromiseTask"))
+                            .and(takesArgument(1, named(Callable.class.getName()))))),
+        getClass().getName() + "$Construct");
+    transformation.applyAdvice(isConstructor(), getClass().getName() + "$Construct");
+    transformation.applyAdvice(isMethod().and(named("run")), getClass().getName() + "$Run");
+    transformation.applyAdvice(
+        isMethod().and(namedOneOf("cancel", "set", "setException")),
+        getClass().getName() + "$Cancel");
   }
 
   public static final class Construct {

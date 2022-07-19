@@ -23,17 +23,6 @@ public class ExcludeFilterTestInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {}
-
-  @Override
-  public Map<String, String> contextStore() {
-    Map<String, String> contextStores = new HashMap<>();
-    contextStores.put(Runnable.class.getName(), Object.class.getName());
-    contextStores.put(Executor.class.getName(), Object.class.getName());
-    return contextStores;
-  }
-
-  @Override
   public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
     EnumMap<ExcludeFilter.ExcludeType, Collection<String>> excludedTypes =
         new EnumMap<>(ExcludeFilter.ExcludeType.class);
@@ -44,6 +33,17 @@ public class ExcludeFilterTestInstrumentation extends Instrumenter.Tracing
         EXECUTOR, Arrays.asList(prefix + "ExcludedExecutor", prefix + "RunnableExcludedExecutor"));
     return excludedTypes;
   }
+
+  @Override
+  public Map<String, String> contextStore() {
+    Map<String, String> contextStores = new HashMap<>();
+    contextStores.put(Runnable.class.getName(), Object.class.getName());
+    contextStores.put(Executor.class.getName(), Object.class.getName());
+    return contextStores;
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {}
 
   public static final class ExcludedRunnable implements Runnable {
     @Override

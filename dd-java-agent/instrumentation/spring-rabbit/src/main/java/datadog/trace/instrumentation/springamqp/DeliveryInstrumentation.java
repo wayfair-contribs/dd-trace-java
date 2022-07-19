@@ -26,13 +26,13 @@ public class DeliveryInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(isConstructor(), getClass().getName() + "$CaptureActiveScope");
+  public Map<String, String> contextStore() {
+    return singletonMap("org.springframework.amqp.rabbit.support.Delivery", State.class.getName());
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("org.springframework.amqp.rabbit.support.Delivery", State.class.getName());
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(isConstructor(), getClass().getName() + "$CaptureActiveScope");
   }
 
   public static class CaptureActiveScope {

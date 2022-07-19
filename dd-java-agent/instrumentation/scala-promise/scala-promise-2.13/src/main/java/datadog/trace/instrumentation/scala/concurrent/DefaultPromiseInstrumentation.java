@@ -37,6 +37,11 @@ public class DefaultPromiseInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {"datadog.trace.instrumentation.scala.PromiseHelper"};
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     return singletonMap("scala.util.Try", AgentSpan.class.getName());
   }
@@ -45,11 +50,6 @@ public class DefaultPromiseInstrumentation extends Instrumenter.Tracing
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         isMethod().and(named("tryComplete0")), getClass().getName() + "$TryComplete");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {"datadog.trace.instrumentation.scala.PromiseHelper"};
   }
 
   @Override

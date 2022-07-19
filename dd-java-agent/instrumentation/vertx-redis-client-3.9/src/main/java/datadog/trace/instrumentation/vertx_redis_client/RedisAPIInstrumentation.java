@@ -19,6 +19,13 @@ public class RedisAPIInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] knownMatchingTypes() {
+    return new String[] {
+      "io.vertx.redis.client.RedisAPI", "io.vertx.redis.client.impl.RedisAPIImpl"
+    };
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".ResponseHandlerWrapper", packageName + ".VertxRedisClientDecorator",
@@ -30,13 +37,6 @@ public class RedisAPIInstrumentation extends Instrumenter.Tracing
     Map<String, String> contextStores = new HashMap<>();
     contextStores.put("io.vertx.redis.client.RedisAPI", packageName + ".ResponseHandlerWrapper");
     return contextStores;
-  }
-
-  @Override
-  public String[] knownMatchingTypes() {
-    return new String[] {
-      "io.vertx.redis.client.RedisAPI", "io.vertx.redis.client.impl.RedisAPIImpl"
-    };
   }
 
   @Override

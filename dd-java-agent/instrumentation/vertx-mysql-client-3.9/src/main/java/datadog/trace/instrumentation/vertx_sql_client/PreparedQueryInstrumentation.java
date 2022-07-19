@@ -24,8 +24,8 @@ public class PreparedQueryInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("io.vertx.sqlclient.Query", "datadog.trace.api.Pair");
+  public ElementMatcher<TypeDescription> hierarchyMatcher() {
+    return implementsInterface(named("io.vertx.sqlclient.PreparedQuery"));
   }
 
   @Override
@@ -36,8 +36,8 @@ public class PreparedQueryInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("io.vertx.sqlclient.PreparedQuery"));
+  public Map<String, String> contextStore() {
+    return singletonMap("io.vertx.sqlclient.Query", "datadog.trace.api.Pair");
   }
 
   @Override

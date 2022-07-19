@@ -28,14 +28,14 @@ public final class SlickRunnableInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return Collections.singletonMap(Runnable.class.getName(), State.class.getName());
-  }
-
-  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return NameMatchers.<TypeDescription>nameStartsWith("slick.")
         .and(implementsInterface(named(Runnable.class.getName())));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return Collections.singletonMap(Runnable.class.getName(), State.class.getName());
   }
 
   @Override

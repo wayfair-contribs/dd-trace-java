@@ -30,13 +30,13 @@ public final class AkkaForkJoinExecutorTaskInstrumentation extends Instrumenter.
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return Collections.singletonMap(Runnable.class.getName(), State.class.getName());
+  public String instrumentedType() {
+    return "akka.dispatch.ForkJoinExecutorConfigurator$AkkaForkJoinTask";
   }
 
   @Override
-  public String instrumentedType() {
-    return "akka.dispatch.ForkJoinExecutorConfigurator$AkkaForkJoinTask";
+  public Map<String, String> contextStore() {
+    return Collections.singletonMap(Runnable.class.getName(), State.class.getName());
   }
 
   @Override

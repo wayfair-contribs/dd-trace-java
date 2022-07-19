@@ -33,6 +33,11 @@ public final class QuartzSchedulingInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {packageName + ".QuartzDecorator"};
+  }
+
+  @Override
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         isMethod()
@@ -40,11 +45,6 @@ public final class QuartzSchedulingInstrumentation extends Instrumenter.Tracing
             .and(named("execute"))
             .and(takesArgument(0, named("org.quartz.JobExecutionContext"))),
         QuartzSchedulingInstrumentation.class.getName() + "$QuartzSchedulingAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {packageName + ".QuartzDecorator"};
   }
 
   public static class QuartzSchedulingAdvice {

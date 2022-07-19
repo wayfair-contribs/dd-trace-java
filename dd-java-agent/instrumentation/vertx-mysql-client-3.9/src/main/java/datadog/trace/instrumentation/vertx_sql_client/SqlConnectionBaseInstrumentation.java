@@ -20,11 +20,8 @@ public class SqlConnectionBaseInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    Map<String, String> contextStores = new HashMap<>();
-    contextStores.put("io.vertx.sqlclient.SqlClient", DBInfo.class.getName());
-    contextStores.put("io.vertx.sqlclient.PreparedStatement", "datadog.trace.api.Pair");
-    return contextStores;
+  public String instrumentedType() {
+    return "io.vertx.sqlclient.impl.SqlConnectionBase";
   }
 
   @Override
@@ -35,8 +32,11 @@ public class SqlConnectionBaseInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public String instrumentedType() {
-    return "io.vertx.sqlclient.impl.SqlConnectionBase";
+  public Map<String, String> contextStore() {
+    Map<String, String> contextStores = new HashMap<>();
+    contextStores.put("io.vertx.sqlclient.SqlClient", DBInfo.class.getName());
+    contextStores.put("io.vertx.sqlclient.PreparedStatement", "datadog.trace.api.Pair");
+    return contextStores;
   }
 
   @Override

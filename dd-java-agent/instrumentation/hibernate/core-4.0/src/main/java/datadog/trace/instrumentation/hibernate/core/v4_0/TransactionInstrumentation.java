@@ -23,11 +23,6 @@ import org.hibernate.Transaction;
 public class TransactionInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("org.hibernate.Transaction", SessionState.class.getName());
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {
       "org.hibernate.engine.transaction.spi.AbstractTransactionImpl",
@@ -40,6 +35,11 @@ public class TransactionInstrumentation extends AbstractHibernateInstrumentation
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("org.hibernate.Transaction"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("org.hibernate.Transaction", SessionState.class.getName());
   }
 
   @Override

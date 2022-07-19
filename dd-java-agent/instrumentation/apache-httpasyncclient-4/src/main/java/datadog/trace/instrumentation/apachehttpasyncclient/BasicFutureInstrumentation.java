@@ -23,12 +23,6 @@ public final class BasicFutureInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap(
-        "org.apache.http.concurrent.BasicFuture", "org.apache.http.concurrent.FutureCallback");
-  }
-
-  @Override
   public String instrumentedType() {
     return "org.apache.http.concurrent.BasicFuture";
   }
@@ -36,6 +30,12 @@ public final class BasicFutureInstrumentation extends Instrumenter.Tracing
   @Override
   public ElementMatcher<? extends ByteCodeElement> structureMatcher() {
     return declaresField(named("callback"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap(
+        "org.apache.http.concurrent.BasicFuture", "org.apache.http.concurrent.FutureCallback");
   }
 
   @Override

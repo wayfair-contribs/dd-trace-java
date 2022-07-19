@@ -21,8 +21,8 @@ public class QueryImplInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("io.vertx.sqlclient.Query", "datadog.trace.api.Pair");
+  public String instrumentedType() {
+    return "io.vertx.sqlclient.impl.SqlClientBase$QueryImpl";
   }
 
   @Override
@@ -33,8 +33,8 @@ public class QueryImplInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public String instrumentedType() {
-    return "io.vertx.sqlclient.impl.SqlClientBase$QueryImpl";
+  public Map<String, String> contextStore() {
+    return singletonMap("io.vertx.sqlclient.Query", "datadog.trace.api.Pair");
   }
 
   @Override

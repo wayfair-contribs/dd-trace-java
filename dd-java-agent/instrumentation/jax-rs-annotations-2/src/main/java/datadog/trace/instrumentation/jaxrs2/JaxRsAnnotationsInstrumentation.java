@@ -38,11 +38,6 @@ public final class JaxRsAnnotationsInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("javax.ws.rs.container.AsyncResponse", AgentSpan.class.getName());
-  }
-
-  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return hasSuperType(
         declaresAnnotation(named("javax.ws.rs.Path"))
@@ -56,6 +51,11 @@ public final class JaxRsAnnotationsInstrumentation extends Instrumenter.Tracing
       "datadog.trace.agent.tooling.ClassHierarchyIterable$ClassIterator",
       packageName + ".JaxRsAnnotationsDecorator",
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("javax.ws.rs.container.AsyncResponse", AgentSpan.class.getName());
   }
 
   @Override

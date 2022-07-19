@@ -41,6 +41,15 @@ public class ExtLogRecordInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {
+      "datadog.trace.agent.tooling.log.UnionMap",
+      "datadog.trace.agent.tooling.log.UnionMap$1",
+      "datadog.trace.agent.tooling.log.UnionMap$1$1",
+    };
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     return singletonMap("org.jboss.logmanager.ExtLogRecord", AgentSpan.Context.class.getName());
   }
@@ -54,15 +63,6 @@ public class ExtLogRecordInstrumentation extends Instrumenter.Tracing
     transformation.applyAdvice(
         isMethod().and(named("getMdcCopy")).and(takesArguments(0)),
         ExtLogRecordInstrumentation.class.getName() + "$GetMdcCopyAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {
-      "datadog.trace.agent.tooling.log.UnionMap",
-      "datadog.trace.agent.tooling.log.UnionMap$1",
-      "datadog.trace.agent.tooling.log.UnionMap$1$1",
-    };
   }
 
   public static class GetMdcAdvice {

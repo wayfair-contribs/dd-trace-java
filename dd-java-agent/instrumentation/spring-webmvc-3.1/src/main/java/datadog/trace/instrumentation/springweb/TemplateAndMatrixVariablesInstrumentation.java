@@ -35,6 +35,13 @@ public class TemplateAndMatrixVariablesInstrumentation extends Instrumenter.AppS
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {
+      packageName + ".PairList",
+    };
+  }
+
+  @Override
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         isMethod()
@@ -47,13 +54,6 @@ public class TemplateAndMatrixVariablesInstrumentation extends Instrumenter.AppS
             .and(takesArgument(2, named("javax.servlet.http.HttpServletRequest")))
             .and(takesArguments(3)),
         TemplateAndMatrixVariablesInstrumentation.class.getName() + "$HandleMatchAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {
-      packageName + ".PairList",
-    };
   }
 
   public static class HandleMatchAdvice {

@@ -19,11 +19,12 @@ public class RedisInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    Map<String, String> contextStores = new HashMap<>();
-    contextStores.put("io.vertx.redis.client.Command", UTF8BytesString.class.getName());
-    contextStores.put("io.vertx.redis.client.Request", Boolean.class.getName());
-    return contextStores;
+  public String[] knownMatchingTypes() {
+    return new String[] {
+      "io.vertx.redis.client.Redis",
+      "io.vertx.redis.client.impl.RedisConnectionImpl",
+      "io.vertx.redis.client.impl.RedisClusterConnection"
+    };
   }
 
   @Override
@@ -34,12 +35,11 @@ public class RedisInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public String[] knownMatchingTypes() {
-    return new String[] {
-      "io.vertx.redis.client.Redis",
-      "io.vertx.redis.client.impl.RedisConnectionImpl",
-      "io.vertx.redis.client.impl.RedisClusterConnection"
-    };
+  public Map<String, String> contextStore() {
+    Map<String, String> contextStores = new HashMap<>();
+    contextStores.put("io.vertx.redis.client.Command", UTF8BytesString.class.getName());
+    contextStores.put("io.vertx.redis.client.Request", Boolean.class.getName());
+    return contextStores;
   }
 
   @Override

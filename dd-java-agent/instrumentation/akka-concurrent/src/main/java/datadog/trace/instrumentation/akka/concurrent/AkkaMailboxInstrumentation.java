@@ -33,12 +33,6 @@ public class AkkaMailboxInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(
-        isMethod().and(named("run")), getClass().getName() + "$SuppressMailboxRunAdvice");
-  }
-
-  @Override
   public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
     List<String> excludedClass = singletonList("akka.dispatch.MailBox");
     EnumMap<ExcludeFilter.ExcludeType, Collection<String>> excludedTypes =
@@ -46,6 +40,12 @@ public class AkkaMailboxInstrumentation extends Instrumenter.Tracing
     excludedTypes.put(ExcludeFilter.ExcludeType.RUNNABLE, excludedClass);
     excludedTypes.put(ExcludeFilter.ExcludeType.FORK_JOIN_TASK, excludedClass);
     return excludedTypes;
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(
+        isMethod().and(named("run")), getClass().getName() + "$SuppressMailboxRunAdvice");
   }
 
   /**

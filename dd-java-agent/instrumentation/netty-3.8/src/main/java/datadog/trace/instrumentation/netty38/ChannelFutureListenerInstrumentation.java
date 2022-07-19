@@ -51,18 +51,18 @@ public class ChannelFutureListenerInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public Map<String, String> contextStore() {
+    return Collections.singletonMap(
+        "org.jboss.netty.channel.Channel", packageName + ".ChannelTraceContext");
+  }
+
+  @Override
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         isMethod()
             .and(named("operationComplete"))
             .and(takesArgument(0, named("org.jboss.netty.channel.ChannelFuture"))),
         ChannelFutureListenerInstrumentation.class.getName() + "$OperationCompleteAdvice");
-  }
-
-  @Override
-  public Map<String, String> contextStore() {
-    return Collections.singletonMap(
-        "org.jboss.netty.channel.Channel", packageName + ".ChannelTraceContext");
   }
 
   public static class OperationCompleteAdvice extends AbstractNettyAdvice {

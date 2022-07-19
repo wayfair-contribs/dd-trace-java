@@ -40,6 +40,15 @@ public class LoggingEventInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {
+      "datadog.trace.agent.tooling.log.UnionMap",
+      "datadog.trace.agent.tooling.log.UnionMap$1",
+      "datadog.trace.agent.tooling.log.UnionMap$1$1",
+    };
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     return singletonMap(
         "ch.qos.logback.classic.spi.ILoggingEvent", AgentSpan.Context.class.getName());
@@ -50,15 +59,6 @@ public class LoggingEventInstrumentation extends Instrumenter.Tracing
     transformation.applyAdvice(
         isMethod().and(named("getMDCPropertyMap").or(named("getMdc"))).and(takesArguments(0)),
         LoggingEventInstrumentation.class.getName() + "$GetMdcAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {
-      "datadog.trace.agent.tooling.log.UnionMap",
-      "datadog.trace.agent.tooling.log.UnionMap$1",
-      "datadog.trace.agent.tooling.log.UnionMap$1$1",
-    };
   }
 
   public static class GetMdcAdvice {

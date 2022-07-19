@@ -31,14 +31,14 @@ public class GrizzlyCharBodyInstrumentation extends Instrumenter.AppSec
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return Collections.singletonMap(
-        "org.glassfish.grizzly.http.io.NIOReader", "datadog.trace.api.http.StoredCharBody");
+  public String[] helperClassNames() {
+    return new String[] {"datadog.trace.instrumentation.grizzlyhttp232.HttpHeaderFetchingHelper"};
   }
 
   @Override
-  public String[] helperClassNames() {
-    return new String[] {"datadog.trace.instrumentation.grizzlyhttp232.HttpHeaderFetchingHelper"};
+  public Map<String, String> contextStore() {
+    return Collections.singletonMap(
+        "org.glassfish.grizzly.http.io.NIOReader", "datadog.trace.api.http.StoredCharBody");
   }
 
   @Override

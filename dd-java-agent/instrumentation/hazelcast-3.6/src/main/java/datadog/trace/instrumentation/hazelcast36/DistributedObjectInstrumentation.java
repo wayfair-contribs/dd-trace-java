@@ -38,16 +38,6 @@ public class DistributedObjectInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public String[] helperClassNames() {
-    return new String[] {
-      packageName + ".DistributedObjectDecorator",
-      packageName + ".DistributedObjectDecorator$1",
-      packageName + ".SpanFinishingExecutionCallback",
-      packageName + ".HazelcastConstants"
-    };
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {
       PROXY_PACKAGE + ".ClientMapProxy",
@@ -66,6 +56,16 @@ public class DistributedObjectInstrumentation extends Instrumenter.Tracing
       PROXY_PACKAGE + ".ClientPNCounterProxy",
       PROXY_PACKAGE + ".ClientCardinalityEstimatorProxy",
       PROXY_PACKAGE + ".ClientSemaphoreProxy"
+    };
+  }
+
+  @Override
+  public String[] helperClassNames() {
+    return new String[] {
+      packageName + ".DistributedObjectDecorator",
+      packageName + ".DistributedObjectDecorator$1",
+      packageName + ".SpanFinishingExecutionCallback",
+      packageName + ".HazelcastConstants"
     };
   }
 

@@ -29,19 +29,19 @@ public final class MessagesAvailableInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] knownMatchingTypes() {
+    return new String[] {
+      "io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl$1MessagesAvailable",
+      "io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl$1MessageRead"
+    };
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".GrpcClientDecorator",
       packageName + ".GrpcClientDecorator$1",
       packageName + ".GrpcInjectAdapter"
-    };
-  }
-
-  @Override
-  public String[] knownMatchingTypes() {
-    return new String[] {
-      "io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl$1MessagesAvailable",
-      "io.grpc.internal.ClientCallImpl$ClientStreamListenerImpl$1MessageRead"
     };
   }
 

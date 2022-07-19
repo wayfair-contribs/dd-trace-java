@@ -27,19 +27,19 @@ public class BlockingQueueConsumerInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(
-        named("handle")
-            .and(takesArgument(0, named("org.springframework.amqp.rabbit.support.Delivery"))),
-        getClass().getName() + "$TransferState");
-  }
-
-  @Override
   public Map<String, String> contextStore() {
     Map<String, String> contextStore = new TreeMap<>();
     contextStore.put("org.springframework.amqp.core.Message", State.class.getName());
     contextStore.put("org.springframework.amqp.rabbit.support.Delivery", State.class.getName());
     return contextStore;
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(
+        named("handle")
+            .and(takesArgument(0, named("org.springframework.amqp.rabbit.support.Delivery"))),
+        getClass().getName() + "$TransferState");
   }
 
   public static class TransferState {

@@ -18,16 +18,16 @@ public class PreparedStatementImplInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String instrumentedType() {
+    return "io.vertx.sqlclient.impl.PreparedStatementImpl";
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     Map<String, String> contextStores = new HashMap<>();
     contextStores.put("io.vertx.sqlclient.PreparedStatement", "datadog.trace.api.Pair");
     contextStores.put("io.vertx.sqlclient.Query", "datadog.trace.api.Pair");
     return contextStores;
-  }
-
-  @Override
-  public String instrumentedType() {
-    return "io.vertx.sqlclient.impl.PreparedStatementImpl";
   }
 
   @Override

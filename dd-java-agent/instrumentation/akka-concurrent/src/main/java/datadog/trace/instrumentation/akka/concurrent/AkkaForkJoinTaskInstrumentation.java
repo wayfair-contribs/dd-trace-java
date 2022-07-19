@@ -45,11 +45,6 @@ public final class AkkaForkJoinTaskInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("akka.dispatch.forkjoin.ForkJoinTask", State.class.getName());
-  }
-
-  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return notExcludedByName(FORK_JOIN_TASK)
         .and(declaresMethod(namedOneOf("exec", "fork", "cancel")))
@@ -72,6 +67,11 @@ public final class AkkaForkJoinTaskInstrumentation extends Instrumenter.Tracing
             "akka.dispatch.forkjoin.ForkJoinTask$AdaptedRunnable",
             "akka.dispatch.forkjoin.ForkJoinTask$AdaptedRunnableAction"));
     return exclude;
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("akka.dispatch.forkjoin.ForkJoinTask", State.class.getName());
   }
 
   @Override

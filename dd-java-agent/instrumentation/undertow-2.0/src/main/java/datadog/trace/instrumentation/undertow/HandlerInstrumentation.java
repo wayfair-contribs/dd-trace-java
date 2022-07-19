@@ -34,16 +34,6 @@ public final class HandlerInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(
-        isMethod()
-            .and(named("handleRequest"))
-            .and(takesArgument(0, named("io.undertow.server.HttpServerExchange")))
-            .and(isPublic()),
-        getClass().getName() + "$HandlerAdvice");
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".ExchangeEndSpanListener",
@@ -53,6 +43,16 @@ public final class HandlerInstrumentation extends Instrumenter.Tracing
       packageName + ".UndertowExtractAdapter$Request",
       packageName + ".UndertowExtractAdapter$Response"
     };
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(
+        isMethod()
+            .and(named("handleRequest"))
+            .and(takesArgument(0, named("io.undertow.server.HttpServerExchange")))
+            .and(isPublic()),
+        getClass().getName() + "$HandlerAdvice");
   }
 
   public static class HandlerAdvice {

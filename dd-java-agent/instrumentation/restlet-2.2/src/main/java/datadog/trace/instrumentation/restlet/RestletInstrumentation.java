@@ -30,15 +30,6 @@ public final class RestletInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(
-        isMethod()
-            .and(named("handle"))
-            .and(takesArgument(0, named("com.sun.net.httpserver.HttpExchange"))),
-        getClass().getName() + "$RestletHandleAdvice");
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".RestletExtractAdapter",
@@ -47,6 +38,15 @@ public final class RestletInstrumentation extends Instrumenter.Tracing
       packageName + ".RestletDecorator",
       packageName + ".HttpExchangeURIDataAdapter"
     };
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(
+        isMethod()
+            .and(named("handle"))
+            .and(takesArgument(0, named("com.sun.net.httpserver.HttpExchange"))),
+        getClass().getName() + "$RestletHandleAdvice");
   }
 
   public static class RestletHandleAdvice {

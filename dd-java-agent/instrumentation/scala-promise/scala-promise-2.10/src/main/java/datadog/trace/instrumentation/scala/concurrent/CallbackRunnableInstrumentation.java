@@ -40,6 +40,21 @@ public class CallbackRunnableInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
+    // force other instrumentations (e.g. Runnable) not to deal with this type
+    Map<ExcludeFilter.ExcludeType, Collection<String>> map = new HashMap<>();
+    Collection<String> cbr = Collections.singleton("scala.concurrent.impl.CallbackRunnable");
+    map.put(RUNNABLE, cbr);
+    map.put(EXECUTOR, cbr);
+    return map;
+  }
+
+  @Override
+  public String[] helperClassNames() {
+    return new String[] {"datadog.trace.instrumentation.scala.PromiseHelper"};
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     Map<String, String> contextStore = new HashMap<>();
     contextStore.put("scala.concurrent.impl.CallbackRunnable", State.class.getName());
@@ -53,21 +68,6 @@ public class CallbackRunnableInstrumentation extends Instrumenter.Tracing
     transformation.applyAdvice(isMethod().and(named("run")), getClass().getName() + "$Run");
     transformation.applyAdvice(
         isMethod().and(named("executeWithValue")), getClass().getName() + "$ExecuteWithValue");
-  }
-
-  @Override
-  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
-    // force other instrumentations (e.g. Runnable) not to deal with this type
-    Map<ExcludeFilter.ExcludeType, Collection<String>> map = new HashMap<>();
-    Collection<String> cbr = Collections.singleton("scala.concurrent.impl.CallbackRunnable");
-    map.put(RUNNABLE, cbr);
-    map.put(EXECUTOR, cbr);
-    return map;
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {"datadog.trace.instrumentation.scala.PromiseHelper"};
   }
 
   /** Capture the scope when the promise is created */

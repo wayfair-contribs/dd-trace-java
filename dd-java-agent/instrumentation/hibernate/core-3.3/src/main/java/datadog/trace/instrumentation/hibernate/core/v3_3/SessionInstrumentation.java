@@ -37,17 +37,6 @@ import org.hibernate.transaction.JBossTransactionManagerLookup;
 public class SessionInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
-  public Map<String, String> contextStore() {
-    final Map<String, String> map = new HashMap<>();
-    map.put("org.hibernate.Session", SessionState.class.getName());
-    map.put("org.hibernate.StatelessSession", SessionState.class.getName());
-    map.put("org.hibernate.Query", SessionState.class.getName());
-    map.put("org.hibernate.Transaction", SessionState.class.getName());
-    map.put("org.hibernate.Criteria", SessionState.class.getName());
-    return Collections.unmodifiableMap(map);
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {
       "org.hibernate.impl.SessionImpl", "org.hibernate.impl.StatelessSessionImpl"
@@ -58,6 +47,17 @@ public class SessionInstrumentation extends AbstractHibernateInstrumentation {
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(
         namedOneOf("org.hibernate.Session", "org.hibernate.StatelessSession"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    final Map<String, String> map = new HashMap<>();
+    map.put("org.hibernate.Session", SessionState.class.getName());
+    map.put("org.hibernate.StatelessSession", SessionState.class.getName());
+    map.put("org.hibernate.Query", SessionState.class.getName());
+    map.put("org.hibernate.Transaction", SessionState.class.getName());
+    map.put("org.hibernate.Criteria", SessionState.class.getName());
+    return Collections.unmodifiableMap(map);
   }
 
   @Override

@@ -29,13 +29,13 @@ public class JettyAddListenerInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("org.eclipse.jetty.client.api.Request", AgentSpan.class.getName());
+  public String[] helperClassNames() {
+    return new String[] {packageName + ".CallbackWrapper"};
   }
 
   @Override
-  public String[] helperClassNames() {
-    return new String[] {packageName + ".CallbackWrapper"};
+  public Map<String, String> contextStore() {
+    return singletonMap("org.eclipse.jetty.client.api.Request", AgentSpan.class.getName());
   }
 
   @Override

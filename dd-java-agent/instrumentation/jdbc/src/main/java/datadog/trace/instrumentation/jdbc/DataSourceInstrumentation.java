@@ -30,15 +30,15 @@ public final class DataSourceInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public ElementMatcher<TypeDescription> hierarchyMatcher() {
+    return implementsInterface(named("javax.sql.DataSource"));
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".DataSourceDecorator",
     };
-  }
-
-  @Override
-  public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("javax.sql.DataSource"));
   }
 
   @Override

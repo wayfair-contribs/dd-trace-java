@@ -39,6 +39,11 @@ public class JettyClientInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
+    return singletonMap(RUNNABLE, singletonList("org.eclipse.jetty.util.SocketAddressResolver$1"));
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".JettyClientDecorator",
@@ -66,11 +71,6 @@ public class JettyClientInstrumentation extends Instrumenter.Tracing
                         "org.eclipse.jetty.client.HttpRequest")))
             .and(takesArgument(1, List.class)),
         JettyClientInstrumentation.class.getName() + "$SendAdvice");
-  }
-
-  @Override
-  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
-    return singletonMap(RUNNABLE, singletonList("org.eclipse.jetty.util.SocketAddressResolver$1"));
   }
 
   public static class SendAdvice {

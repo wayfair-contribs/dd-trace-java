@@ -35,14 +35,14 @@ public class GrizzlyByteBodyInstrumentation extends Instrumenter.AppSec
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return Collections.singletonMap(
-        "org.glassfish.grizzly.http.io.NIOInputStream", "datadog.trace.api.http.StoredByteBody");
+  public String[] helperClassNames() {
+    return new String[] {"datadog.trace.instrumentation.grizzlyhttp232.HttpHeaderFetchingHelper"};
   }
 
   @Override
-  public String[] helperClassNames() {
-    return new String[] {"datadog.trace.instrumentation.grizzlyhttp232.HttpHeaderFetchingHelper"};
+  public Map<String, String> contextStore() {
+    return Collections.singletonMap(
+        "org.glassfish.grizzly.http.io.NIOInputStream", "datadog.trace.api.http.StoredByteBody");
   }
 
   @Override

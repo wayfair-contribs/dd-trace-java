@@ -31,17 +31,17 @@ public class HttpClientInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String instrumentedType() {
+    return "reactor.netty.http.client.HttpClient";
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       "datadog.trace.instrumentation.netty41.AttributeKeys",
       packageName + ".CaptureConnectSpan",
       packageName + ".TransferConnectSpan",
     };
-  }
-
-  @Override
-  public String instrumentedType() {
-    return "reactor.netty.http.client.HttpClient";
   }
 
   @Override

@@ -53,12 +53,6 @@ public class HttpAsyncClientExchangeHandlerInstrumentation extends Instrumenter.
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap(
-        "org.apache.http.concurrent.BasicFuture", "org.apache.http.concurrent.FutureCallback");
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".HttpHeadersInjectAdapter",
@@ -66,6 +60,12 @@ public class HttpAsyncClientExchangeHandlerInstrumentation extends Instrumenter.
       packageName + ".TraceContinuedFutureCallback",
       packageName + ".ApacheHttpAsyncClientDecorator"
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap(
+        "org.apache.http.concurrent.BasicFuture", "org.apache.http.concurrent.FutureCallback");
   }
 
   @Override

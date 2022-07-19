@@ -21,6 +21,13 @@ public final class MicronautInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {
+      packageName + ".MicronautDecorator",
+    };
+  }
+
+  @Override
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         isMethod()
@@ -54,12 +61,5 @@ public final class MicronautInstrumentation extends Instrumenter.Tracing
             .and(takesArgument(1, named("io.micronaut.http.HttpRequest")))
             .and(takesArgument(2, named("io.netty.channel.ChannelHandlerContext"))),
         packageName + ".WriteFinalNettyResponseAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {
-      packageName + ".MicronautDecorator",
-    };
   }
 }

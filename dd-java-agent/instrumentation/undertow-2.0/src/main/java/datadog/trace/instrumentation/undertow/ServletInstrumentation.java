@@ -28,12 +28,6 @@ public final class ServletInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(
-        isMethod().and(named("dispatchRequest")), getClass().getName() + "$DispatchAdvice");
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".HttpServerExchangeURIDataAdapter",
@@ -42,6 +36,12 @@ public final class ServletInstrumentation extends Instrumenter.Tracing
       packageName + ".UndertowExtractAdapter$Request",
       packageName + ".UndertowExtractAdapter$Response"
     };
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(
+        isMethod().and(named("dispatchRequest")), getClass().getName() + "$DispatchAdvice");
   }
 
   public static class DispatchAdvice {

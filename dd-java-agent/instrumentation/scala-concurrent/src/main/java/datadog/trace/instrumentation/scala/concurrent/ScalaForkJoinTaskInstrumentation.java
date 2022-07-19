@@ -54,6 +54,16 @@ public final class ScalaForkJoinTaskInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
+    return singletonMap(
+        RUNNABLE_FUTURE,
+        Arrays.asList(
+            "scala.concurrent.forkjoin.ForkJoinTask$AdaptedCallable",
+            "scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnable",
+            "scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction"));
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     return singletonMap("scala.concurrent.forkjoin.ForkJoinTask", State.class.getName());
   }
@@ -64,16 +74,6 @@ public final class ScalaForkJoinTaskInstrumentation extends Instrumenter.Tracing
         isMethod().and(namedOneOf("doExec", "exec")), getClass().getName() + "$Exec");
     transformation.applyAdvice(isMethod().and(named("fork")), getClass().getName() + "$Fork");
     transformation.applyAdvice(isMethod().and(named("cancel")), getClass().getName() + "$Cancel");
-  }
-
-  @Override
-  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
-    return singletonMap(
-        RUNNABLE_FUTURE,
-        Arrays.asList(
-            "scala.concurrent.forkjoin.ForkJoinTask$AdaptedCallable",
-            "scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnable",
-            "scala.concurrent.forkjoin.ForkJoinTask$AdaptedRunnableAction"));
   }
 
   public static final class Exec {

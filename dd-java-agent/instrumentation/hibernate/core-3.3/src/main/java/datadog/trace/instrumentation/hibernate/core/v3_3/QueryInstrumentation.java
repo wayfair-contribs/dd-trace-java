@@ -27,11 +27,6 @@ import org.hibernate.transaction.JBossTransactionManagerLookup;
 public class QueryInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("org.hibernate.Query", SessionState.class.getName());
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {
       "org.hibernate.impl.AbstractQueryImpl",
@@ -44,6 +39,11 @@ public class QueryInstrumentation extends AbstractHibernateInstrumentation {
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("org.hibernate.Query"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("org.hibernate.Query", SessionState.class.getName());
   }
 
   @Override

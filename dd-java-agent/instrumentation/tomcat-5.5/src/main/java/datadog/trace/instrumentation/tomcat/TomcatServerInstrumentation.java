@@ -39,6 +39,23 @@ public final class TomcatServerInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
+    return singletonMap(
+        RUNNABLE,
+        Arrays.asList(
+            "org.apache.tomcat.util.threads.TaskThread$WrappingRunnable",
+            "org.apache.tomcat.util.net.SocketProcessorBase",
+            "org.apache.tomcat.util.net.AprEndpoint$Poller",
+            "org.apache.tomcat.util.net.NioEndpoint$Poller",
+            "org.apache.tomcat.util.net.NioEndpoint$PollerEvent",
+            "org.apache.tomcat.util.net.AprEndpoint$SocketProcessor",
+            "org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor",
+            "org.apache.tomcat.util.net.NioEndpoint$SocketProcessor",
+            "org.apache.tomcat.util.net.Nio2Endpoint$SocketProcessor",
+            "org.apache.tomcat.util.net.NioBlockingSelector$BlockPoller"));
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".ExtractAdapter",
@@ -63,23 +80,6 @@ public final class TomcatServerInstrumentation extends Instrumenter.Tracing
             .and(takesArgument(2, named("org.apache.coyote.Response")))
             .and(takesArgument(3, named("org.apache.catalina.connector.Response"))),
         TomcatServerInstrumentation.class.getName() + "$PostParseAdvice");
-  }
-
-  @Override
-  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
-    return singletonMap(
-        RUNNABLE,
-        Arrays.asList(
-            "org.apache.tomcat.util.threads.TaskThread$WrappingRunnable",
-            "org.apache.tomcat.util.net.SocketProcessorBase",
-            "org.apache.tomcat.util.net.AprEndpoint$Poller",
-            "org.apache.tomcat.util.net.NioEndpoint$Poller",
-            "org.apache.tomcat.util.net.NioEndpoint$PollerEvent",
-            "org.apache.tomcat.util.net.AprEndpoint$SocketProcessor",
-            "org.apache.tomcat.util.net.JIoEndpoint$SocketProcessor",
-            "org.apache.tomcat.util.net.NioEndpoint$SocketProcessor",
-            "org.apache.tomcat.util.net.Nio2Endpoint$SocketProcessor",
-            "org.apache.tomcat.util.net.NioBlockingSelector$BlockPoller"));
   }
 
   public static class ServiceAdvice {

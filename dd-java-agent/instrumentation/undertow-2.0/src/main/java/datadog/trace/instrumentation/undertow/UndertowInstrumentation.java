@@ -24,16 +24,6 @@ public final class UndertowInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(
-        isMethod()
-            .and(named("dispatch"))
-            .and(takesArgument(0, named("java.util.concurrent.Executor")))
-            .and(takesArgument(1, named("java.lang.Runnable"))),
-        getClass().getName() + "$DispatchAdvice");
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".ExchangeEndSpanListener",
@@ -44,6 +34,16 @@ public final class UndertowInstrumentation extends Instrumenter.Tracing
       packageName + ".UndertowExtractAdapter$Response",
       packageName + ".UndertowRunnableWrapper"
     };
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(
+        isMethod()
+            .and(named("dispatch"))
+            .and(takesArgument(0, named("java.util.concurrent.Executor")))
+            .and(takesArgument(1, named("java.lang.Runnable"))),
+        getClass().getName() + "$DispatchAdvice");
   }
 
   public static class DispatchAdvice {

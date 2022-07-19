@@ -18,8 +18,8 @@ public class CursorImplInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("io.vertx.sqlclient.PreparedStatement", "datadog.trace.api.Pair");
+  public String instrumentedType() {
+    return "io.vertx.sqlclient.impl.CursorImpl";
   }
 
   @Override
@@ -30,8 +30,8 @@ public class CursorImplInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public String instrumentedType() {
-    return "io.vertx.sqlclient.impl.CursorImpl";
+  public Map<String, String> contextStore() {
+    return singletonMap("io.vertx.sqlclient.PreparedStatement", "datadog.trace.api.Pair");
   }
 
   @Override

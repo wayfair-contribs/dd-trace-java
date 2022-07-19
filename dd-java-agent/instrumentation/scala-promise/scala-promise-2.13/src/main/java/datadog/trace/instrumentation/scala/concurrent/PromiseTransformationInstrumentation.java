@@ -41,6 +41,21 @@ public final class PromiseTransformationInstrumentation extends Instrumenter.Tra
   }
 
   @Override
+  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
+    // force other instrumentations (e.g. Runnable) not to deal with this type
+    Map<ExcludeFilter.ExcludeType, Collection<String>> map = new HashMap<>();
+    Collection<String> pt = Collections.singleton("scala.concurrent.impl.Promise$Transformation");
+    map.put(RUNNABLE, pt);
+    map.put(EXECUTOR, pt);
+    return map;
+  }
+
+  @Override
+  public String[] helperClassNames() {
+    return new String[] {"datadog.trace.instrumentation.scala.PromiseHelper"};
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     Map<String, String> contextStore = new HashMap<>();
     contextStore.put("scala.concurrent.impl.Promise$Transformation", State.class.getName());
@@ -56,21 +71,6 @@ public final class PromiseTransformationInstrumentation extends Instrumenter.Tra
         isMethod().and(named("submitWithValue")), getClass().getName() + "$SubmitWithValue");
     transformation.applyAdvice(isMethod().and(named("run")), getClass().getName() + "$Run");
     transformation.applyAdvice(isMethod().and(named("cancel")), getClass().getName() + "$Cancel");
-  }
-
-  @Override
-  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
-    // force other instrumentations (e.g. Runnable) not to deal with this type
-    Map<ExcludeFilter.ExcludeType, Collection<String>> map = new HashMap<>();
-    Collection<String> pt = Collections.singleton("scala.concurrent.impl.Promise$Transformation");
-    map.put(RUNNABLE, pt);
-    map.put(EXECUTOR, pt);
-    return map;
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {"datadog.trace.instrumentation.scala.PromiseHelper"};
   }
 
   public static final class Construct {

@@ -36,16 +36,16 @@ public class Elasticsearch7RestClientInstrumentation extends Instrumenter.Tracin
   }
 
   @Override
+  public String instrumentedType() {
+    return "org.elasticsearch.client.RestClient";
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       "datadog.trace.instrumentation.elasticsearch.ElasticsearchRestClientDecorator",
       packageName + ".RestResponseListener",
     };
-  }
-
-  @Override
-  public String instrumentedType() {
-    return "org.elasticsearch.client.RestClient";
   }
 
   @Override

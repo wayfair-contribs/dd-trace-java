@@ -29,17 +29,17 @@ public class ClientInvocationInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String instrumentedType() {
+    return "com.hazelcast.client.spi.impl.ClientInvocation";
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".HazelcastConstants",
       packageName + ".DistributedObjectDecorator",
       packageName + ".DistributedObjectDecorator$1"
     };
-  }
-
-  @Override
-  public String instrumentedType() {
-    return "com.hazelcast.client.spi.impl.ClientInvocation";
   }
 
   @Override

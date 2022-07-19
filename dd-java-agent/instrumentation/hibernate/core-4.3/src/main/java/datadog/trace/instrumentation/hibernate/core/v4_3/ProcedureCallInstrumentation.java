@@ -21,11 +21,6 @@ import org.hibernate.procedure.ProcedureCall;
 public class ProcedureCallInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("org.hibernate.procedure.ProcedureCall", SessionState.class.getName());
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {"org.hibernate.procedure.internal.ProcedureCallImpl"};
   }
@@ -33,6 +28,11 @@ public class ProcedureCallInstrumentation extends AbstractHibernateInstrumentati
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("org.hibernate.procedure.ProcedureCall"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("org.hibernate.procedure.ProcedureCall", SessionState.class.getName());
   }
 
   @Override

@@ -16,6 +16,11 @@ public class HttpServerResponseEndHandlerInstrumentation extends Instrumenter.Tr
   }
 
   @Override
+  public String instrumentedType() {
+    return "io.vertx.core.http.impl.HttpServerResponseImpl";
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".EndHandlerWrapper",
@@ -23,11 +28,6 @@ public class HttpServerResponseEndHandlerInstrumentation extends Instrumenter.Tr
       packageName + ".VertxDecorator",
       packageName + ".VertxDecorator$VertxURIDataAdapter",
     };
-  }
-
-  @Override
-  public String instrumentedType() {
-    return "io.vertx.core.http.impl.HttpServerResponseImpl";
   }
 
   @Override

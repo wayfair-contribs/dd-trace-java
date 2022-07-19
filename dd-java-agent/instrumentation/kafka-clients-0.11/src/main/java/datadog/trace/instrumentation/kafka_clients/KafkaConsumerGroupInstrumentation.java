@@ -29,15 +29,6 @@ public final class KafkaConsumerGroupInstrumentation extends Instrumenter.Tracin
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    Map<String, String> contextStores = new HashMap<>();
-    contextStores.put("org.apache.kafka.clients.consumer.KafkaConsumer", "java.lang.String");
-    contextStores.put("org.apache.kafka.clients.consumer.ConsumerRecords", "java.lang.String");
-
-    return contextStores;
-  }
-
-  @Override
   public String instrumentedType() {
     return "org.apache.kafka.clients.consumer.KafkaConsumer";
   }
@@ -47,6 +38,15 @@ public final class KafkaConsumerGroupInstrumentation extends Instrumenter.Tracin
     return new String[] {
       packageName + ".KafkaDecorator",
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    Map<String, String> contextStores = new HashMap<>();
+    contextStores.put("org.apache.kafka.clients.consumer.KafkaConsumer", "java.lang.String");
+    contextStores.put("org.apache.kafka.clients.consumer.ConsumerRecords", "java.lang.String");
+
+    return contextStores;
   }
 
   @Override

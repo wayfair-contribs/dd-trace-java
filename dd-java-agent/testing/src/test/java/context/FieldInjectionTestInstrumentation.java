@@ -27,22 +27,6 @@ public class FieldInjectionTestInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(named("isInstrumented"), MarkInstrumentedAdvice.class.getName());
-    transformation.applyAdvice(
-        named("incrementContextCount"), StoreAndIncrementApiUsageAdvice.class.getName());
-    transformation.applyAdvice(named("getContextCount"), GetApiUsageAdvice.class.getName());
-    transformation.applyAdvice(named("putContextCount"), PutApiUsageAdvice.class.getName());
-    transformation.applyAdvice(
-        named("incorrectKeyClassUsage"), IncorrectKeyClassContextApiUsageAdvice.class.getName());
-    transformation.applyAdvice(
-        named("incorrectContextClassUsage"),
-        IncorrectContextClassContextApiUsageAdvice.class.getName());
-    transformation.applyAdvice(
-        named("incorrectCallUsage"), IncorrectCallContextApiUsageAdvice.class.getName());
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {getClass().getName() + "$Context", getClass().getName() + "$Context$1"};
   }
@@ -59,6 +43,22 @@ public class FieldInjectionTestInstrumentation extends Instrumenter.Tracing
     store.put(prefix + "ValidInheritsSerializableKeyClass", prefix + "Context");
     store.put(prefix + "InvalidInheritsSerializableKeyClass", prefix + "Context");
     return store;
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(named("isInstrumented"), MarkInstrumentedAdvice.class.getName());
+    transformation.applyAdvice(
+        named("incrementContextCount"), StoreAndIncrementApiUsageAdvice.class.getName());
+    transformation.applyAdvice(named("getContextCount"), GetApiUsageAdvice.class.getName());
+    transformation.applyAdvice(named("putContextCount"), PutApiUsageAdvice.class.getName());
+    transformation.applyAdvice(
+        named("incorrectKeyClassUsage"), IncorrectKeyClassContextApiUsageAdvice.class.getName());
+    transformation.applyAdvice(
+        named("incorrectContextClassUsage"),
+        IncorrectContextClassContextApiUsageAdvice.class.getName());
+    transformation.applyAdvice(
+        named("incorrectCallUsage"), IncorrectCallContextApiUsageAdvice.class.getName());
   }
 
   public static class MarkInstrumentedAdvice {

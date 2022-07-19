@@ -34,15 +34,15 @@ public class FinatraInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public String[] helperClassNames() {
-    return new String[] {packageName + ".FinatraDecorator", packageName + ".Listener"};
-  }
-
-  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return nameStartsWith("com.twitter.finatra.")
         .<TypeDescription>and(
             extendsClass(named("com.twitter.finatra.http.internal.routing.Route")));
+  }
+
+  @Override
+  public String[] helperClassNames() {
+    return new String[] {packageName + ".FinatraDecorator", packageName + ".Listener"};
   }
 
   @Override

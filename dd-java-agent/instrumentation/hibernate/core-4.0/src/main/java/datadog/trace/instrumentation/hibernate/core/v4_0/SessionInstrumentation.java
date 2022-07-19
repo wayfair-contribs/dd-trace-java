@@ -34,16 +34,6 @@ import org.hibernate.Transaction;
 public class SessionInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
-  public Map<String, String> contextStore() {
-    final Map<String, String> map = new HashMap<>();
-    map.put("org.hibernate.SharedSessionContract", SessionState.class.getName());
-    map.put("org.hibernate.Query", SessionState.class.getName());
-    map.put("org.hibernate.Transaction", SessionState.class.getName());
-    map.put("org.hibernate.Criteria", SessionState.class.getName());
-    return Collections.unmodifiableMap(map);
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {
       "org.hibernate.internal.SessionImpl", "org.hibernate.internal.StatelessSessionImpl"
@@ -53,6 +43,16 @@ public class SessionInstrumentation extends AbstractHibernateInstrumentation {
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("org.hibernate.SharedSessionContract"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    final Map<String, String> map = new HashMap<>();
+    map.put("org.hibernate.SharedSessionContract", SessionState.class.getName());
+    map.put("org.hibernate.Query", SessionState.class.getName());
+    map.put("org.hibernate.Transaction", SessionState.class.getName());
+    map.put("org.hibernate.Criteria", SessionState.class.getName());
+    return Collections.unmodifiableMap(map);
   }
 
   @Override

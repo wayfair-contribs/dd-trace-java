@@ -31,6 +31,18 @@ public final class JettyServerInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
+    return Collections.singletonMap(
+        RUNNABLE,
+        Arrays.asList(
+            "org.eclipse.jetty.util.thread.strategy.ProduceConsume",
+            "org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume",
+            "org.eclipse.jetty.io.ManagedSelector",
+            "org.eclipse.jetty.util.thread.TimerScheduler",
+            "org.eclipse.jetty.util.thread.TimerScheduler$SimpleTask"));
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".ExtractAdapter",
@@ -69,17 +81,5 @@ public final class JettyServerInstrumentation extends Instrumenter.Tracing
         // name changed to recycle in 9.3.0
         namedOneOf("reset", "recycle").and(takesNoArguments()),
         packageName + ".JettyServerAdvice$ResetAdvice");
-  }
-
-  @Override
-  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
-    return Collections.singletonMap(
-        RUNNABLE,
-        Arrays.asList(
-            "org.eclipse.jetty.util.thread.strategy.ProduceConsume",
-            "org.eclipse.jetty.util.thread.strategy.ExecuteProduceConsume",
-            "org.eclipse.jetty.io.ManagedSelector",
-            "org.eclipse.jetty.util.thread.TimerScheduler",
-            "org.eclipse.jetty.util.thread.TimerScheduler$SimpleTask"));
   }
 }

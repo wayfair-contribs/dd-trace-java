@@ -62,16 +62,6 @@ public class CompletableFutureUniCompletionInstrumentation extends Instrumenter.
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap(UNI_COMPLETION, ConcurrentState.class.getName());
-  }
-
-  @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(isConstructor(), ADVICE_BASE + "UniConstructor");
-  }
-
-  @Override
   public Map<ExcludeType, ? extends Collection<String>> excludedClasses() {
     if (!isEnabled()) {
       return Collections.emptyMap();
@@ -110,5 +100,15 @@ public class CompletableFutureUniCompletionInstrumentation extends Instrumenter.
     excludedTypes.put(FORK_JOIN_TASK, excludedClasses);
     excludedTypes.put(EXECUTOR, excludedClasses);
     return excludedTypes;
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap(UNI_COMPLETION, ConcurrentState.class.getName());
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(isConstructor(), ADVICE_BASE + "UniConstructor");
   }
 }

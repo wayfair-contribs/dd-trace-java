@@ -25,14 +25,6 @@ import org.hibernate.procedure.ProcedureCall;
 public class SessionInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
-  public Map<String, String> contextStore() {
-    final Map<String, String> map = new HashMap<>();
-    map.put("org.hibernate.SharedSessionContract", SessionState.class.getName());
-    map.put("org.hibernate.procedure.ProcedureCall", SessionState.class.getName());
-    return Collections.unmodifiableMap(map);
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {
       "org.hibernate.internal.AbstractSessionImpl",
@@ -47,6 +39,14 @@ public class SessionInstrumentation extends AbstractHibernateInstrumentation {
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("org.hibernate.SharedSessionContract"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    final Map<String, String> map = new HashMap<>();
+    map.put("org.hibernate.SharedSessionContract", SessionState.class.getName());
+    map.put("org.hibernate.procedure.ProcedureCall", SessionState.class.getName());
+    return Collections.unmodifiableMap(map);
   }
 
   @Override

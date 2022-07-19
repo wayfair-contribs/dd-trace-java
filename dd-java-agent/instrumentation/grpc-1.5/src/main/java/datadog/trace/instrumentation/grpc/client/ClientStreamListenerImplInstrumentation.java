@@ -34,18 +34,18 @@ public class ClientStreamListenerImplInstrumentation extends Instrumenter.Tracin
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return Collections.singletonMap(
-        "io.grpc.internal.ClientStreamListener", AgentSpan.class.getName());
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".GrpcClientDecorator",
       packageName + ".GrpcClientDecorator$1",
       packageName + ".GrpcInjectAdapter"
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return Collections.singletonMap(
+        "io.grpc.internal.ClientStreamListener", AgentSpan.class.getName());
   }
 
   @Override

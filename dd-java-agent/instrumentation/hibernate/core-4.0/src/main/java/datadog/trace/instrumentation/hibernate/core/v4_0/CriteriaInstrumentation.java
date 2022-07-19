@@ -24,11 +24,6 @@ import org.hibernate.SharedSessionContract;
 public class CriteriaInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("org.hibernate.Criteria", SessionState.class.getName());
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {
       "org.hibernate.internal.CriteriaImpl", "org.hibernate.internal.CriteriaImpl$Subcriteria"
@@ -38,6 +33,11 @@ public class CriteriaInstrumentation extends AbstractHibernateInstrumentation {
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("org.hibernate.Criteria"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("org.hibernate.Criteria", SessionState.class.getName());
   }
 
   @Override

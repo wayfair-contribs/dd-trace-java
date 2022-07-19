@@ -53,6 +53,11 @@ public class ServletRequestBodyInstrumentation extends Instrumenter.AppSec
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {packageName + ".BufferedReaderWrapper"};
+  }
+
+  @Override
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         named("getInputStream")
@@ -66,11 +71,6 @@ public class ServletRequestBodyInstrumentation extends Instrumenter.AppSec
             .and(returns(named("java.io.BufferedReader")))
             .and(isPublic()),
         getClass().getName() + "$HttpServletGetReaderAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {packageName + ".BufferedReaderWrapper"};
   }
 
   @Override

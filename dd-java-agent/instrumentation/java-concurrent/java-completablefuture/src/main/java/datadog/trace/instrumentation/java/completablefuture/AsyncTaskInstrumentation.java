@@ -48,6 +48,15 @@ public final class AsyncTaskInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
+    EnumMap<ExcludeFilter.ExcludeType, Collection<String>> excluded =
+        new EnumMap<>(ExcludeFilter.ExcludeType.class);
+    excluded.put(FORK_JOIN_TASK, Arrays.asList(CLASS_NAMES));
+    excluded.put(RUNNABLE, Arrays.asList(CLASS_NAMES));
+    return excluded;
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     return Collections.singletonMap("java.util.concurrent.ForkJoinTask", State.class.getName());
   }
@@ -57,15 +66,6 @@ public final class AsyncTaskInstrumentation extends Instrumenter.Tracing
     transformation.applyAdvice(isConstructor(), getClass().getName() + "$Construct");
     transformation.applyAdvice(named("run"), getClass().getName() + "$Run");
     transformation.applyAdvice(named("cancel"), getClass().getName() + "$Cancel");
-  }
-
-  @Override
-  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
-    EnumMap<ExcludeFilter.ExcludeType, Collection<String>> excluded =
-        new EnumMap<>(ExcludeFilter.ExcludeType.class);
-    excluded.put(FORK_JOIN_TASK, Arrays.asList(CLASS_NAMES));
-    excluded.put(RUNNABLE, Arrays.asList(CLASS_NAMES));
-    return excluded;
   }
 
   public static class Construct {

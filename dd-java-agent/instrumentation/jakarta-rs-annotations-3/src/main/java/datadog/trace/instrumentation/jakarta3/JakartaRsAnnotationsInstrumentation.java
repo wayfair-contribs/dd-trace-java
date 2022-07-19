@@ -38,11 +38,6 @@ public final class JakartaRsAnnotationsInstrumentation extends Instrumenter.Trac
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("jakarta.ws.rs.container.AsyncResponse", AgentSpan.class.getName());
-  }
-
-  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return hasSuperType(
         declaresAnnotation(named("jakarta.ws.rs.Path"))
@@ -56,6 +51,11 @@ public final class JakartaRsAnnotationsInstrumentation extends Instrumenter.Trac
       "datadog.trace.agent.tooling.ClassHierarchyIterable$ClassIterator",
       packageName + ".JakartaRsAnnotationsDecorator",
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("jakarta.ws.rs.container.AsyncResponse", AgentSpan.class.getName());
   }
 
   @Override

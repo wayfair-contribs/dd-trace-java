@@ -33,15 +33,15 @@ public final class DriverInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("java.sql.Connection", DBInfo.class.getName());
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".JDBCDecorator",
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("java.sql.Connection", DBInfo.class.getName());
   }
 
   @Override

@@ -31,13 +31,22 @@ public final class ClientCallImplInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return Collections.singletonMap("io.grpc.ClientCall", AgentSpan.class.getName());
+  public String instrumentedType() {
+    return "io.grpc.internal.ClientCallImpl";
   }
 
   @Override
-  public String instrumentedType() {
-    return "io.grpc.internal.ClientCallImpl";
+  public String[] helperClassNames() {
+    return new String[] {
+      packageName + ".GrpcClientDecorator",
+      packageName + ".GrpcClientDecorator$1",
+      packageName + ".GrpcInjectAdapter"
+    };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return Collections.singletonMap("io.grpc.ClientCall", AgentSpan.class.getName());
   }
 
   @Override
@@ -49,15 +58,6 @@ public final class ClientCallImplInstrumentation extends Instrumenter.Tracing
         named("sendMessage").and(isMethod()), getClass().getName() + "$SendMessage");
     transformation.applyAdvice(
         named("closeObserver").and(takesArguments(3)), getClass().getName() + "$CloseObserver");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {
-      packageName + ".GrpcClientDecorator",
-      packageName + ".GrpcClientDecorator$1",
-      packageName + ".GrpcInjectAdapter"
-    };
   }
 
   public static final class Capture {

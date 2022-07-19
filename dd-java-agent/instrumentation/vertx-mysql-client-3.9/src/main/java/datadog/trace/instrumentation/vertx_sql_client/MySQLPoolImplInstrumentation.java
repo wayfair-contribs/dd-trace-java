@@ -18,13 +18,13 @@ public class MySQLPoolImplInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("io.vertx.sqlclient.SqlClient", DBInfo.class.getName());
+  public String instrumentedType() {
+    return "io.vertx.mysqlclient.impl.MySQLPoolImpl";
   }
 
   @Override
-  public String instrumentedType() {
-    return "io.vertx.mysqlclient.impl.MySQLPoolImpl";
+  public Map<String, String> contextStore() {
+    return singletonMap("io.vertx.sqlclient.SqlClient", DBInfo.class.getName());
   }
 
   @Override

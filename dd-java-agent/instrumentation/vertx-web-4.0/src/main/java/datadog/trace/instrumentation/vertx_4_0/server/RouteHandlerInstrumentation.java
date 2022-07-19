@@ -22,6 +22,11 @@ public class RouteHandlerInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String instrumentedType() {
+    return "io.vertx.ext.web.impl.RouteImpl";
+  }
+
+  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".EndHandlerWrapper",
@@ -29,11 +34,6 @@ public class RouteHandlerInstrumentation extends Instrumenter.Tracing
       packageName + ".VertxDecorator",
       packageName + ".VertxDecorator$VertxURIDataAdapter",
     };
-  }
-
-  @Override
-  public String instrumentedType() {
-    return "io.vertx.ext.web.impl.RouteImpl";
   }
 
   @Override

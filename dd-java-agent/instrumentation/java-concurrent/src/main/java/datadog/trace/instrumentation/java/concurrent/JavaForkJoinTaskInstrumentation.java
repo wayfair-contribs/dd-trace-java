@@ -51,6 +51,17 @@ public final class JavaForkJoinTaskInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public Map<ExcludeType, ? extends Collection<String>> excludedClasses() {
+    return singletonMap(
+        RUNNABLE_FUTURE,
+        Arrays.asList(
+            "java.util.concurrent.ForkJoinTask$AdaptedCallable",
+            "java.util.concurrent.ForkJoinTask$AdaptedRunnable",
+            "java.util.concurrent.ForkJoinTask$AdaptedRunnableAction",
+            "java.util.concurrent.ForkJoinTask$AdaptedInterruptibleCallable"));
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     return singletonMap("java.util.concurrent.ForkJoinTask", State.class.getName());
   }
@@ -61,17 +72,6 @@ public final class JavaForkJoinTaskInstrumentation extends Instrumenter.Tracing
         isMethod().and(namedOneOf("doExec", "exec")), getClass().getName() + "$Exec");
     transformation.applyAdvice(isMethod().and(named("fork")), getClass().getName() + "$Fork");
     transformation.applyAdvice(isMethod().and(named("cancel")), getClass().getName() + "$Cancel");
-  }
-
-  @Override
-  public Map<ExcludeType, ? extends Collection<String>> excludedClasses() {
-    return singletonMap(
-        RUNNABLE_FUTURE,
-        Arrays.asList(
-            "java.util.concurrent.ForkJoinTask$AdaptedCallable",
-            "java.util.concurrent.ForkJoinTask$AdaptedRunnable",
-            "java.util.concurrent.ForkJoinTask$AdaptedRunnableAction",
-            "java.util.concurrent.ForkJoinTask$AdaptedInterruptibleCallable"));
   }
 
   public static final class Exec {

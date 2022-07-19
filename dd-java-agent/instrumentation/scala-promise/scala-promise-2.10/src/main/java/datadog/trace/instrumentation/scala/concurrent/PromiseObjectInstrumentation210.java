@@ -37,6 +37,11 @@ public class PromiseObjectInstrumentation210 extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {"datadog.trace.instrumentation.scala.PromiseHelper"};
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     return singletonMap("scala.util.Try", AgentSpan.class.getName());
   }
@@ -46,11 +51,6 @@ public class PromiseObjectInstrumentation210 extends Instrumenter.Tracing
     transformation.applyAdvice(
         isMethod().and(named("scala$concurrent$impl$Promise$$resolveTry")),
         getClass().getName() + "$ResolveTry");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {"datadog.trace.instrumentation.scala.PromiseHelper"};
   }
 
   @Override

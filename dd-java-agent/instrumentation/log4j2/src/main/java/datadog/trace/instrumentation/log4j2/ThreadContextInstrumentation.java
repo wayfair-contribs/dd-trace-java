@@ -37,17 +37,17 @@ public class ThreadContextInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public void adviceTransformations(AdviceTransformation transformation) {
-    transformation.applyAdvice(
-        isTypeInitializer(), ThreadContextInstrumentation.class.getName() + "$ThreadContextAdvice");
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       "datadog.trace.agent.tooling.log.LogContextScopeListener",
       "datadog.trace.instrumentation.log4j2.ThreadContextUpdater"
     };
+  }
+
+  @Override
+  public void adviceTransformations(AdviceTransformation transformation) {
+    transformation.applyAdvice(
+        isTypeInitializer(), ThreadContextInstrumentation.class.getName() + "$ThreadContextAdvice");
   }
 
   public static class ThreadContextAdvice {

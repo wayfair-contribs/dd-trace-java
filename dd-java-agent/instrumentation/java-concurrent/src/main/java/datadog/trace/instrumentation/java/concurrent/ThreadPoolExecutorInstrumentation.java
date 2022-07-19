@@ -80,6 +80,15 @@ public final class ThreadPoolExecutorInstrumentation extends Instrumenter.Tracin
   }
 
   @Override
+  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
+    return Collections.singletonMap(
+        RUNNABLE,
+        Arrays.asList(
+            "datadog.trace.bootstrap.instrumentation.java.concurrent.Wrapper",
+            "datadog.trace.bootstrap.instrumentation.java.concurrent.ComparableRunnable"));
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     final Map<String, String> stores = new HashMap<>();
     stores.put(TPE, Boolean.class.getName());
@@ -106,15 +115,6 @@ public final class ThreadPoolExecutorInstrumentation extends Instrumenter.Tracin
     transformation.applyAdvice(
         named("remove").and(isMethod()).and(returns(Runnable.class)),
         getClass().getName() + "$Remove");
-  }
-
-  @Override
-  public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
-    return Collections.singletonMap(
-        RUNNABLE,
-        Arrays.asList(
-            "datadog.trace.bootstrap.instrumentation.java.concurrent.Wrapper",
-            "datadog.trace.bootstrap.instrumentation.java.concurrent.ComparableRunnable"));
   }
 
   public static final class Init {

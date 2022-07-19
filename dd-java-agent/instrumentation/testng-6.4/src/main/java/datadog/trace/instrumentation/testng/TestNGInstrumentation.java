@@ -24,15 +24,15 @@ public class TestNGInstrumentation extends Instrumenter.CiVisibility
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {packageName + ".TestNGDecorator", packageName + ".TracingListener"};
+  }
+
+  @Override
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         named("initializeDefaultListeners"),
         TestNGInstrumentation.class.getName() + "$TestNGAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {packageName + ".TestNGDecorator", packageName + ".TracingListener"};
   }
 
   public static class TestNGAdvice {

@@ -18,13 +18,13 @@ public class CommandImplInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("io.vertx.redis.client.Command", UTF8BytesString.class.getName());
+  public String instrumentedType() {
+    return "io.vertx.redis.client.impl.CommandImpl";
   }
 
   @Override
-  public String instrumentedType() {
-    return "io.vertx.redis.client.impl.CommandImpl";
+  public Map<String, String> contextStore() {
+    return singletonMap("io.vertx.redis.client.Command", UTF8BytesString.class.getName());
   }
 
   @Override

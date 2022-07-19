@@ -32,15 +32,6 @@ import org.hibernate.transaction.JBossTransactionManagerLookup;
 public class SessionFactoryInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
-  public Map<String, String> contextStore() {
-    final Map<String, String> stores = new HashMap<>();
-    stores.put("org.hibernate.Session", SessionState.class.getName());
-    stores.put("org.hibernate.StatelessSession", SessionState.class.getName());
-    stores.put("org.hibernate.SharedSessionContract", SessionState.class.getName());
-    return Collections.unmodifiableMap(stores);
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {"org.hibernate.impl.SessionFactoryImpl"};
   }
@@ -48,6 +39,15 @@ public class SessionFactoryInstrumentation extends AbstractHibernateInstrumentat
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("org.hibernate.SessionFactory"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    final Map<String, String> stores = new HashMap<>();
+    stores.put("org.hibernate.Session", SessionState.class.getName());
+    stores.put("org.hibernate.StatelessSession", SessionState.class.getName());
+    stores.put("org.hibernate.SharedSessionContract", SessionState.class.getName());
+    return Collections.unmodifiableMap(stores);
   }
 
   @Override

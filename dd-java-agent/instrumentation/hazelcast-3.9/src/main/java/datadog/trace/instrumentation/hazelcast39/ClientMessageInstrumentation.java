@@ -36,13 +36,13 @@ public class ClientMessageInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public String[] helperClassNames() {
-    return new String[] {packageName + ".HazelcastConstants"};
+  public String instrumentedType() {
+    return "com.hazelcast.client.impl.protocol.ClientMessage";
   }
 
   @Override
-  public String instrumentedType() {
-    return "com.hazelcast.client.impl.protocol.ClientMessage";
+  public String[] helperClassNames() {
+    return new String[] {packageName + ".HazelcastConstants"};
   }
 
   @Override

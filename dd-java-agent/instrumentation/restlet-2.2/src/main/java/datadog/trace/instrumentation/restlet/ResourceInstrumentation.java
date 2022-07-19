@@ -34,6 +34,13 @@ public final class ResourceInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String[] helperClassNames() {
+    return new String[] {
+      packageName + ".ResourceDecorator",
+    };
+  }
+
+  @Override
   public void adviceTransformations(AdviceTransformation transformation) {
     transformation.applyAdvice(
         isMethod()
@@ -45,13 +52,6 @@ public final class ResourceInstrumentation extends Instrumenter.Tracing
                 takesArgument(0, extendsClass(named("org.restlet.engine.resource.AnnotationInfo"))))
             .and(takesArgument(1, named("org.restlet.representation.Variant"))),
         getClass().getName() + "$ResourceHandleAdvice");
-  }
-
-  @Override
-  public String[] helperClassNames() {
-    return new String[] {
-      packageName + ".ResourceDecorator",
-    };
   }
 
   public static class ResourceHandleAdvice {

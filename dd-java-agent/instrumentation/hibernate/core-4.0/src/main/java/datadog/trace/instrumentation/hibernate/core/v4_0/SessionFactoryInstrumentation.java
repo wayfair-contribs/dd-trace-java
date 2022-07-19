@@ -27,11 +27,6 @@ import org.hibernate.SharedSessionContract;
 public class SessionFactoryInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("org.hibernate.SharedSessionContract", SessionState.class.getName());
-  }
-
-  @Override
   public String[] knownMatchingTypes() {
     return new String[] {"org.hibernate.internal.SessionFactoryImpl"};
   }
@@ -39,6 +34,11 @@ public class SessionFactoryInstrumentation extends AbstractHibernateInstrumentat
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("org.hibernate.SessionFactory"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("org.hibernate.SharedSessionContract", SessionState.class.getName());
   }
 
   @Override

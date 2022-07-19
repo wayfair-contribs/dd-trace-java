@@ -20,16 +20,16 @@ public class SqlClientBaseInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String instrumentedType() {
+    return "io.vertx.sqlclient.impl.SqlClientBase";
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     Map<String, String> contextStores = new HashMap<>();
     contextStores.put("io.vertx.sqlclient.SqlClient", DBInfo.class.getName());
     contextStores.put("io.vertx.sqlclient.Query", "datadog.trace.api.Pair");
     return contextStores;
-  }
-
-  @Override
-  public String instrumentedType() {
-    return "io.vertx.sqlclient.impl.SqlClientBase";
   }
 
   @Override

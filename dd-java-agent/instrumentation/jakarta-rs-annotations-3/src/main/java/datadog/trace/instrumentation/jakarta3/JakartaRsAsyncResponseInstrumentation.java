@@ -27,12 +27,6 @@ public final class JakartaRsAsyncResponseInstrumentation extends Instrumenter.Tr
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return Collections.singletonMap(
-        "jakarta.ws.rs.container.AsyncResponse", AgentSpan.class.getName());
-  }
-
-  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("jakarta.ws.rs.container.AsyncResponse"));
   }
@@ -44,6 +38,12 @@ public final class JakartaRsAsyncResponseInstrumentation extends Instrumenter.Tr
       "datadog.trace.agent.tooling.ClassHierarchyIterable$ClassIterator",
       packageName + ".JakartaRsAnnotationsDecorator",
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return Collections.singletonMap(
+        "jakarta.ws.rs.container.AsyncResponse", AgentSpan.class.getName());
   }
 
   @Override

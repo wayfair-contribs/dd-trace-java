@@ -18,16 +18,16 @@ public class MySQLConnectionImplInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String instrumentedType() {
+    return "io.vertx.mysqlclient.impl.MySQLConnectionImpl";
+  }
+
+  @Override
   public Map<String, String> contextStore() {
     Map<String, String> contextStores = new HashMap<>();
     contextStores.put("io.vertx.mysqlclient.impl.MySQLConnectionFactory", DBInfo.class.getName());
     contextStores.put("io.vertx.sqlclient.SqlClient", DBInfo.class.getName());
     return contextStores;
-  }
-
-  @Override
-  public String instrumentedType() {
-    return "io.vertx.mysqlclient.impl.MySQLConnectionImpl";
   }
 
   @Override

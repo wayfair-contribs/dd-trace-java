@@ -29,11 +29,6 @@ public final class KafkaConsumerInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("org.apache.kafka.clients.consumer.ConsumerRecords", "java.lang.String");
-  }
-
-  @Override
   public String instrumentedType() {
     return "org.apache.kafka.clients.consumer.ConsumerRecords";
   }
@@ -50,6 +45,11 @@ public final class KafkaConsumerInstrumentation extends Instrumenter.Tracing
       packageName + ".TracingListIterator",
       packageName + ".Base64Decoder"
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("org.apache.kafka.clients.consumer.ConsumerRecords", "java.lang.String");
   }
 
   @Override

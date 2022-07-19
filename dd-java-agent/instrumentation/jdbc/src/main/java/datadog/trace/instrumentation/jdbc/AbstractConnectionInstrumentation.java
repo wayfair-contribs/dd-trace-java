@@ -24,15 +24,15 @@ public abstract class AbstractConnectionInstrumentation extends Instrumenter.Tra
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("java.sql.Statement", DBQueryInfo.class.getName());
-  }
-
-  @Override
   public String[] helperClassNames() {
     return new String[] {
       packageName + ".JDBCDecorator",
     };
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("java.sql.Statement", DBQueryInfo.class.getName());
   }
 
   @Override

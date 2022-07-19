@@ -42,16 +42,16 @@ public class AbstractMessageListenerContainerInstrumentation extends Instrumente
   }
 
   @Override
-  public Map<String, String> contextStore() {
-    return singletonMap("org.springframework.amqp.core.Message", State.class.getName());
-  }
-
-  @Override
   public Map<ExcludeFilter.ExcludeType, ? extends Collection<String>> excludedClasses() {
     // Even though this class isn't immediately relevant to spring-rabbit, it's loaded by the test.
     return singletonMap(
         RUNNABLE,
         singleton("org.springframework.boot.logging.logback.LogbackLoggingSystem$ShutdownHandler"));
+  }
+
+  @Override
+  public Map<String, String> contextStore() {
+    return singletonMap("org.springframework.amqp.core.Message", State.class.getName());
   }
 
   @Override

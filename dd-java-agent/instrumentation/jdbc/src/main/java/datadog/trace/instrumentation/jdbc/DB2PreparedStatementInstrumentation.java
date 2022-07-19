@@ -16,16 +16,17 @@ public class DB2PreparedStatementInstrumentation extends AbstractPreparedStateme
     super("jdbc", "db2");
   }
 
-  public static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
+  // Optimization for expensive typeMatcher.
+  static final ElementMatcher<ClassLoader> HAS_DB2_CLASSES =
       hasClassesNamed("com.ibm.db2.jcc.DB2PreparedStatement");
+
+  @Override
+  public ElementMatcher<ClassLoader> classLoaderMatcher() {
+    return HAS_DB2_CLASSES;
+  }
 
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(named("com.ibm.db2.jcc.DB2PreparedStatement"));
-  }
-
-  @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return CLASS_LOADER_MATCHER;
   }
 }

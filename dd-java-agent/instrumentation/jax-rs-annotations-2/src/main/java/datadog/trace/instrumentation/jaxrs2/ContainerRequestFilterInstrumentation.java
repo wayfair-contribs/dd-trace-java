@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.jaxrs2;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassesNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.isMethod;
@@ -25,12 +24,6 @@ public class ContainerRequestFilterInstrumentation extends Instrumenter.Tracing
 
   public ContainerRequestFilterInstrumentation() {
     super("jax-rs", "jaxrs", "jax-rs-filter");
-  }
-
-  @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return hasClassesNamed("javax.ws.rs.container.ContainerRequestFilter");
   }
 
   @Override

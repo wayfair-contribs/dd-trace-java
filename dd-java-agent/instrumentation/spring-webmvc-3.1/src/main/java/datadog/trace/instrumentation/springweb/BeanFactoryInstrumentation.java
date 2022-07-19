@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.springweb;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassesNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.extendsClass;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.isMethod;
@@ -28,12 +27,6 @@ public class BeanFactoryInstrumentation extends Instrumenter.Tracing
     implements Instrumenter.ForTypeHierarchy {
   public BeanFactoryInstrumentation() {
     super("spring-web");
-  }
-
-  @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return hasClassesNamed("org.springframework.beans.factory.support.AbstractBeanFactory");
   }
 
   @Override

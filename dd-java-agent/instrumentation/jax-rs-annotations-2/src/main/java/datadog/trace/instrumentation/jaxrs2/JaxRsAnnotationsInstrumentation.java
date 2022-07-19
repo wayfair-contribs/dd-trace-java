@@ -43,12 +43,6 @@ public final class JaxRsAnnotationsInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return JaxRsAsyncResponseInstrumentation.CLASS_LOADER_MATCHER;
-  }
-
-  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return hasSuperType(
         declaresAnnotation(named("javax.ws.rs.Path"))

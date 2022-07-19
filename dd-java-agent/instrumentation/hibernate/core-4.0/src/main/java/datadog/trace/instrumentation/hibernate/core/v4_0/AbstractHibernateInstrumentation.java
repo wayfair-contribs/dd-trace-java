@@ -13,8 +13,7 @@ public abstract class AbstractHibernateInstrumentation extends Instrumenter.Trac
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return HibernateMatchers.CLASS_LOADER_MATCHER;
+    return HibernateMatchers.HAS_HIBERNATE_CLASSES;
   }
 
   @Override

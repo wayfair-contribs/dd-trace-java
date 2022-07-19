@@ -6,7 +6,8 @@ import net.bytebuddy.matcher.ElementMatcher;
 
 public final class HibernateMatchers {
 
-  public static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
+  // Optimization for expensive typeMatcher.
+  public static final ElementMatcher<ClassLoader> HAS_HIBERNATE_CLASSES =
       hasClassesNamed("org.hibernate.Session");
 
   private HibernateMatchers() {}

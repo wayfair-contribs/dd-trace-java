@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.vertx_sql_client;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassesNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static java.util.Collections.singletonMap;
@@ -22,11 +21,6 @@ public class PreparedQueryInstrumentation extends Instrumenter.Tracing
     implements Instrumenter.ForTypeHierarchy {
   public PreparedQueryInstrumentation() {
     super("vertx", "vertx-sql-client");
-  }
-
-  @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return hasClassesNamed("io.vertx.sqlclient.PreparedQuery");
   }
 
   @Override

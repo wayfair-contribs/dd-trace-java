@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.jbosslogmanager;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassesNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.extendsClass;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static java.util.Collections.singletonMap;
@@ -34,12 +33,6 @@ public class ExtLogRecordInstrumentation extends Instrumenter.Tracing
   @Override
   protected boolean defaultEnabled() {
     return Config.get().isLogsInjectionEnabled();
-  }
-
-  @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return hasClassesNamed("org.jboss.logmanager.ExtLogRecord");
   }
 
   @Override

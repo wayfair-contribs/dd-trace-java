@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.aws.v2;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassesNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.extendsClass;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.nameStartsWith;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
@@ -24,13 +23,6 @@ import software.amazon.awssdk.core.internal.http.pipeline.stages.MakeAsyncHttpRe
 @AutoService(Instrumenter.class)
 public final class AwsHttpClientInstrumentation extends AbstractAwsClientInstrumentation
     implements Instrumenter.ForTypeHierarchy {
-
-  @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return hasClassesNamed(
-        "software.amazon.awssdk.core.internal.http.pipeline.stages.MakeHttpRequestStage");
-  }
 
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {

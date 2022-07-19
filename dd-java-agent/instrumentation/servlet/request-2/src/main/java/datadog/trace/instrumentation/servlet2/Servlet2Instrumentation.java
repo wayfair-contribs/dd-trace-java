@@ -24,15 +24,15 @@ public final class Servlet2Instrumentation extends Instrumenter.Tracing
     super("servlet", "servlet-2");
   }
 
-  // this is required to make sure servlet 2 instrumentation won't apply to servlet 3
-  static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
+  static final ElementMatcher<ClassLoader> HAS_SERVLET2NOT3_CLASSES =
+      // Optimization for expensive typeMatcher...
       hasClassesNamed("javax.servlet.http.HttpServletResponse")
-          .and(not(hasClassesNamed("javax.servlet.AsyncEvent", "javax.servlet.AsyncListener")));
+          // ...but avoid matching servlet 3+ which has its own instrumentation.
+          .and(not(hasClassesNamed("javax.servlet.AsyncEvent")));
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return CLASS_LOADER_MATCHER;
+    return HAS_SERVLET2NOT3_CLASSES;
   }
 
   @Override

@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.jsp;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassesNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static datadog.trace.bootstrap.instrumentation.api.AgentTracer.activateSpan;
@@ -25,12 +24,6 @@ public final class JSPInstrumentation extends Instrumenter.Tracing
 
   public JSPInstrumentation() {
     super("jsp", "jsp-render");
-  }
-
-  @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return hasClassesNamed("javax.servlet.jsp.HttpJspPage");
   }
 
   @Override

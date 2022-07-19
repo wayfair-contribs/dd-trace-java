@@ -30,13 +30,10 @@ public class Elasticsearch73TransportClientInstrumentation extends Instrumenter.
     super("elasticsearch", "elasticsearch-transport", "elasticsearch-transport-7");
   }
 
-  // this is required to make sure ES7 instrumentation won't apply to previous releases
-  static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
-      hasClassesNamed("org.elasticsearch.action.ActionType");
-
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return CLASS_LOADER_MATCHER;
+    // Avoid matching pre-ES7 releases which have their own instrumentations.
+    return hasClassesNamed("org.elasticsearch.action.ActionType");
   }
 
   @Override

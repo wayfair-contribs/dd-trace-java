@@ -1,4 +1,4 @@
-package datadog.trace.instrumentation.hibernate.core.v3_3;
+package datadog.trace.instrumentation.hibernate.core.v4_3;
 
 import datadog.trace.agent.tooling.Instrumenter;
 import datadog.trace.instrumentation.hibernate.HibernateMatchers;

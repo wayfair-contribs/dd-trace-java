@@ -162,7 +162,7 @@ git config core.hooksPath .githooks
 Compiler settings:
 
 * OpenJDK 11 must be installed to build the entire project.  Under `SDKs` it must have the name `11`.
-* Under `Build, Execution, Deployment > Compiler > Java Compiler` disable `Use '--release' option for cross-compilation`
+* In Preferences, under `Build, Execution, Deployment > Compiler > Java Compiler` disable `Use '--release' option for cross-compilation`
 
 Suggested plugins and settings:
 
@@ -180,12 +180,9 @@ Suggested plugins and settings:
 * P: When Gradle is building the project, the error `Could not find netty-transport-native-epoll-4.1.43.Final-linux-x86_64.jar` is shown.
   * S: Execute `rm -rf  ~/.m2/repository/io/netty/netty-transport*` in a Terminal and re-build again.
 
-* IntelliJ 2021.3 complains `Failed to find KotlinGradleProjectData for GradleSourceSetData` https://youtrack.jetbrains.com/issue/KTIJ-20173
-  * Switch to `IntelliJ IDEA CE 2021.2.3`
-
 * IntelliJ Gradle fails to import the project with `JAVA_11_HOME must be set to build Java 11 code`
   * A workaround is to run IntelliJ from terminal with `JAVA_11_HOME`
-  * In order to verify what's visible from IntelliJ use `Add Configuration` bar and go to `Add New` -> `Gradle` -> `Environmental Variables`
+  * In order to verify what's visible from IntelliJ use `Run -> Edit Configurations -> Add New -> Gradle -> Environmental Variables`
 
 ## Running tests on another JVM
 

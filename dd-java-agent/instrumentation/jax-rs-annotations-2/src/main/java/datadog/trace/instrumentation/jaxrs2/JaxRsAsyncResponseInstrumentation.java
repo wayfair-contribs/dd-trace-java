@@ -27,7 +27,8 @@ public final class JaxRsAsyncResponseInstrumentation extends Instrumenter.Tracin
     super("jax-rs", "jaxrs", "jax-rs-annotations");
   }
 
-  static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
+  static final ElementMatcher<ClassLoader> HAS_JAX_RS2 =
+      // Avoid matching JAX-RS 1 which has its own instrumentation.
       hasClassNamed("javax.ws.rs.container.AsyncResponse");
 
   @Override
@@ -38,8 +39,7 @@ public final class JaxRsAsyncResponseInstrumentation extends Instrumenter.Tracin
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return CLASS_LOADER_MATCHER;
+    return HAS_JAX_RS2;
   }
 
   @Override

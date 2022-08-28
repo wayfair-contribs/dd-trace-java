@@ -25,8 +25,7 @@ public final class ServletContextInstrumentation extends Instrumenter.Tracing
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return RequestDispatcherInstrumentation.CLASS_LOADER_MATCHER;
+    return RequestDispatcherInstrumentation.HAS_REQUEST_DISPATCHER;
   }
 
   @Override

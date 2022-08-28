@@ -31,7 +31,8 @@ public final class AsyncHttpClientInstrumentation extends Instrumenter.Tracing
     super("grizzly-client", "ning");
   }
 
-  static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
+  static final ElementMatcher<ClassLoader> HAS_ASYNC_HTTP_CLIENT =
+      // Optimization for expensive typeMatcher.
       hasClassNamed("com.ning.http.client.AsyncHandler");
 
   @Override
@@ -41,7 +42,7 @@ public final class AsyncHttpClientInstrumentation extends Instrumenter.Tracing
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return CLASS_LOADER_MATCHER;
+    return HAS_ASYNC_HTTP_CLIENT;
   }
 
   @Override

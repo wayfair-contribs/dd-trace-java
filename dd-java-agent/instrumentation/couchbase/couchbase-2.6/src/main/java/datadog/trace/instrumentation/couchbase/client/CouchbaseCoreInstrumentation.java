@@ -28,7 +28,7 @@ public class CouchbaseCoreInstrumentation extends Instrumenter.Tracing
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return CouchbaseNetworkInstrumentation.CLASS_LOADER_MATCHER;
+    return CouchbaseNetworkInstrumentation.HAS_COUCHBASE;
   }
 
   @Override

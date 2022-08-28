@@ -44,8 +44,7 @@ public final class JaxRsAnnotationsInstrumentation extends Instrumenter.Tracing
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return JaxRsAsyncResponseInstrumentation.CLASS_LOADER_MATCHER;
+    return JaxRsAsyncResponseInstrumentation.HAS_JAX_RS2;
   }
 
   @Override

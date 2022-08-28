@@ -43,13 +43,13 @@ public final class RequestDispatcherInstrumentation extends Instrumenter.Tracing
     super("servlet", "servlet-dispatcher");
   }
 
-  static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
+  static final ElementMatcher<ClassLoader> HAS_REQUEST_DISPATCHER =
+      // Optimization for expensive typeMatcher.
       hasClassNamed("javax.servlet.RequestDispatcher");
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return CLASS_LOADER_MATCHER;
+    return HAS_REQUEST_DISPATCHER;
   }
 
   @Override

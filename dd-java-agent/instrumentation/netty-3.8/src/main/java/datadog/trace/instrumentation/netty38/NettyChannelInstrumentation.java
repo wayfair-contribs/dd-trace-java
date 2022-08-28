@@ -28,13 +28,13 @@ public class NettyChannelInstrumentation extends Instrumenter.Tracing
     super(INSTRUMENTATION_NAME, ADDITIONAL_INSTRUMENTATION_NAMES);
   }
 
-  static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
+  static final ElementMatcher<ClassLoader> HAS_NETTY_CHANNEL =
+      // Optimization for expensive typeMatcher.
       hasClassNamed("org.jboss.netty.channel.Channel");
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return CLASS_LOADER_MATCHER;
+    return HAS_NETTY_CHANNEL;
   }
 
   @Override

@@ -36,8 +36,7 @@ public class ChannelFutureListenerInstrumentation extends Instrumenter.Tracing
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return NettyChannelInstrumentation.CLASS_LOADER_MATCHER;
+    return NettyChannelInstrumentation.HAS_NETTY_CHANNEL;
   }
 
   @Override

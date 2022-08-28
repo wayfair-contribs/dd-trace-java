@@ -39,7 +39,7 @@ public final class AsyncCompletionHandlerInstrumentation extends Instrumenter.Tr
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return AsyncHttpClientInstrumentation.CLASS_LOADER_MATCHER;
+    return AsyncHttpClientInstrumentation.HAS_ASYNC_HTTP_CLIENT;
   }
 
   @Override

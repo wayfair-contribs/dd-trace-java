@@ -44,8 +44,7 @@ public final class JakartaRsAnnotationsInstrumentation extends Instrumenter.Trac
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return JakartaRsAsyncResponseInstrumentation.CLASS_LOADER_MATCHER;
+    return JakartaRsAsyncResponseInstrumentation.HAS_JAKARTA_RS;
   }
 
   @Override

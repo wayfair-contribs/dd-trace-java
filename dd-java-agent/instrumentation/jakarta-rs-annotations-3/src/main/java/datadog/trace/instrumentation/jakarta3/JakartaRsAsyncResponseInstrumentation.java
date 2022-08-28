@@ -27,7 +27,8 @@ public final class JakartaRsAsyncResponseInstrumentation extends Instrumenter.Tr
     super("jakarta-rs", "jakartars", "jakarta-rs-annotations");
   }
 
-  static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
+  static final ElementMatcher<ClassLoader> HAS_JAKARTA_RS =
+      // Optimization for expensive typeMatcher.
       hasClassNamed("jakarta.ws.rs.container.AsyncResponse");
 
   @Override
@@ -38,8 +39,7 @@ public final class JakartaRsAsyncResponseInstrumentation extends Instrumenter.Tr
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return CLASS_LOADER_MATCHER;
+    return HAS_JAKARTA_RS;
   }
 
   @Override

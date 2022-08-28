@@ -1,5 +1,6 @@
 package datadog.trace.instrumentation.grizzly.client;
 
+import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.extendsClass;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.namedOneOf;
@@ -39,7 +40,8 @@ public final class AsyncCompletionHandlerInstrumentation extends Instrumenter.Tr
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return AsyncHttpClientInstrumentation.HAS_ASYNC_HTTP_CLIENT;
+    // Optimization for expensive typeMatcher.
+    return hasClassNamed("com.ning.http.client.AsyncHandler");
   }
 
   @Override

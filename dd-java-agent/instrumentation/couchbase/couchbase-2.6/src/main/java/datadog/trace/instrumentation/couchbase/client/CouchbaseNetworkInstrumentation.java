@@ -29,13 +29,10 @@ public class CouchbaseNetworkInstrumentation extends Instrumenter.Tracing
     super("couchbase");
   }
 
-  static final ElementMatcher<ClassLoader> HAS_COUCHBASE =
-      // Optimization for expensive typeMatcher.
-      hasClassNamed("com.couchbase.client.core.message.CouchbaseRequest");
-
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return HAS_COUCHBASE;
+    // Optimization for expensive typeMatcher.
+    return hasClassNamed("com.couchbase.client.core.message.CouchbaseRequest");
   }
 
   @Override

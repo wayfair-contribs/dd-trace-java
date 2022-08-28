@@ -34,8 +34,7 @@ import org.hibernate.classic.Validatable;
 import org.hibernate.transaction.JBossTransactionManagerLookup;
 
 @AutoService(Instrumenter.class)
-public class SessionInstrumentation extends AbstractHibernateInstrumentation
-    implements Instrumenter.CanShortcutTypeMatching {
+public class SessionInstrumentation extends AbstractHibernateInstrumentation {
 
   @Override
   public Map<String, String> contextStore() {

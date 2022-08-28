@@ -1,5 +1,6 @@
 package datadog.trace.instrumentation.hibernate.core.v4_3;
 
+import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.ANY_CLASS_LOADER;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.hasInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
@@ -30,9 +31,6 @@ public class SessionInstrumentation extends Instrumenter.Tracing
     super("hibernate", "hibernate-core");
   }
 
-  static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
-      hasClassNamed("org.hibernate.Session");
-
   @Override
   public Map<String, String> contextStore() {
     final Map<String, String> map = new HashMap<>();
@@ -52,8 +50,12 @@ public class SessionInstrumentation extends Instrumenter.Tracing
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return CLASS_LOADER_MATCHER;
+    if (onlyMatchKnownTypes()) {
+      return ANY_CLASS_LOADER;
+    } else {
+      // Optimization for expensive typeMatcher.
+      return hasClassNamed("org.hibernate.Session");
+    }
   }
 
   @Override

@@ -1,5 +1,7 @@
 package datadog.trace.instrumentation.hibernate.core.v4_3;
 
+import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.ANY_CLASS_LOADER;
+import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static java.util.Collections.singletonMap;
@@ -41,8 +43,12 @@ public class ProcedureCallInstrumentation extends Instrumenter.Tracing
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // Optimization for expensive typeMatcher.
-    return SessionInstrumentation.CLASS_LOADER_MATCHER;
+    if (onlyMatchKnownTypes()) {
+      return ANY_CLASS_LOADER;
+    } else {
+      // Optimization for expensive typeMatcher.
+      return hasClassNamed("org.hibernate.Session");
+    }
   }
 
   @Override

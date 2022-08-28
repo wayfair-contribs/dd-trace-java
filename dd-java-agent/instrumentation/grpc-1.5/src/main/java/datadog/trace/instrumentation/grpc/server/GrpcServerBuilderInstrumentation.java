@@ -1,5 +1,7 @@
 package datadog.trace.instrumentation.grpc.server;
 
+import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.ANY_CLASS_LOADER;
+import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.extendsClass;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static datadog.trace.bootstrap.CallDepthThreadLocalMap.incrementCallDepth;
@@ -25,6 +27,15 @@ public class GrpcServerBuilderInstrumentation extends Instrumenter.Tracing
 
   public GrpcServerBuilderInstrumentation() {
     super("grpc", "grpc-server");
+  }
+
+  @Override
+  public ElementMatcher<ClassLoader> classLoaderMatcher() {
+    if (onlyMatchKnownTypes()) {
+      return ANY_CLASS_LOADER;
+    } else {
+      return hasClassNamed("io.grpc.ServerBuilder");
+    }
   }
 
   @Override

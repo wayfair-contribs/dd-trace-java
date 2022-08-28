@@ -30,6 +30,7 @@ public class JUnit4Instrumentation extends Instrumenter.CiVisibility
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
+    // Optimization for expensive typeMatcher.
     return hasClassNamed("org.junit.runner.Runner");
   }
 

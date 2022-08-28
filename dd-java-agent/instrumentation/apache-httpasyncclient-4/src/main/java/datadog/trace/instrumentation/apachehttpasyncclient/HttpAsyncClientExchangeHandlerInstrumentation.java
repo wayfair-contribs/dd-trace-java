@@ -28,6 +28,7 @@ public class HttpAsyncClientExchangeHandlerInstrumentation extends Instrumenter.
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
+    // Optimization for expensive typeMatcher.
     return hasClassNamed("org.apache.http.nio.protocol.HttpAsyncClientExchangeHandler");
   }
 

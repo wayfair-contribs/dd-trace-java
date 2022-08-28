@@ -35,7 +35,7 @@ public final class FilterInstrumentation extends Instrumenter.Tracing
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
     // Optimization for expensive typeMatcher.
-    // return hasClassesNamed("javax.servlet.Filter"); // Not available in 2.2
+    // return hasClassNamed("javax.servlet.Filter"); // Not available in 2.2
     return hasClassNamed("javax.servlet.http.HttpServlet");
   }
 

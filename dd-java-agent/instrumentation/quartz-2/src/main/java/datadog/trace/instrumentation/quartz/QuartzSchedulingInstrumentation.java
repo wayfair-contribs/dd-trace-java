@@ -30,6 +30,7 @@ public final class QuartzSchedulingInstrumentation extends Instrumenter.Tracing
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
+    // Optimization for expensive typeMatcher.
     return hasClassNamed("org.quartz.Job");
   }
 

@@ -47,6 +47,7 @@ public final class ScalaForkJoinTaskInstrumentation extends Instrumenter.Tracing
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
+    // Optimization for expensive typeMatcher.
     return hasClassNamed("scala.concurrent.forkjoin.ForkJoinTask");
   }
 

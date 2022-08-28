@@ -20,13 +20,10 @@ public final class Servlet3Instrumentation extends Instrumenter.Tracing
     super("servlet", "servlet-3");
   }
 
-  private final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
-      hasClassNamed("javax.servlet.http.HttpServletResponse");
-
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
     // Optimization for expensive typeMatcher.
-    return CLASS_LOADER_MATCHER;
+    return hasClassNamed("javax.servlet.http.HttpServletResponse");
   }
 
   @Override

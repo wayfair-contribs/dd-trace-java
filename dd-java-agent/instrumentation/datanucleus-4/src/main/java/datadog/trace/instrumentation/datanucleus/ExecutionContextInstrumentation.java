@@ -28,12 +28,10 @@ public class ExecutionContextInstrumentation extends Instrumenter.Tracing
     super("datanucleus");
   }
 
-  private final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
-      hasClassNamed("org.datanucleus.ExecutionContext");
-
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return CLASS_LOADER_MATCHER;
+    // Optimization for expensive typeMatcher.
+    return hasClassNamed("org.datanucleus.ExecutionContext");
   }
 
   @Override

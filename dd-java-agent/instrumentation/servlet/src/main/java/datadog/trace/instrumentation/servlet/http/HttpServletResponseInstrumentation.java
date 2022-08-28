@@ -27,13 +27,10 @@ public final class HttpServletResponseInstrumentation extends Instrumenter.Traci
     super("servlet", "servlet-response");
   }
 
-  public static final ElementMatcher<ClassLoader> CLASS_LOADER_MATCHER =
-      hasClassNamed("javax.servlet.http.HttpServletResponse");
-
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
     // Optimization for expensive typeMatcher.
-    return CLASS_LOADER_MATCHER;
+    return hasClassNamed("javax.servlet.http.HttpServletResponse");
   }
 
   @Override

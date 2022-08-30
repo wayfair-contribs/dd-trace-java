@@ -225,21 +225,20 @@ public class AgentTransformerBuilder
   }
 
   private ElementMatcher<ClassLoader> getContextStoreActivator(Instrumenter.Default instrumenter) {
-    ElementMatcher<ClassLoader> classLoaderMatcher = instrumenter.classLoaderMatcher();
-    if (ANY_CLASS_LOADER == classLoaderMatcher) {
+    ElementMatcher<ClassLoader> activator = instrumenter.classLoaderMatcher();
+    if (ANY_CLASS_LOADER == activator) {
       if (instrumenter instanceof Instrumenter.ForSingleType) {
-        classLoaderMatcher =
-            hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());
+        activator = hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());
       } else if (instrumenter instanceof Instrumenter.ForKnownTypes) {
         String[] names = ((Instrumenter.ForKnownTypes) instrumenter).knownMatchingTypes();
         ElementMatcher<ClassLoader>[] matchers = new ElementMatcher[names.length];
         for (int i = 0; i < names.length; i++) {
           matchers[i] = hasClassNamed(names[i]);
         }
-        classLoaderMatcher = new ElementMatcher.Junction.Disjunction(matchers);
+        activator = new ElementMatcher.Junction.Disjunction(matchers);
       }
     }
-    return classLoaderMatcher;
+    return activator;
   }
 
   static AgentBuilder.Transformer wrapVisitor(final AsmVisitorWrapper visitor) {

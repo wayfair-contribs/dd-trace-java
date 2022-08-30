@@ -4,6 +4,7 @@ import static datadog.trace.agent.tooling.bytebuddy.DDTransformers.defaultTransf
 import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.ANY_CLASS_LOADER;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.declaresAnnotation;
+import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.hasSuperType;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.isSynthetic;
 import static net.bytebuddy.matcher.ElementMatchers.none;
@@ -12,7 +13,9 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
 import datadog.trace.agent.tooling.bytebuddy.ExceptionHandlers;
 import datadog.trace.agent.tooling.bytebuddy.matcher.FailSafeRawMatcher;
 import datadog.trace.agent.tooling.bytebuddy.matcher.KnownTypesMatcher;
+import datadog.trace.agent.tooling.bytebuddy.matcher.ShouldInjectFieldsRawMatcher;
 import datadog.trace.agent.tooling.bytebuddy.matcher.SingleTypeMatcher;
+import datadog.trace.agent.tooling.context.FieldBackedContextInjector;
 import datadog.trace.agent.tooling.context.FieldBackedContextRequestRewriter;
 import datadog.trace.api.Config;
 import datadog.trace.api.IntegrationsCollector;
@@ -60,6 +63,8 @@ public class AgentTransformerBuilder
   }
 
   public ResettableClassFileTransformer installOn(Instrumentation instrumentation) {
+    registerContextStoreInjection();
+
     return agentBuilder.installOn(instrumentation);
   }
 
@@ -98,21 +103,10 @@ public class AgentTransformerBuilder
 
     final Map<String, String> contextStore = instrumenter.contextStore();
     if (!contextStore.isEmpty()) {
-      final AsmVisitorWrapper requestRewriter =
-          new FieldBackedContextRequestRewriter(contextStore, instrumenter.name());
-
       adviceBuilder =
           adviceBuilder.transform(
-              new AgentBuilder.Transformer() {
-                @Override
-                public DynamicType.Builder<?> transform(
-                    DynamicType.Builder<?> builder,
-                    TypeDescription typeDescription,
-                    ClassLoader classLoader,
-                    JavaModule module) {
-                  return builder.visit(requestRewriter);
-                }
-              });
+              wrapVisitor(
+                  new FieldBackedContextRequestRewriter(contextStore, instrumenter.name())));
 
       for (Map.Entry<String, String> storeEntry : contextStore.entrySet()) {
         ElementMatcher<ClassLoader> activator = getContextStoreActivator(instrumenter);
@@ -243,10 +237,36 @@ public class AgentTransformerBuilder
           matchers[i] = hasClassNamed(names[i]);
         }
         classLoaderMatcher = new ElementMatcher.Junction.Disjunction(matchers);
-      } else {
-        System.err.println("========  MISSING CONTEXT STORE ACTIVATOR  ========   " + instrumenter);
       }
     }
     return classLoaderMatcher;
+  }
+
+  static AgentBuilder.Transformer wrapVisitor(final AsmVisitorWrapper visitor) {
+    return new AgentBuilder.Transformer() {
+      @Override
+      public DynamicType.Builder<?> transform(
+          final DynamicType.Builder<?> builder,
+          final TypeDescription typeDescription,
+          final ClassLoader classLoader,
+          final JavaModule module) {
+        return builder.visit(visitor);
+      }
+    };
+  }
+
+  private void registerContextStoreInjection() {
+    for (Map.Entry<Map.Entry<String, String>, ElementMatcher<ClassLoader>> activation :
+        contextStoreActivation.entrySet()) {
+      String keyClassName = activation.getKey().getKey();
+      String contextClassName = activation.getKey().getValue();
+      agentBuilder =
+          agentBuilder
+              .type(hasSuperType(named(keyClassName)), activation.getValue())
+              .and(new ShouldInjectFieldsRawMatcher(keyClassName, contextClassName))
+              .and(AgentTransformerBuilder.NOT_DECORATOR_MATCHER)
+              .transform(
+                  wrapVisitor(new FieldBackedContextInjector(keyClassName, contextClassName)));
+    }
   }
 }

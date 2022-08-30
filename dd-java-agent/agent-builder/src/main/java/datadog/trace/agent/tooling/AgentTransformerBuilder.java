@@ -2,9 +2,9 @@ package datadog.trace.agent.tooling;
 
 import static datadog.trace.agent.tooling.bytebuddy.DDTransformers.defaultTransformers;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.ANY_CLASS_LOADER;
+import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.declaresAnnotation;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
-import static java.util.Collections.singletonMap;
 import static net.bytebuddy.matcher.ElementMatchers.isSynthetic;
 import static net.bytebuddy.matcher.ElementMatchers.none;
 import static net.bytebuddy.matcher.ElementMatchers.not;
@@ -13,16 +13,16 @@ import datadog.trace.agent.tooling.bytebuddy.ExceptionHandlers;
 import datadog.trace.agent.tooling.bytebuddy.matcher.FailSafeRawMatcher;
 import datadog.trace.agent.tooling.bytebuddy.matcher.KnownTypesMatcher;
 import datadog.trace.agent.tooling.bytebuddy.matcher.SingleTypeMatcher;
-import datadog.trace.agent.tooling.context.FieldBackedContextProvider;
-import datadog.trace.agent.tooling.context.InstrumentationContextProvider;
-import datadog.trace.agent.tooling.context.NoopContextProvider;
+import datadog.trace.agent.tooling.context.FieldBackedContextRequestRewriter;
 import datadog.trace.api.Config;
 import datadog.trace.api.IntegrationsCollector;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
+import java.util.HashMap;
 import java.util.Map;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
+import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
@@ -36,6 +36,9 @@ public class AgentTransformerBuilder
   // expensive. https://github.com/DataDog/dd-trace-java/pull/1045
   public static final ElementMatcher.Junction<TypeDescription> NOT_DECORATOR_MATCHER =
       not(declaresAnnotation(named("javax.decorator.Decorator")));
+
+  private final Map<Map.Entry<String, String>, ElementMatcher<ClassLoader>> contextStoreActivation =
+      new HashMap<>();
 
   private AgentBuilder agentBuilder;
   private ElementMatcher<? super MethodDescription> ignoreMatcher;
@@ -93,17 +96,33 @@ public class AgentTransformerBuilder
               new HelperTransformer(instrumenter.getClass().getSimpleName(), helperClassNames));
     }
 
-    InstrumentationContextProvider contextProvider;
-    Map<String, String> matchedContextStores = instrumenter.contextStore();
-    if (matchedContextStores.isEmpty()) {
-      contextProvider = NoopContextProvider.INSTANCE;
-    } else {
-      contextProvider =
-          new FieldBackedContextProvider(
-              instrumenter, singletonMap(instrumenter.classLoaderMatcher(), matchedContextStores));
-    }
+    final Map<String, String> contextStore = instrumenter.contextStore();
+    if (!contextStore.isEmpty()) {
+      final AsmVisitorWrapper requestRewriter =
+          new FieldBackedContextRequestRewriter(contextStore, instrumenter.name());
 
-    adviceBuilder = contextProvider.instrumentationTransformer(adviceBuilder);
+      adviceBuilder =
+          adviceBuilder.transform(
+              new AgentBuilder.Transformer() {
+                @Override
+                public DynamicType.Builder<?> transform(
+                    DynamicType.Builder<?> builder,
+                    TypeDescription typeDescription,
+                    ClassLoader classLoader,
+                    JavaModule module) {
+                  return builder.visit(requestRewriter);
+                }
+              });
+
+      for (Map.Entry<String, String> storeEntry : contextStore.entrySet()) {
+        ElementMatcher<ClassLoader> activator = getContextStoreActivator(instrumenter);
+        ElementMatcher<ClassLoader> oldActivator = contextStoreActivation.get(storeEntry);
+        if (null != oldActivator) {
+          activator = new ElementMatcher.Junction.Disjunction<>(oldActivator, activator);
+        }
+        contextStoreActivation.put(storeEntry, activator);
+      }
+    }
 
     final Instrumenter.AdviceTransformer customTransformer = instrumenter.transformer();
     if (customTransformer != null) {
@@ -122,8 +141,6 @@ public class AgentTransformerBuilder
     }
 
     instrumenter.adviceTransformations(this);
-
-    adviceBuilder = contextProvider.additionalInstrumentation(adviceBuilder);
 
     return adviceBuilder;
   }
@@ -211,5 +228,25 @@ public class AgentTransformerBuilder
                 .include(Utils.getBootstrapProxy(), Utils.getAgentClassLoader())
                 .withExceptionHandler(ExceptionHandlers.defaultExceptionHandler())
                 .advice(not(ignoreMatcher).and(matcher), name));
+  }
+
+  private ElementMatcher<ClassLoader> getContextStoreActivator(Instrumenter.Default instrumenter) {
+    ElementMatcher<ClassLoader> classLoaderMatcher = instrumenter.classLoaderMatcher();
+    if (ANY_CLASS_LOADER == classLoaderMatcher) {
+      if (instrumenter instanceof Instrumenter.ForSingleType) {
+        classLoaderMatcher =
+            hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());
+      } else if (instrumenter instanceof Instrumenter.ForKnownTypes) {
+        String[] names = ((Instrumenter.ForKnownTypes) instrumenter).knownMatchingTypes();
+        ElementMatcher<ClassLoader>[] matchers = new ElementMatcher[names.length];
+        for (int i = 0; i < names.length; i++) {
+          matchers[i] = hasClassNamed(names[i]);
+        }
+        classLoaderMatcher = new ElementMatcher.Junction.Disjunction(matchers);
+      } else {
+        System.err.println("========  MISSING CONTEXT STORE ACTIVATOR  ========   " + instrumenter);
+      }
+    }
+    return classLoaderMatcher;
   }
 }

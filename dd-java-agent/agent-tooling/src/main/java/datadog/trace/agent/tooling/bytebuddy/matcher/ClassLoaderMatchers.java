@@ -3,6 +3,7 @@ package datadog.trace.agent.tooling.bytebuddy.matcher;
 import static datadog.trace.bootstrap.AgentClassLoading.PROBING_CLASSLOADER;
 import static net.bytebuddy.matcher.ElementMatchers.any;
 
+import datadog.trace.agent.tooling.Utils;
 import datadog.trace.agent.tooling.WeakCaches;
 import datadog.trace.api.Config;
 import datadog.trace.api.Tracer;
@@ -123,11 +124,8 @@ public final class ClassLoaderMatchers {
       };
 
   /**
-   * NOTICE: Does not match the bootstrap classpath. Don't use with classes expected to be on the
-   * bootstrap.
-   *
-   * @param className the className to match.
-   * @return true if class is available as a resource, not on the bootstrap classloader.
+   * @param className the class name to match.
+   * @return true if class is available as a resource.
    */
   public static ElementMatcher.Junction<ClassLoader> hasClassNamed(String className) {
     String resourceName = Strings.getResourceName(className);
@@ -158,7 +156,7 @@ public final class ClassLoaderMatchers {
     }
   }
 
-  static final class HasClassMatcher extends ElementMatcher.Junction.ForNonNullValues<ClassLoader> {
+  static final class HasClassMatcher extends ElementMatcher.Junction.AbstractBase<ClassLoader> {
     private final int hasClassId;
 
     private HasClassMatcher(int hasClassId) {
@@ -166,8 +164,11 @@ public final class ClassLoaderMatchers {
     }
 
     @Override
-    protected boolean doMatch(final ClassLoader cl) {
-      return hasClassCache.computeIfAbsent(cl, buildHasClassMask).get(hasClassId);
+    public boolean matches(final ClassLoader cl) {
+      return hasClassCache
+          .computeIfAbsent(
+              BOOTSTRAP_CLASSLOADER == cl ? Utils.getBootstrapProxy() : cl, buildHasClassMask)
+          .get(hasClassId);
     }
   }
 }

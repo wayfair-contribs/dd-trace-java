@@ -1,7 +1,5 @@
 package datadog.trace.instrumentation.hibernate.core.v4_3;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.ANY_CLASS_LOADER;
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static java.util.Collections.singletonMap;
@@ -42,16 +40,6 @@ public class ProcedureCallInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    if (onlyMatchKnownTypes()) {
-      return ANY_CLASS_LOADER;
-    } else {
-      // Optimization for expensive typeMatcher.
-      return hasClassNamed("org.hibernate.Session");
-    }
-  }
-
-  @Override
   public boolean onlyMatchKnownTypes() {
     return isShortcutMatchingEnabled(true);
   }
@@ -62,8 +50,13 @@ public class ProcedureCallInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
+  public String hierarchyMarkerType() {
+    return "org.hibernate.procedure.ProcedureCall";
+  }
+
+  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("org.hibernate.procedure.ProcedureCall"));
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 
   @Override

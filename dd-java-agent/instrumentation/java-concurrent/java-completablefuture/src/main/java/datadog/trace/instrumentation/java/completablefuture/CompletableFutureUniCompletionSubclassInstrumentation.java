@@ -24,8 +24,13 @@ public class CompletableFutureUniCompletionSubclassInstrumentation extends Instr
   }
 
   @Override
+  public String hierarchyMarkerType() {
+    return UNI_COMPLETION;
+  }
+
+  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return nameStartsWith(COMPLETABLE_FUTURE).and(extendsClass(named(UNI_COMPLETION)));
+    return nameStartsWith(COMPLETABLE_FUTURE).and(extendsClass(named(hierarchyMarkerType())));
   }
 
   @Override

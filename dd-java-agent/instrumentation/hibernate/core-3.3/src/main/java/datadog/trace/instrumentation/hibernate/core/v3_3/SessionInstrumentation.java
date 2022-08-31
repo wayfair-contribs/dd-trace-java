@@ -55,6 +55,11 @@ public class SessionInstrumentation extends AbstractHibernateInstrumentation {
   }
 
   @Override
+  public String hierarchyMarkerType() {
+    return "org.hibernate.Session"; // implies existence of org.hibernate.StatelessSession
+  }
+
+  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
     return implementsInterface(
         namedOneOf("org.hibernate.Session", "org.hibernate.StatelessSession"));

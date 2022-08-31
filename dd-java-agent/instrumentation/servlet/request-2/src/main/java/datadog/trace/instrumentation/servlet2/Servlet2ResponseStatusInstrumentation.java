@@ -20,12 +20,17 @@ public final class Servlet2ResponseStatusInstrumentation extends Instrumenter.Tr
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return Servlet2Instrumentation.HAS_SERVLET2;
+    return Servlet2Instrumentation.NOT_SERVLET3;
+  }
+
+  @Override
+  public String hierarchyMarkerType() {
+    return "javax.servlet.http.HttpServletResponse";
   }
 
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("javax.servlet.http.HttpServletResponse"));
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 
   @Override

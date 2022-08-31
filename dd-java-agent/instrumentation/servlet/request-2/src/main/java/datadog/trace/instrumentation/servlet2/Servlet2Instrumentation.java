@@ -24,20 +24,23 @@ public final class Servlet2Instrumentation extends Instrumenter.Tracing
     super("servlet", "servlet-2");
   }
 
-  static final ElementMatcher<ClassLoader> HAS_SERVLET2 =
-      // Optimization for expensive typeMatcher...
-      hasClassNamed("javax.servlet.http.HttpServletResponse")
-          // ...but avoid matching servlet 3+ which has its own instrumentation.
-          .and(not(hasClassNamed("javax.servlet.AsyncEvent")));
+  static final ElementMatcher<ClassLoader> NOT_SERVLET3 =
+      // Avoid matching servlet 3+ which has its own instrumentation.
+      not(hasClassNamed("javax.servlet.AsyncEvent"));
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return HAS_SERVLET2;
+    return NOT_SERVLET3;
+  }
+
+  @Override
+  public String hierarchyMarkerType() {
+    return "javax.servlet.http.HttpServlet";
   }
 
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return extendsClass(named("javax.servlet.http.HttpServlet"))
+    return extendsClass(named(hierarchyMarkerType()))
         .or(implementsInterface(named("javax.servlet.FilterChain")));
   }
 

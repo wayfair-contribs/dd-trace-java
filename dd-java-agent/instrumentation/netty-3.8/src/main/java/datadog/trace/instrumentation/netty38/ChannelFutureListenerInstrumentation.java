@@ -35,13 +35,13 @@ public class ChannelFutureListenerInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return NettyChannelInstrumentation.HAS_NETTY_CHANNEL;
+  public String hierarchyMarkerType() {
+    return "org.jboss.netty.channel.ChannelFutureListener";
   }
 
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("org.jboss.netty.channel.ChannelFutureListener"));
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 
   @Override

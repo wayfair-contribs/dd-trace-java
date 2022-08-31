@@ -16,12 +16,12 @@ public class DB2ConnectionInstrumentation extends AbstractConnectionInstrumentat
   }
 
   @Override
-  public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("com.ibm.db2.jcc.DB2Connection"));
+  public String hierarchyMarkerType() {
+    return "com.ibm.db2.jcc.DB2Connection";
   }
 
   @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return DB2PreparedStatementInstrumentation.HAS_DB2;
+  public ElementMatcher<TypeDescription> hierarchyMatcher() {
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 }

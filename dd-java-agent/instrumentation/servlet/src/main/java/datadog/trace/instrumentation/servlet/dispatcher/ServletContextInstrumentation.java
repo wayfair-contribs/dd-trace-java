@@ -24,13 +24,13 @@ public final class ServletContextInstrumentation extends Instrumenter.Tracing
   }
 
   @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return RequestDispatcherInstrumentation.HAS_REQUEST_DISPATCHER;
+  public String hierarchyMarkerType() {
+    return "javax.servlet.ServletContext";
   }
 
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("javax.servlet.ServletContext"));
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 
   @Override

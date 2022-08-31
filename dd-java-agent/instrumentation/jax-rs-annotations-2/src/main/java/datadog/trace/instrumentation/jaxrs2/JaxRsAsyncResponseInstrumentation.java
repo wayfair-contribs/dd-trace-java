@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.jaxrs2;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static datadog.trace.instrumentation.jaxrs2.JaxRsAnnotationsDecorator.DECORATE;
@@ -27,10 +26,6 @@ public final class JaxRsAsyncResponseInstrumentation extends Instrumenter.Tracin
     super("jax-rs", "jaxrs", "jax-rs-annotations");
   }
 
-  static final ElementMatcher<ClassLoader> HAS_JAX_RS2 =
-      // Avoid matching JAX-RS 1 which has its own instrumentation.
-      hasClassNamed("javax.ws.rs.container.AsyncResponse");
-
   @Override
   public Map<String, String> contextStore() {
     return Collections.singletonMap(
@@ -38,13 +33,13 @@ public final class JaxRsAsyncResponseInstrumentation extends Instrumenter.Tracin
   }
 
   @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return HAS_JAX_RS2;
+  public String hierarchyMarkerType() {
+    return "javax.ws.rs.container.AsyncResponse";
   }
 
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("javax.ws.rs.container.AsyncResponse"));
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 
   @Override

@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.servlet.dispatcher;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.namedOneOf;
@@ -43,18 +42,14 @@ public final class RequestDispatcherInstrumentation extends Instrumenter.Tracing
     super("servlet", "servlet-dispatcher");
   }
 
-  static final ElementMatcher<ClassLoader> HAS_REQUEST_DISPATCHER =
-      // Optimization for expensive typeMatcher.
-      hasClassNamed("javax.servlet.RequestDispatcher");
-
   @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return HAS_REQUEST_DISPATCHER;
+  public String hierarchyMarkerType() {
+    return "javax.servlet.RequestDispatcher";
   }
 
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("javax.servlet.RequestDispatcher"));
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 
   @Override

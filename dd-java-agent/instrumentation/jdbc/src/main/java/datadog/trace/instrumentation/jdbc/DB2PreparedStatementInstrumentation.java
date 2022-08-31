@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.jdbc;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 
@@ -16,17 +15,13 @@ public class DB2PreparedStatementInstrumentation extends AbstractPreparedStateme
     super("jdbc", "db2");
   }
 
-  public static final ElementMatcher<ClassLoader> HAS_DB2 =
-      // Optimization for expensive typeMatcher.
-      hasClassNamed("com.ibm.db2.jcc.DB2PreparedStatement");
-
   @Override
-  public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("com.ibm.db2.jcc.DB2PreparedStatement"));
+  public String hierarchyMarkerType() {
+    return "com.ibm.db2.jcc.DB2PreparedStatement";
   }
 
   @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return HAS_DB2;
+  public ElementMatcher<TypeDescription> hierarchyMatcher() {
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 }

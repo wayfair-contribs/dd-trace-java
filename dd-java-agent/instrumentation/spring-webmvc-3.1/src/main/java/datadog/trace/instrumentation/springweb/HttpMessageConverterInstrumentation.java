@@ -34,14 +34,19 @@ public class HttpMessageConverterInstrumentation extends Instrumenter.AppSec
 
   @Override
   public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    // class chosen so it's only applied when the other instrumentations are applied
+    // Only apply this spring-framework instrumentation when spring-webmvc is also deployed.
     return hasClassNamed(
         "org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping");
   }
 
   @Override
+  public String hierarchyMarkerType() {
+    return "org.springframework.http.converter.HttpMessageConverter";
+  }
+
+  @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("org.springframework.http.converter.HttpMessageConverter"));
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 
   @Override

@@ -1,6 +1,5 @@
 package datadog.trace.instrumentation.jakarta3;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.implementsInterface;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
 import static datadog.trace.instrumentation.jakarta3.JakartaRsAnnotationsDecorator.DECORATE;
@@ -27,10 +26,6 @@ public final class JakartaRsAsyncResponseInstrumentation extends Instrumenter.Tr
     super("jakarta-rs", "jakartars", "jakarta-rs-annotations");
   }
 
-  static final ElementMatcher<ClassLoader> HAS_JAKARTA_RS =
-      // Optimization for expensive typeMatcher.
-      hasClassNamed("jakarta.ws.rs.container.AsyncResponse");
-
   @Override
   public Map<String, String> contextStore() {
     return Collections.singletonMap(
@@ -38,13 +33,13 @@ public final class JakartaRsAsyncResponseInstrumentation extends Instrumenter.Tr
   }
 
   @Override
-  public ElementMatcher<ClassLoader> classLoaderMatcher() {
-    return HAS_JAKARTA_RS;
+  public String hierarchyMarkerType() {
+    return "jakarta.ws.rs.container.AsyncResponse";
   }
 
   @Override
   public ElementMatcher<TypeDescription> hierarchyMatcher() {
-    return implementsInterface(named("jakarta.ws.rs.container.AsyncResponse"));
+    return implementsInterface(named(hierarchyMarkerType()));
   }
 
   @Override

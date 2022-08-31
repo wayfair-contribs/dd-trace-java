@@ -141,7 +141,7 @@ public class AgentTransformerBuilder
 
   private AgentBuilder.RawMatcher matcher(Instrumenter.Default instrumenter) {
     ElementMatcher<? super TypeDescription> typeMatcher;
-    String hierarchyMarkerType = null;
+    boolean includeHierarchy = false;
 
     if (instrumenter instanceof Instrumenter.ForSingleType) {
       String name = ((Instrumenter.ForSingleType) instrumenter).instrumentedType();
@@ -151,7 +151,7 @@ public class AgentTransformerBuilder
       typeMatcher = new KnownTypesMatcher(names);
     } else if (instrumenter instanceof Instrumenter.ForTypeHierarchy) {
       typeMatcher = ((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMatcher();
-      hierarchyMarkerType = ((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMarkerType();
+      includeHierarchy = true;
     } else if (instrumenter instanceof Instrumenter.ForConfiguredType) {
       typeMatcher = none(); // handle below, just like when it's combined with other matchers
     } else {
@@ -164,7 +164,7 @@ public class AgentTransformerBuilder
       typeMatcher =
           new ElementMatcher.Junction.Disjunction(
               typeMatcher, ((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMatcher());
-      hierarchyMarkerType = ((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMarkerType();
+      includeHierarchy = true;
     }
 
     if (instrumenter instanceof Instrumenter.ForConfiguredType) {
@@ -184,12 +184,16 @@ public class AgentTransformerBuilder
     }
 
     ElementMatcher<ClassLoader> classLoaderMatcher = instrumenter.classLoaderMatcher();
-    if (null != hierarchyMarkerType) {
-      classLoaderMatcher =
-          classLoaderMatcher == ANY_CLASS_LOADER
-              ? hasClassNamed(hierarchyMarkerType)
-              : new ElementMatcher.Junction.Conjunction<>(
-                  hasClassNamed(hierarchyMarkerType), classLoaderMatcher);
+    if (includeHierarchy) {
+      String hierarchyMarkerType =
+          ((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMarkerType();
+      if (null != hierarchyMarkerType) {
+        classLoaderMatcher =
+            classLoaderMatcher == ANY_CLASS_LOADER
+                ? hasClassNamed(hierarchyMarkerType)
+                : new ElementMatcher.Junction.Conjunction<>(
+                    hasClassNamed(hierarchyMarkerType), classLoaderMatcher);
+      }
     }
 
     if (classLoaderMatcher == ANY_CLASS_LOADER && typeMatcher instanceof AgentBuilder.RawMatcher) {

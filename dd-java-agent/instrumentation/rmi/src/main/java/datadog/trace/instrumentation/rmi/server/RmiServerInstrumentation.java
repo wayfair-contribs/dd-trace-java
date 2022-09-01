@@ -23,7 +23,7 @@ import net.bytebuddy.matcher.ElementMatcher;
 
 @AutoService(Instrumenter.class)
 public final class RmiServerInstrumentation extends Instrumenter.Tracing
-    implements Instrumenter.ForTypeHierarchy {
+    implements Instrumenter.BootstrapInstrumenter, Instrumenter.ForTypeHierarchy {
 
   public RmiServerInstrumentation() {
     super("rmi", "rmi-server");

@@ -2,9 +2,11 @@ package datadog.trace.agent.tooling;
 
 import static datadog.trace.agent.tooling.bytebuddy.DDTransformers.defaultTransformers;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
+import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamedOneOf;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.declaresAnnotation;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.hasSuperType;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.NameMatchers.named;
+import static net.bytebuddy.matcher.ElementMatchers.any;
 import static net.bytebuddy.matcher.ElementMatchers.isSynthetic;
 import static net.bytebuddy.matcher.ElementMatchers.none;
 import static net.bytebuddy.matcher.ElementMatchers.not;
@@ -39,7 +41,9 @@ public class AgentTransformerBuilder
   public static final ElementMatcher.Junction<TypeDescription> NOT_DECORATOR_MATCHER =
       not(declaresAnnotation(named("javax.decorator.Decorator")));
 
-  private final Map<Map.Entry<String, String>, ElementMatcher<ClassLoader>> contextStoreActivation =
+  private static final ElementMatcher<ClassLoader> ANY_CLASS_LOADER = any();
+
+  private final Map<Map.Entry<String, String>, ElementMatcher<ClassLoader>> contextStoreInjection =
       new HashMap<>();
 
   private AgentBuilder agentBuilder;
@@ -100,21 +104,12 @@ public class AgentTransformerBuilder
               new HelperTransformer(instrumenter.getClass().getSimpleName(), helperClassNames));
     }
 
-    final Map<String, String> contextStore = instrumenter.contextStore();
+    Map<String, String> contextStore = instrumenter.contextStore();
     if (!contextStore.isEmpty()) {
       adviceBuilder =
           adviceBuilder.transform(
               wrapVisitor(
                   new FieldBackedContextRequestRewriter(contextStore, instrumenter.name())));
-
-      for (Map.Entry<String, String> storeEntry : contextStore.entrySet()) {
-        ElementMatcher<ClassLoader> activator = getContextStoreActivator(instrumenter);
-        ElementMatcher<ClassLoader> oldActivator = contextStoreActivation.get(storeEntry);
-        if (null != oldActivator) {
-          activator = new ElementMatcher.Junction.Disjunction<>(oldActivator, activator);
-        }
-        contextStoreActivation.put(storeEntry, activator);
-      }
     }
 
     final Instrumenter.AdviceTransformer customTransformer = instrumenter.transformer();
@@ -196,6 +191,8 @@ public class AgentTransformerBuilder
       }
     }
 
+    updateContextStoreInjection(instrumenter, classLoaderMatcher);
+
     if (null == classLoaderMatcher && typeMatcher instanceof AgentBuilder.RawMatcher) {
       // optimization when using raw (named) type matcher with no classloader filtering
       return (AgentBuilder.RawMatcher) typeMatcher;
@@ -239,23 +236,6 @@ public class AgentTransformerBuilder
                 .advice(not(ignoreMatcher).and(matcher), name));
   }
 
-  private ElementMatcher<ClassLoader> getContextStoreActivator(Instrumenter.Default instrumenter) {
-    ElementMatcher<ClassLoader> activator = instrumenter.classLoaderMatcher();
-    if (null == activator) {
-      if (instrumenter instanceof Instrumenter.ForSingleType) {
-        activator = hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());
-      } else if (instrumenter instanceof Instrumenter.ForKnownTypes) {
-        String[] names = ((Instrumenter.ForKnownTypes) instrumenter).knownMatchingTypes();
-        ElementMatcher<ClassLoader>[] matchers = new ElementMatcher[names.length];
-        for (int i = 0; i < names.length; i++) {
-          matchers[i] = hasClassNamed(names[i]);
-        }
-        activator = new ElementMatcher.Junction.Disjunction(matchers);
-      }
-    }
-    return activator;
-  }
-
   static AgentBuilder.Transformer wrapVisitor(final AsmVisitorWrapper visitor) {
     return new AgentBuilder.Transformer() {
       @Override
@@ -269,14 +249,43 @@ public class AgentTransformerBuilder
     };
   }
 
+  private void updateContextStoreInjection(
+      Instrumenter.Default instrumenter, ElementMatcher<ClassLoader> activation) {
+    Map<String, String> contextStore = instrumenter.contextStore();
+    if (contextStore.isEmpty()) {
+      return;
+    }
+
+    if (null == activation) {
+      if (instrumenter instanceof Instrumenter.BootstrapInstrumenter) {
+        activation = ANY_CLASS_LOADER;
+      } else if (instrumenter instanceof Instrumenter.ForSingleType) {
+        activation = hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());
+      } else if (instrumenter instanceof Instrumenter.ForKnownTypes) {
+        activation =
+            hasClassNamedOneOf(((Instrumenter.ForKnownTypes) instrumenter).knownMatchingTypes());
+      }
+    }
+
+    for (Map.Entry<String, String> storeEntry : contextStore.entrySet()) {
+      ElementMatcher<ClassLoader> oldActivation = contextStoreInjection.get(storeEntry);
+      if (null == oldActivation || ANY_CLASS_LOADER == activation) {
+        contextStoreInjection.put(storeEntry, activation);
+      } else if (ANY_CLASS_LOADER != oldActivation) {
+        contextStoreInjection.put(
+            storeEntry, new ElementMatcher.Junction.Disjunction<>(oldActivation, activation));
+      }
+    }
+  }
+
   private void registerContextStoreInjection() {
-    for (Map.Entry<Map.Entry<String, String>, ElementMatcher<ClassLoader>> activation :
-        contextStoreActivation.entrySet()) {
-      String keyClassName = activation.getKey().getKey();
-      String contextClassName = activation.getKey().getValue();
+    for (Map.Entry<Map.Entry<String, String>, ElementMatcher<ClassLoader>> injection :
+        contextStoreInjection.entrySet()) {
+      String keyClassName = injection.getKey().getKey();
+      String contextClassName = injection.getKey().getValue();
       agentBuilder =
           agentBuilder
-              .type(hasSuperType(named(keyClassName)), activation.getValue())
+              .type(hasSuperType(named(keyClassName)), injection.getValue())
               .and(new ShouldInjectFieldsRawMatcher(keyClassName, contextClassName))
               .and(AgentTransformerBuilder.NOT_DECORATOR_MATCHER)
               .transform(

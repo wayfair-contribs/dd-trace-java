@@ -133,6 +133,18 @@ public final class ClassLoaderMatchers {
     return matcher;
   }
 
+  /**
+   * @param classNames the class names to match.
+   * @return true if any of the classes is available as a resource.
+   */
+  public static ElementMatcher.Junction<ClassLoader> hasClassNamedOneOf(String... classNames) {
+    ElementMatcher<ClassLoader>[] matchers = new ElementMatcher[classNames.length];
+    for (int i = 0; i < matchers.length; i++) {
+      matchers[i] = hasClassNamed(classNames[i]);
+    }
+    return new ElementMatcher.Junction.Disjunction<>(matchers);
+  }
+
   static BitSet buildHasClassMask(ClassLoader cl) {
     PROBING_CLASSLOADER.begin();
     try {

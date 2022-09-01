@@ -68,7 +68,7 @@ public interface Instrumenter {
 
   /** Instrumentation that matches based on the type hierarchy. */
   interface ForTypeHierarchy {
-    /** Optional type that implies which class-loaders should allow hierarchy matching. */
+    /** Class-loaders that don't have this type can skip this hierarchy matcher. */
     String hierarchyMarkerType();
 
     ElementMatcher<TypeDescription> hierarchyMatcher();

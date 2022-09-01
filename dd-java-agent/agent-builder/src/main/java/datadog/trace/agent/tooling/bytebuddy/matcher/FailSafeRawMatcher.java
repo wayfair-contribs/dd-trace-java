@@ -46,7 +46,8 @@ public class FailSafeRawMatcher implements AgentBuilder.RawMatcher {
       Class<?> classBeingRedefined,
       ProtectionDomain protectionDomain) {
     try {
-      return classLoaderMatcher.matches(classLoader) && typeMatcher.matches(typeDescription);
+      return (null == classLoaderMatcher || classLoaderMatcher.matches(classLoader))
+          && typeMatcher.matches(typeDescription);
     } catch (Exception e) {
       log.debug(description, e);
       return false;

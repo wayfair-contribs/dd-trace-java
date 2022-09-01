@@ -1,7 +1,6 @@
 package datadog.trace.agent.tooling;
 
 import static datadog.trace.agent.tooling.bytebuddy.DDTransformers.defaultTransformers;
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.ANY_CLASS_LOADER;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.hasClassNamed;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.declaresAnnotation;
 import static datadog.trace.agent.tooling.bytebuddy.matcher.HierarchyMatchers.hasSuperType;
@@ -141,7 +140,7 @@ public class AgentTransformerBuilder
 
   private AgentBuilder.RawMatcher matcher(Instrumenter.Default instrumenter) {
     ElementMatcher<? super TypeDescription> typeMatcher;
-    boolean includeHierarchy = false;
+    boolean checkingTypeHierarchy = false;
 
     if (instrumenter instanceof Instrumenter.ForSingleType) {
       String name = ((Instrumenter.ForSingleType) instrumenter).instrumentedType();
@@ -151,7 +150,7 @@ public class AgentTransformerBuilder
       typeMatcher = new KnownTypesMatcher(names);
     } else if (instrumenter instanceof Instrumenter.ForTypeHierarchy) {
       typeMatcher = ((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMatcher();
-      includeHierarchy = true;
+      checkingTypeHierarchy = true;
     } else if (instrumenter instanceof Instrumenter.ForConfiguredType) {
       typeMatcher = none(); // handle below, just like when it's combined with other matchers
     } else {
@@ -164,7 +163,7 @@ public class AgentTransformerBuilder
       typeMatcher =
           new ElementMatcher.Junction.Disjunction(
               typeMatcher, ((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMatcher());
-      includeHierarchy = true;
+      checkingTypeHierarchy = true;
     }
 
     if (instrumenter instanceof Instrumenter.ForConfiguredType) {
@@ -184,19 +183,20 @@ public class AgentTransformerBuilder
     }
 
     ElementMatcher<ClassLoader> classLoaderMatcher = instrumenter.classLoaderMatcher();
-    if (includeHierarchy) {
+
+    if (checkingTypeHierarchy) {
       String hierarchyMarkerType =
           ((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMarkerType();
       if (null != hierarchyMarkerType) {
         classLoaderMatcher =
-            classLoaderMatcher == ANY_CLASS_LOADER
+            null == classLoaderMatcher
                 ? hasClassNamed(hierarchyMarkerType)
                 : new ElementMatcher.Junction.Conjunction<>(
                     hasClassNamed(hierarchyMarkerType), classLoaderMatcher);
       }
     }
 
-    if (classLoaderMatcher == ANY_CLASS_LOADER && typeMatcher instanceof AgentBuilder.RawMatcher) {
+    if (null == classLoaderMatcher && typeMatcher instanceof AgentBuilder.RawMatcher) {
       // optimization when using raw (named) type matcher with no classloader filtering
       return (AgentBuilder.RawMatcher) typeMatcher;
     }
@@ -241,7 +241,7 @@ public class AgentTransformerBuilder
 
   private ElementMatcher<ClassLoader> getContextStoreActivator(Instrumenter.Default instrumenter) {
     ElementMatcher<ClassLoader> activator = instrumenter.classLoaderMatcher();
-    if (ANY_CLASS_LOADER == activator) {
+    if (null == activator) {
       if (instrumenter instanceof Instrumenter.ForSingleType) {
         activator = hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());
       } else if (instrumenter instanceof Instrumenter.ForKnownTypes) {

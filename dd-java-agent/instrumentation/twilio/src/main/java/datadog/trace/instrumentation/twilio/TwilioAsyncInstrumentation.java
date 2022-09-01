@@ -43,7 +43,7 @@ public class TwilioAsyncInstrumentation extends Instrumenter.Tracing
 
   @Override
   public String hierarchyMarkerType() {
-    return "com.twilio.base.Creator";
+    return "com.twilio.base.Resource"; // indirect type that implies existence of service classes
   }
 
   /** Match any child class of the base Twilio service classes. */

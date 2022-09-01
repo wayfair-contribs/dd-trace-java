@@ -1,6 +1,5 @@
 package datadog.trace.agent.tooling;
 
-import static datadog.trace.agent.tooling.bytebuddy.matcher.ClassLoaderMatchers.ANY_CLASS_LOADER;
 import static java.util.Collections.addAll;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -69,7 +68,7 @@ public interface Instrumenter {
 
   /** Instrumentation that matches based on the type hierarchy. */
   interface ForTypeHierarchy {
-    /** Identifies a hierarchy type that can be used for class-loader matching. */
+    /** Optional type that implies which class-loaders should allow hierarchy matching. */
     String hierarchyMarkerType();
 
     ElementMatcher<TypeDescription> hierarchyMatcher();
@@ -93,6 +92,9 @@ public interface Instrumenter {
      */
     void adviceTransformations(AdviceTransformation transformation);
   }
+
+  /** Instrumentation that transforms types on the bootstrap class-path. */
+  interface BootstrapInstrumenter {}
 
   /**
    * Indicates the applicability of an {@linkplain Instrumenter} to the given system.<br>
@@ -223,9 +225,9 @@ public interface Instrumenter {
       return null;
     }
 
-    /** @return Class-loader matcher that limits where this transformation applies. */
+    /** Override this to supply additional class-loader requirements. */
     public ElementMatcher<ClassLoader> classLoaderMatcher() {
-      return ANY_CLASS_LOADER;
+      return null;
     }
 
     /** @return A transformer for further transformation of the class */

@@ -1,7 +1,6 @@
 package datadog.trace.agent.tooling.bytebuddy.matcher;
 
 import static datadog.trace.bootstrap.AgentClassLoading.PROBING_CLASSLOADER;
-import static net.bytebuddy.matcher.ElementMatchers.any;
 
 import datadog.trace.agent.tooling.Utils;
 import datadog.trace.agent.tooling.WeakCaches;
@@ -20,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 public final class ClassLoaderMatchers {
   private static final Logger log = LoggerFactory.getLogger(ClassLoaderMatchers.class);
-
-  public static final ElementMatcher<ClassLoader> ANY_CLASS_LOADER = any();
 
   private static final ClassLoader BOOTSTRAP_CLASSLOADER = null;
 

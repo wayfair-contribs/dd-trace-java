@@ -29,7 +29,7 @@ import net.bytebuddy.matcher.ElementMatcher;
 
 @AutoService(Instrumenter.class)
 public final class StatementInstrumentation extends Instrumenter.Tracing
-    implements Instrumenter.BootstrapInstrumenter, Instrumenter.ForTypeHierarchy {
+    implements Instrumenter.ForBootstrap, Instrumenter.ForTypeHierarchy {
 
   public StatementInstrumentation() {
     super("jdbc");

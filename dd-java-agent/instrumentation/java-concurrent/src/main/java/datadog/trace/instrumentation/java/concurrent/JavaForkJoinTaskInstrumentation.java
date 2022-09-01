@@ -37,9 +37,7 @@ import net.bytebuddy.matcher.ElementMatcher;
  */
 @AutoService(Instrumenter.class)
 public final class JavaForkJoinTaskInstrumentation extends Instrumenter.Tracing
-    implements Instrumenter.BootstrapInstrumenter,
-        Instrumenter.ForTypeHierarchy,
-        ExcludeFilterProvider {
+    implements Instrumenter.ForBootstrap, Instrumenter.ForTypeHierarchy, ExcludeFilterProvider {
 
   public JavaForkJoinTaskInstrumentation() {
     super(AbstractExecutorInstrumentation.EXEC_NAME);

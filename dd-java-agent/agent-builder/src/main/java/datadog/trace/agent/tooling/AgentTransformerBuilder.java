@@ -257,7 +257,7 @@ public class AgentTransformerBuilder
     }
 
     if (null == activation) {
-      if (instrumenter instanceof Instrumenter.BootstrapInstrumenter) {
+      if (instrumenter instanceof Instrumenter.ForBootstrap) {
         activation = ANY_CLASS_LOADER;
       } else if (instrumenter instanceof Instrumenter.ForSingleType) {
         activation = hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());

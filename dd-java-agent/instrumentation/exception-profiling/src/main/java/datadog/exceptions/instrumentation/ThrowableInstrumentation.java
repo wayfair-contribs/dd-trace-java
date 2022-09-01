@@ -8,7 +8,7 @@ import datadog.trace.agent.tooling.Instrumenter;
 /** Provides instrumentation of {@linkplain Throwable} constructor. */
 @AutoService(Instrumenter.class)
 public final class ThrowableInstrumentation extends Instrumenter.Profiling
-    implements Instrumenter.ForSingleType {
+    implements Instrumenter.ForBootstrap, Instrumenter.ForSingleType {
   private final boolean hasJfr;
 
   public ThrowableInstrumentation() {

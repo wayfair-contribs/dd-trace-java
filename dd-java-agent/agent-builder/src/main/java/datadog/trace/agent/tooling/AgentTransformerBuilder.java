@@ -259,12 +259,17 @@ public class AgentTransformerBuilder
     if (null == activation) {
       if (instrumenter instanceof Instrumenter.ForBootstrap) {
         activation = ANY_CLASS_LOADER;
+      } else if (instrumenter instanceof Instrumenter.ForTypeHierarchy) {
+        activation = hasClassNamed(((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMarkerType());
       } else if (instrumenter instanceof Instrumenter.ForSingleType) {
         activation = hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());
       } else if (instrumenter instanceof Instrumenter.ForKnownTypes) {
         activation =
             hasClassNamedOneOf(((Instrumenter.ForKnownTypes) instrumenter).knownMatchingTypes());
       }
+    }
+    if (null == activation) {
+      activation = ANY_CLASS_LOADER;
     }
 
     for (Map.Entry<String, String> storeEntry : contextStore.entrySet()) {

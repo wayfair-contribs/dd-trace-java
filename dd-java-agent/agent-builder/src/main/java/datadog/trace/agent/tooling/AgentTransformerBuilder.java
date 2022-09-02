@@ -110,6 +110,8 @@ public class AgentTransformerBuilder
           adviceBuilder.transform(
               wrapVisitor(
                   new FieldBackedContextRequestRewriter(contextStore, instrumenter.name())));
+
+      updateContextStoreInjection(contextStore, instrumenter);
     }
 
     final Instrumenter.AdviceTransformer customTransformer = instrumenter.transformer();
@@ -184,14 +186,12 @@ public class AgentTransformerBuilder
           ((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMarkerType();
       if (null != hierarchyMarkerType) {
         classLoaderMatcher =
-            null == classLoaderMatcher
-                ? hasClassNamed(hierarchyMarkerType)
-                : new ElementMatcher.Junction.Conjunction<>(
-                    hasClassNamed(hierarchyMarkerType), classLoaderMatcher);
+            null != classLoaderMatcher
+                ? new ElementMatcher.Junction.Conjunction<>(
+                    hasClassNamed(hierarchyMarkerType), classLoaderMatcher)
+                : hasClassNamed(hierarchyMarkerType);
       }
     }
-
-    updateContextStoreInjection(instrumenter, classLoaderMatcher);
 
     if (null == classLoaderMatcher && typeMatcher instanceof AgentBuilder.RawMatcher) {
       // optimization when using raw (named) type matcher with no classloader filtering
@@ -250,26 +250,29 @@ public class AgentTransformerBuilder
   }
 
   private void updateContextStoreInjection(
-      Instrumenter.Default instrumenter, ElementMatcher<ClassLoader> activation) {
-    Map<String, String> contextStore = instrumenter.contextStore();
-    if (contextStore.isEmpty()) {
-      return;
+      Map<String, String> contextStore, Instrumenter.Default instrumenter) {
+
+    ElementMatcher<ClassLoader> activation;
+    if (instrumenter instanceof Instrumenter.ForBootstrap) {
+      activation = ANY_CLASS_LOADER;
+    } else if (instrumenter instanceof Instrumenter.ForTypeHierarchy) {
+      activation =
+          hasClassNamed(((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMarkerType());
+    } else if (instrumenter instanceof Instrumenter.ForSingleType) {
+      activation = hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());
+    } else if (instrumenter instanceof Instrumenter.ForKnownTypes) {
+      activation =
+          hasClassNamedOneOf(((Instrumenter.ForKnownTypes) instrumenter).knownMatchingTypes());
+    } else {
+      activation = ANY_CLASS_LOADER;
     }
 
-    if (null == activation) {
-      if (instrumenter instanceof Instrumenter.ForBootstrap) {
-        activation = ANY_CLASS_LOADER;
-      } else if (instrumenter instanceof Instrumenter.ForTypeHierarchy) {
-        activation = hasClassNamed(((Instrumenter.ForTypeHierarchy) instrumenter).hierarchyMarkerType());
-      } else if (instrumenter instanceof Instrumenter.ForSingleType) {
-        activation = hasClassNamed(((Instrumenter.ForSingleType) instrumenter).instrumentedType());
-      } else if (instrumenter instanceof Instrumenter.ForKnownTypes) {
-        activation =
-            hasClassNamedOneOf(((Instrumenter.ForKnownTypes) instrumenter).knownMatchingTypes());
-      }
-    }
-    if (null == activation) {
-      activation = ANY_CLASS_LOADER;
+    ElementMatcher<ClassLoader> required = instrumenter.classLoaderMatcher();
+    if (null != required) {
+      activation =
+          ANY_CLASS_LOADER != activation
+              ? new ElementMatcher.Junction.Conjunction<>(activation, required)
+              : required;
     }
 
     for (Map.Entry<String, String> storeEntry : contextStore.entrySet()) {

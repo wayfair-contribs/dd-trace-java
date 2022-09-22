@@ -103,6 +103,8 @@ public final class StatusLogger extends JsonAdapter<Config>
     writer.value(config.isProfilingEnabled());
     writer.name("appsec_enabled");
     writer.value(config.getAppSecEnabledConfig().toString());
+    writer.name("data_streams_enabled");
+    writer.value(config.isDataStreamsEnabled());
     writer.name("appsec_rules_file_path");
     writer.value(config.getAppSecRulesFile());
     writer.name("dd_version");

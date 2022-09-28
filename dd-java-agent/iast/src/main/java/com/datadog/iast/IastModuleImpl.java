@@ -19,6 +19,7 @@ import datadog.trace.bootstrap.instrumentation.api.AgentTracer;
 import datadog.trace.instrumentation.iastinstrumenter.IastExclusionTrie;
 import datadog.trace.util.stacktrace.StackWalker;
 import datadog.trace.util.stacktrace.StackWalkerFactory;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;

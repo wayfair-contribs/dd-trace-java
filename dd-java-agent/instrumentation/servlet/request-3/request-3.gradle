@@ -16,6 +16,7 @@ muzzle {
 apply from: "$rootDir/gradle/java.gradle"
 
 apply plugin: 'org.unbroken-dome.test-sets'
+apply plugin: 'call-site-instrumentation'
 
 testSets {
   latestDepTest {
@@ -24,6 +25,8 @@ testSets {
 }
 
 dependencies {
+  testRuntimeOnly project(':dd-java-agent:instrumentation:iast-instrumenter')
+
   compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
 
   testImplementation(project(':dd-java-agent:testing')) {

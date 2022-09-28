@@ -1,5 +1,6 @@
 package datadog.trace.api.iast;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public interface IastModule {
@@ -7,6 +8,8 @@ public interface IastModule {
   void onCipherAlgorithm(@Nullable String algorithm);
 
   void onHashingAlgorithm(@Nullable String algorithm);
+
+  void onJdbcQuery(@Nonnull String queryString);
 
   /**
    * An HTTP request parameter name is used. This should be used when it cannot be determined

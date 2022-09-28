@@ -21,6 +21,10 @@ public class IastSystem {
   private static final Logger log = LoggerFactory.getLogger(IastSystem.class);
 
   public static void start(final SubscriptionService ss) {
+    start(ss, null);
+  }
+
+  public static void start(final SubscriptionService ss, OverheadController overheadController) {
     final Config config = Config.get();
     if (!config.isIastEnabled()) {
       log.debug("IAST is disabled");
@@ -29,8 +33,9 @@ public class IastSystem {
     log.debug("IAST is starting");
 
     final Reporter reporter = new Reporter(config);
-    final OverheadController overheadController =
-        new OverheadController(config, AgentTaskScheduler.INSTANCE);
+    if (overheadController == null) {
+      overheadController = new OverheadController(config, AgentTaskScheduler.INSTANCE);
+    }
     final IastModule iastModule = new IastModuleImpl(config, reporter, overheadController);
     InstrumentationBridge.registerIastModule(iastModule);
     registerRequestStartedCallback(ss, overheadController);

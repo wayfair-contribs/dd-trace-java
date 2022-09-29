@@ -18,7 +18,7 @@ class IastExclusionTrieTest extends DDSpecification {
     String.name                                         | 1
     'io.vertx.core.json.JsonArray'                      | 1
     'io.vertx.demo.Test'                                | 0
-    'org.springframework.core.env.Environment'          | 1
+    'org.springframework.core.env.Environment'          | 0
     'org.springframework.samples.petclinic.owner.Owner' | 0
     'org.owasp.encoder.Encode'                          | 1
     'org.owasp.webgoat.server.StartWebGoat'             | 0

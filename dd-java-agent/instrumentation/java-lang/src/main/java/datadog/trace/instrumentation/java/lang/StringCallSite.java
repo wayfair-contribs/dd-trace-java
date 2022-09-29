@@ -15,4 +15,34 @@ public class StringCallSite {
     InstrumentationBridge.onStringConcat(self, param, result);
     return result;
   }
+
+  @CallSite.After("java.lang.String java.lang.String.substring(int)")
+  public static String afterSubstring(
+      @CallSite.This final String self,
+      @CallSite.Argument final int beginIndex,
+      @CallSite.Return final String result) {
+    InstrumentationBridge.onStringSubSequence(
+        self, beginIndex, self != null ? self.length() : 0, result);
+    return result;
+  }
+
+  @CallSite.After("java.lang.String java.lang.String.substring(int, int)")
+  public static String afterSubstring(
+      @CallSite.This final String self,
+      @CallSite.Argument final int beginIndex,
+      @CallSite.Argument final int endIndex,
+      @CallSite.Return final String result) {
+    InstrumentationBridge.onStringSubSequence(self, beginIndex, endIndex, result);
+    return result;
+  }
+
+  @CallSite.After("java.lang.CharSequence java.lang.String.subSequence(int, int)")
+  public static CharSequence afterSubSequence(
+      @CallSite.This final String self,
+      @CallSite.Argument final int beginIndex,
+      @CallSite.Argument final int endIndex,
+      @CallSite.Return final CharSequence result) {
+    InstrumentationBridge.onStringSubSequence(self, beginIndex, endIndex, result);
+    return result;
+  }
 }

@@ -25,4 +25,64 @@ public final class Ranges {
       }
     }
   }
+
+  public static Range createIfDifferent(Range range, int start, int length) {
+    if (start != range.getStart() || length != range.getLength()) {
+      return new Range(start, length, range.getSource());
+    } else {
+      return range;
+    }
+  }
+
+  public static Range[] forSubstring(int offset, int length, @Nonnull Range[] ranges) {
+
+    int skippedRanges = getSubstringSkippedRanges(offset, length, ranges);
+
+    // Range adjusting
+    if (0 == ranges.length - skippedRanges) {
+      return null;
+    }
+
+    Range[] newRanges = new Range[ranges.length - skippedRanges];
+    int newRangeIndex = 0;
+    for (final Range rangeSelf : ranges) {
+      int newStart = rangeSelf.getStart() - offset;
+      int newLength = rangeSelf.getLength();
+      final int newEnd = newStart + newLength;
+      if (newStart < 0) {
+        newLength = newLength + newStart;
+        newStart = 0;
+      }
+      if (newEnd > length) {
+        newLength = length - newStart;
+      }
+      if (newLength > 0) {
+        newRanges[newRangeIndex] = createIfDifferent(rangeSelf, newStart, newLength);
+        newRangeIndex++;
+      }
+    }
+
+    return newRanges;
+  }
+
+  private static int getSubstringSkippedRanges(int offset, int length, Range[] ranges) {
+    int skippedRanges = 0;
+    for (final Range rangeSelf : ranges) {
+      if (rangeSelf.getStart() + rangeSelf.getLength() <= offset) {
+        skippedRanges++;
+      } else {
+        break;
+      }
+    }
+
+    for (int rangeIndex = ranges.length - 1; rangeIndex >= 0; rangeIndex--) {
+      final Range rangeSelf = ranges[rangeIndex];
+      if (rangeSelf.getStart() - offset >= length) {
+        skippedRanges++;
+      } else {
+        break;
+      }
+    }
+    return skippedRanges;
+  }
 }

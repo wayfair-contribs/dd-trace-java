@@ -15,6 +15,13 @@ public class TestStringBuilderSuite {
     return result;
   }
 
+  public static StringBuilder stringBuilderNew(final String param) {
+    LOGGER.debug("Before new string builder {}", param);
+    final StringBuilder result = new StringBuilder(param);
+    LOGGER.debug("After new string builder {}", result);
+    return result;
+  }
+
   public static StringBuilder init(final CharSequence param) {
     LOGGER.debug("Before new string builder {}", param);
     final StringBuilder result = new StringBuilder(param);

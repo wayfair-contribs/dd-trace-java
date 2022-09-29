@@ -236,4 +236,40 @@ class InstrumentationBridgeTest extends DDSpecification {
     then:
     noExceptionThrown()
   }
+
+  def "bridge calls module when a String.subSequence(int beginIndex, int endIndex) method is detected"() {
+    setup:
+    final module = Mock(IastModule)
+    InstrumentationBridge.registerIastModule(module)
+
+    when:
+    InstrumentationBridge.onStringSubSequence("Hello", 1, 3, "el")
+
+    then:
+    1 * module.onStringSubSequence("Hello", 1, 3, "el")
+  }
+
+  def "bridge calls don't fail with null module when a String.subSequence(int beginIndex, int endIndex) method is detected"() {
+    setup:
+    InstrumentationBridge.registerIastModule(null)
+
+    when:
+    InstrumentationBridge.onStringSubSequence("Hello", 1, 3, "el")
+
+    then:
+    noExceptionThrown()
+  }
+
+  def "bridge calls don't leak exceptions when String.subSequence(int beginIndex, int endIndex) method is detected"() {
+    setup:
+    final module = Mock(IastModule)
+    InstrumentationBridge.registerIastModule(module)
+
+    when:
+    InstrumentationBridge.onStringSubSequence("Hello", 1, 3, "el")
+
+    then:
+    1 * module.onStringSubSequence("Hello", 1, 3, "el") >> { throw new Error('Boom!!!') }
+    noExceptionThrown()
+  }
 }

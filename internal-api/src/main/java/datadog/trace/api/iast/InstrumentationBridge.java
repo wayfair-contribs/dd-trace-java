@@ -82,6 +82,17 @@ public abstract class InstrumentationBridge {
     }
   }
 
+  public static void onStringSubSequence(
+      String self, int beginIndex, int endIndex, CharSequence result) {
+    try {
+      if (MODULE != null) {
+        MODULE.onStringSubSequence(self, beginIndex, endIndex, result);
+      }
+    } catch (final Throwable t) {
+      onUnexpectedException("Callback for onStringSubstring threw.", t);
+    }
+  }
+
   public static void onStringBuilderInit(final StringBuilder self, final CharSequence param) {
     try {
       if (MODULE != null) {

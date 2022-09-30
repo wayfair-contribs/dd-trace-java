@@ -28,7 +28,7 @@ public class TaintedObjects {
   public void taintInputString(final @Nonnull String obj, final @Nonnull Source source) {
     map.put(new TaintedObject(obj, Ranges.forString(obj, source), map.getReferenceQueue()));
     if (debug) {
-      log.debug("TaintInputString: " + obj + " source: " + source);
+      log.debug("TaintInputString: " + obj);
     }
   }
 

@@ -160,6 +160,72 @@ public final class IastModuleImpl implements IastModule {
   }
 
   @Override
+  public void onStringTrim(@Nullable final String self, @Nullable final String result) {
+    // checks
+    if (!canBeTainted(result)) {
+      return;
+    }
+    if (!canBeTainted(self)) {
+      return;
+    }
+    final IastRequestContext ctx = IastRequestContext.get();
+    if (ctx == null) {
+      return;
+    }
+    final TaintedObjects taintedObjects = ctx.getTaintedObjects();
+    final TaintedObject taintedSelf = taintedObjects.get(self);
+    if (taintedSelf == null) {
+      return;
+    }
+
+    int offset = 0;
+    while ((offset < self.length()) && (self.charAt(offset) <= ' ')) {
+      offset++;
+    }
+
+    int resultLength = result.length();
+
+    final Range[] rangesSelf = getRanges(taintedObjects, self);
+    if (rangesSelf.length == 0) {
+      return;
+    }
+
+    // Range adjusting
+    int skippedRanges = 0;
+    Range[] tmpRanges = new Range[rangesSelf.length];
+    for (int rangeIndex = 0; rangeIndex < rangesSelf.length; rangeIndex++) {
+      final Range rangeSelf = rangesSelf[rangeIndex];
+
+      final int newEnd = rangeSelf.getStart() + rangeSelf.getLength() - offset;
+      int newStart = rangeSelf.getStart() - offset;
+      int newLength = rangeSelf.getLength();
+      if (newStart < 0) {
+        newLength = newLength + newStart;
+        newStart = 0;
+      }
+      if (newEnd > resultLength) {
+        newLength = resultLength - newStart;
+      }
+      if (newLength > 0) {
+        tmpRanges[rangeIndex] = new Range(newStart, newLength, rangeSelf.getSource());
+      } else {
+        skippedRanges++;
+      }
+    }
+
+    // copy results
+    Range[] newRanges = new Range[rangesSelf.length - skippedRanges];
+    int newRangeIndex = 0;
+    for (int rangeIndex = 0; rangeIndex < tmpRanges.length; rangeIndex++) {
+      if (null != tmpRanges[rangeIndex]) {
+        newRanges[newRangeIndex] = tmpRanges[rangeIndex];
+        newRangeIndex++;
+      }
+    }
+    taintedObjects.taint(result, newRanges);
+  }
+
+  @Override
   public void onStringConcat(
       @Nullable final String left, @Nullable final String right, @Nullable final String result) {
     if (!canBeTainted(result)) {

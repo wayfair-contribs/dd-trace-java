@@ -1,6 +1,7 @@
 package datadog.trace.api.iast;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +90,16 @@ public abstract class InstrumentationBridge {
       }
     } catch (final Throwable t) {
       onUnexpectedException("Callback for onStringConcat threw.", t);
+    }
+  }
+
+  public static void onStringTrim(@Nullable String self, @Nullable String result) {
+    try {
+      if (MODULE != null) {
+        MODULE.onStringTrim(self, result);
+      }
+    } catch (final Throwable t) {
+      onUnexpectedException("Callback for onStringTrim threw.", t);
     }
   }
 

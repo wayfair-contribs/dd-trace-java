@@ -10,7 +10,8 @@ class StringCallSiteTest extends AgentTestRunner {
 
   @Override
   protected void configurePreAgent() {
-    injectSysConfig(TracerConfig.SCOPE_ITERATION_KEEP_ALIVE, "1") // don't let iteration spans linger
+    injectSysConfig(TracerConfig.SCOPE_ITERATION_KEEP_ALIVE, "1")
+    // don't let iteration spans linger
     injectSysConfig("dd.iast.enabled", "true")
   }
 
@@ -25,6 +26,20 @@ class StringCallSiteTest extends AgentTestRunner {
     then:
     result == 'Hello World!'
     1 * iastModule.onStringConcat('Hello ', 'World!', 'Hello World!')
+    0 * _
+  }
+
+  def 'test string trim call site'() {
+    setup:
+    final iastModule = Mock(IastModule)
+    InstrumentationBridge.registerIastModule(iastModule)
+
+    when:
+    final result = TestSuite.stringTrim(' hello ')
+
+    then:
+    result == 'hello'
+    1 * iastModule.onStringTrim(' hello ', 'hello')
     0 * _
   }
 }

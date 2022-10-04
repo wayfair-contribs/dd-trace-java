@@ -25,6 +25,8 @@ public interface IastModule {
 
   void onStringConcat(@Nullable String left, @Nullable String right, @Nullable String result);
 
+  void onStringTrim(@Nullable String self, @Nullable String result);
+
   void onStringBuilderAppend(@Nullable StringBuilder builder, @Nullable CharSequence param);
 
   void onStringBuilderToString(@Nullable StringBuilder builder, @Nullable String result);

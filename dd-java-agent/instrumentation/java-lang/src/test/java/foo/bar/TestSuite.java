@@ -14,6 +14,13 @@ public class TestSuite {
     return result;
   }
 
+  public static String stringTrim(final String self) {
+    LOGGER.debug("Before string trim {} ", self);
+    final String result = self.trim();
+    LOGGER.debug("After string trim {}", result);
+    return result;
+  }
+
   public static StringBuilder stringBuilderNew(final String param) {
     LOGGER.debug("Before new string builder {}", param);
     final StringBuilder result = new StringBuilder(param);

@@ -81,7 +81,7 @@ public abstract class AbstractBenchmark<C extends AbstractBenchmark.BenchmarkCon
     private final IastRequestContext iastContext;
 
     protected BenchmarkContext(final IastRequestContext iasContext) {
-      this.iastContext = iasContext;
+      iastContext = iasContext;
     }
 
     public IastRequestContext getIastContext() {

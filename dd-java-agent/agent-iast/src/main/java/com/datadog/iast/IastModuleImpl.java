@@ -16,10 +16,16 @@ import datadog.trace.api.Config;
 import datadog.trace.api.iast.IastModule;
 import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
 import datadog.trace.bootstrap.instrumentation.api.AgentTracer;
+import datadog.trace.util.Maybe;
 import datadog.trace.util.stacktrace.StackWalker;
 import datadog.trace.util.stacktrace.StackWalkerFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -201,6 +207,90 @@ public final class IastModuleImpl implements IastModule {
   }
 
   @Override
+  public void onStringJoin(
+      @Nullable String result, CharSequence delimiter, CharSequence... elements) {
+    if (!canBeTainted(result)) {
+      return;
+    }
+    final IastRequestContext ctx = IastRequestContext.get();
+    if (ctx == null) {
+      return;
+    }
+    final TaintedObjects taintedObjects = ctx.getTaintedObjects();
+    List<Range> newRanges = new ArrayList<>();
+    int pos = 0;
+    // Delimiter info
+    Range[] delimiterRanges = getRanges(getTainted(taintedObjects, delimiter));
+    boolean delimiterHasRanges = delimiterRanges.length > 0;
+    int delimiterLength = delimiter.length();
+
+    for (int i = 0; i < elements.length; i++) {
+      CharSequence element = elements[i];
+      pos =
+          getPositionAndUpdateRangesInStringJoin(
+              taintedObjects,
+              newRanges,
+              pos,
+              delimiterRanges,
+              delimiterLength,
+              element,
+              delimiterHasRanges && i < elements.length - 1);
+    }
+    if (!newRanges.isEmpty()) {
+      taintedObjects.taint(result, newRanges.toArray(new Range[0]));
+    }
+  }
+
+  @Override
+  public Maybe<String> onStringJoin(
+      CharSequence delimiter, Iterable<? extends CharSequence> elements) {
+
+    final IastRequestContext ctx = IastRequestContext.get();
+    if (ctx == null) {
+      return Maybe.Values.empty();
+    }
+
+    Objects.requireNonNull(delimiter);
+    Objects.requireNonNull(elements);
+    StringJoiner joiner = new StringJoiner(delimiter);
+
+    final TaintedObjects taintedObjects = ctx.getTaintedObjects();
+    List<Range> newRanges = new ArrayList<>();
+    int pos = 0;
+    // Delimiter info
+    int delimiterLength = delimiter.length();
+    Range[] delimiterRanges = getRanges(getTainted(taintedObjects, delimiter));
+    boolean delimiterHasRanges = delimiterRanges.length > 0;
+
+    Iterator<? extends CharSequence> iterator = elements.iterator();
+    boolean hasExceptions = false;
+    while (iterator.hasNext()) {
+      CharSequence element = iterator.next();
+      joiner.add(element);
+      try {
+        if (!hasExceptions) {
+          pos =
+              getPositionAndUpdateRangesInStringJoin(
+                  taintedObjects,
+                  newRanges,
+                  pos,
+                  delimiterRanges,
+                  delimiterLength,
+                  element,
+                  delimiterHasRanges && iterator.hasNext());
+        }
+      } catch (Throwable e) {
+        hasExceptions = true;
+      }
+    }
+    String result = joiner.toString();
+    if (!newRanges.isEmpty() && !hasExceptions) {
+      taintedObjects.taint(result, newRanges.toArray(new Range[0]));
+    }
+    return Maybe.Values.of(result);
+  }
+
+  @Override
   public void onStringBuilderAppend(
       @Nullable final StringBuilder builder, @Nullable final CharSequence param) {
     if (!canBeTainted(builder) || !canBeTainted(param)) {
@@ -271,5 +361,35 @@ public final class IastModuleImpl implements IastModule {
       Ranges.copyShift(rangesRight, ranges, rangesLeft.length, offset);
     }
     return ranges;
+  }
+
+  /**
+   * Iterates over the element ranges and delimiter ranges (if is necessary) to update them and calc
+   * the new pos value
+   */
+  private static int getPositionAndUpdateRangesInStringJoin(
+      TaintedObjects taintedObjects,
+      List<Range> newRanges,
+      Integer pos,
+      Range[] delimiterRanges,
+      int delimiterLength,
+      CharSequence element,
+      boolean addDelimiterRanges) {
+    if (canBeTainted(element)) {
+      Range[] elementRanges = getRanges(getTainted(taintedObjects, element));
+      if (elementRanges.length > 0) {
+        for (Range range : elementRanges) {
+          newRanges.add(Ranges.createIfDifferent(range, range.getStart() + pos, range.getLength()));
+        }
+      }
+      pos += element.length();
+    }
+    if (addDelimiterRanges) {
+      for (Range range : delimiterRanges) {
+        newRanges.add(Ranges.createIfDifferent(range, range.getStart() + pos, range.getLength()));
+      }
+    }
+    pos += delimiterLength;
+    return pos;
   }
 }

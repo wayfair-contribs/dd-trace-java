@@ -168,6 +168,9 @@ public final class IastModuleImpl implements IastModule {
     if (!canBeTainted(self)) {
       return;
     }
+    if (self.equals(result)) {
+      return;
+    }
     final IastRequestContext ctx = IastRequestContext.get();
     if (ctx == null) {
       return;
@@ -192,7 +195,7 @@ public final class IastModuleImpl implements IastModule {
 
     // Range adjusting
     int skippedRanges = 0;
-    Range[] tmpRanges = new Range[rangesSelf.length];
+    Range[] newRanges = new Range[rangesSelf.length];
     for (int rangeIndex = 0; rangeIndex < rangesSelf.length; rangeIndex++) {
       final Range rangeSelf = rangesSelf[rangeIndex];
 
@@ -207,20 +210,23 @@ public final class IastModuleImpl implements IastModule {
         newLength = resultLength - newStart;
       }
       if (newLength > 0) {
-        tmpRanges[rangeIndex] = new Range(newStart, newLength, rangeSelf.getSource());
+        newRanges[rangeIndex] = new Range(newStart, newLength, rangeSelf.getSource());
       } else {
         skippedRanges++;
       }
     }
 
-    // copy results
-    Range[] newRanges = new Range[rangesSelf.length - skippedRanges];
-    int newRangeIndex = 0;
-    for (int rangeIndex = 0; rangeIndex < tmpRanges.length; rangeIndex++) {
-      if (null != tmpRanges[rangeIndex]) {
-        newRanges[newRangeIndex] = tmpRanges[rangeIndex];
-        newRangeIndex++;
+    if (0 != skippedRanges) {
+      // copy results
+      Range[] nonSkippedRanges = new Range[rangesSelf.length - skippedRanges];
+      int newRangeIndex = 0;
+      for (int rangeIndex = 0; rangeIndex < newRanges.length; rangeIndex++) {
+        if (null != newRanges[rangeIndex]) {
+          nonSkippedRanges[newRangeIndex] = newRanges[rangeIndex];
+          newRangeIndex++;
+        }
       }
+      newRanges = nonSkippedRanges;
     }
     taintedObjects.taint(result, newRanges);
   }

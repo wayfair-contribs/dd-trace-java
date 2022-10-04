@@ -17,7 +17,7 @@ class IastModuleImplOnStringTrimTest extends IastModuleImplTestBase {
     noExceptionThrown()
   }
 
-  void 'test trim for not empty string cases'() {
+  void 'make sure IastRequestContext is called'() {
     given:
 
     final span = Mock(AgentSpan)
@@ -39,6 +39,32 @@ class IastModuleImplOnStringTrimTest extends IastModuleImplTestBase {
     1 * tracer.activeSpan() >> span
     1 * span.getRequestContext() >> reqCtx
     1 * reqCtx.getData(RequestContextSlot.IAST) >> ctx
+    taintFormat(result, taintedObject.getRanges()) == expected
+
+    where:
+    testString     | expected
+    "==>123<==   " | "==>123<=="
+  }
+
+  void 'test trim for not empty string cases'() {
+    given:
+
+    final span = Mock(AgentSpan)
+    tracer.activeSpan() >> span
+    final reqCtx = Mock(RequestContext)
+    span.getRequestContext() >> reqCtx
+    final ctx = new IastRequestContext()
+    reqCtx.getData(RequestContextSlot.IAST) >> ctx
+    final taintedObjects = ctx.getTaintedObjects()
+    def self = addFromTaintFormat(taintedObjects, testString)
+    def result = self.trim()
+
+
+    when:
+    module.onStringTrim(self, result)
+    def taintedObject = taintedObjects.get(result)
+
+    then:
     taintFormat(result, taintedObject.getRanges()) == expected
 
     where:
@@ -89,5 +115,7 @@ class IastModuleImplOnStringTrimTest extends IastModuleImplTestBase {
     ""                      | ""
     " ==>   <== ==>   <== " | ""
     "==>   <== ==>   <=="   | ""
+    "123"                   | "123"
+    " 123 "                 | "123"
   }
 }

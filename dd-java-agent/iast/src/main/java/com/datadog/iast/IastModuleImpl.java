@@ -165,7 +165,7 @@ public final class IastModuleImpl implements IastModule {
     if (!canBeTainted(result)) {
       return;
     }
-    if (self.equals(result)) {
+    if (self == result) {
       return;
     }
     final IastRequestContext ctx = IastRequestContext.get();
@@ -185,8 +185,8 @@ public final class IastModuleImpl implements IastModule {
 
     int resultLength = result.length();
 
-    final Range[] rangesSelf = getRanges(taintedObjects, self);
-    if (rangesSelf.length == 0) {
+    final Range[] rangesSelf = taintedSelf.getRanges();
+    if (null == rangesSelf || rangesSelf.length == 0) {
       return;
     }
 

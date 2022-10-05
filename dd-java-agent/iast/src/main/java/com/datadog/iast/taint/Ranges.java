@@ -62,9 +62,9 @@ public final class Ranges {
     for (int rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
       final Range rangeSelf = ranges[rangeIndex];
 
-      final int newEnd = rangeSelf.getStart() + rangeSelf.getLength() - offset;
       int newStart = rangeSelf.getStart() - offset;
       int newLength = rangeSelf.getLength();
+      final int newEnd = newStart + newLength;
       if (newStart < 0) {
         newLength = newLength + newStart;
         newStart = 0;

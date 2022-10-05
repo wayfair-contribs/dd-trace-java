@@ -22,6 +22,14 @@ public final class Ranges {
     }
   }
 
+  public static Range createIfDifferent(Range range, int start, int length) {
+    if (start != range.getStart() || length != range.getLength()) {
+      return new Range(start, length, range.getSource());
+    } else {
+      return range;
+    }
+  }
+
   public static Range[] forSubstring(int offset, int length, @Nonnull Range[] ranges) {
     // calculate how many skipped ranges are there
     int skippedRanges = 0;
@@ -65,7 +73,7 @@ public final class Ranges {
         newLength = length - newStart;
       }
       if (newLength > 0) {
-        newRanges[newRangeIndex] = new Range(newStart, newLength, rangeSelf.getSource());
+        newRanges[newRangeIndex] = createIfDifferent(rangeSelf, newStart, newLength);
         newRangeIndex++;
       }
     }

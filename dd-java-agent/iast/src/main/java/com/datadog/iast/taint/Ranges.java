@@ -21,4 +21,55 @@ public final class Ranges {
       dst[iDst] = src[iSrc].shift(shift);
     }
   }
+
+  public static Range[] forSubstring(int offset, int length, @Nonnull Range[] ranges) {
+    // calculate how many skipped ranges are there
+    int skippedRanges = 0;
+    for (int rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
+      final Range rangeSelf = ranges[rangeIndex];
+      if (rangeSelf.getStart() + rangeSelf.getLength() <= offset) {
+        skippedRanges++;
+      } else {
+        break;
+      }
+    }
+
+    for (int rangeIndex = ranges.length - 1; rangeIndex > 0; rangeIndex--) {
+      final Range rangeSelf = ranges[rangeIndex];
+      if (rangeSelf.getStart() - offset >= length) {
+        skippedRanges++;
+      } else {
+        break;
+      }
+    }
+
+    // Range adjusting
+
+    if (0 == ranges.length - skippedRanges) {
+      return null;
+    }
+
+    Range[] newRanges = new Range[ranges.length - skippedRanges];
+    int newRangeIndex = 0;
+    for (int rangeIndex = 0; rangeIndex < ranges.length; rangeIndex++) {
+      final Range rangeSelf = ranges[rangeIndex];
+
+      final int newEnd = rangeSelf.getStart() + rangeSelf.getLength() - offset;
+      int newStart = rangeSelf.getStart() - offset;
+      int newLength = rangeSelf.getLength();
+      if (newStart < 0) {
+        newLength = newLength + newStart;
+        newStart = 0;
+      }
+      if (newEnd > length) {
+        newLength = length - newStart;
+      }
+      if (newLength > 0) {
+        newRanges[newRangeIndex] = new Range(newStart, newLength, rangeSelf.getSource());
+        newRangeIndex++;
+      }
+    }
+
+    return newRanges;
+  }
 }

@@ -165,9 +165,6 @@ public final class IastModuleImpl implements IastModule {
     if (!canBeTainted(result)) {
       return;
     }
-    if (!canBeTainted(self)) {
-      return;
-    }
     if (self.equals(result)) {
       return;
     }
@@ -193,42 +190,11 @@ public final class IastModuleImpl implements IastModule {
       return;
     }
 
-    // Range adjusting
-    int skippedRanges = 0;
-    Range[] newRanges = new Range[rangesSelf.length];
-    for (int rangeIndex = 0; rangeIndex < rangesSelf.length; rangeIndex++) {
-      final Range rangeSelf = rangesSelf[rangeIndex];
+    final Range[] newRanges = Ranges.forSubstring(offset, resultLength, rangesSelf);
 
-      final int newEnd = rangeSelf.getStart() + rangeSelf.getLength() - offset;
-      int newStart = rangeSelf.getStart() - offset;
-      int newLength = rangeSelf.getLength();
-      if (newStart < 0) {
-        newLength = newLength + newStart;
-        newStart = 0;
-      }
-      if (newEnd > resultLength) {
-        newLength = resultLength - newStart;
-      }
-      if (newLength > 0) {
-        newRanges[rangeIndex] = new Range(newStart, newLength, rangeSelf.getSource());
-      } else {
-        skippedRanges++;
-      }
+    if (null != newRanges) {
+      taintedObjects.taint(result, newRanges);
     }
-
-    if (0 != skippedRanges) {
-      // copy results
-      Range[] nonSkippedRanges = new Range[rangesSelf.length - skippedRanges];
-      int newRangeIndex = 0;
-      for (int rangeIndex = 0; rangeIndex < newRanges.length; rangeIndex++) {
-        if (null != newRanges[rangeIndex]) {
-          nonSkippedRanges[newRangeIndex] = newRanges[rangeIndex];
-          newRangeIndex++;
-        }
-      }
-      newRanges = nonSkippedRanges;
-    }
-    taintedObjects.taint(result, newRanges);
   }
 
   @Override

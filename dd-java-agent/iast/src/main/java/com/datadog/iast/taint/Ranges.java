@@ -42,7 +42,7 @@ public final class Ranges {
       }
     }
 
-    for (int rangeIndex = ranges.length - 1; rangeIndex > 0; rangeIndex--) {
+    for (int rangeIndex = ranges.length - 1; rangeIndex >= 0; rangeIndex--) {
       final Range rangeSelf = ranges[rangeIndex];
       if (rangeSelf.getStart() - offset >= length) {
         skippedRanges++;

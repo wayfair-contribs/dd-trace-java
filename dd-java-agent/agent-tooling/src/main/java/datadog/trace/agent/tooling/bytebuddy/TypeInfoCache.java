@@ -46,6 +46,10 @@ public final class TypeInfoCache<T> {
         name, new SharedTypeInfo<>(loaderId(loader), classFile, typeInfo));
   }
 
+  public void clear() {
+    sharedTypeInfo.clear();
+  }
+
   private static LoaderId loaderId(ClassLoader loader) {
     return BOOTSTRAP_LOADER == loader
         ? BOOTSTRAP_LOADER_ID

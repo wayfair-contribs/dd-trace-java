@@ -62,6 +62,7 @@ import static datadog.trace.api.ConfigDefaults.DEFAULT_REMOTE_CONFIG_INTEGRITY_C
 import static datadog.trace.api.ConfigDefaults.DEFAULT_REMOTE_CONFIG_MAX_PAYLOAD_SIZE;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_REMOTE_CONFIG_TARGETS_KEY;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_REMOTE_CONFIG_TARGETS_KEY_ID;
+import static datadog.trace.api.ConfigDefaults.DEFAULT_RESOLVER_MEMO_POOL_SIZE;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_RESOLVER_OUTLINE_POOL_SIZE;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_RESOLVER_TYPE_POOL_SIZE;
 import static datadog.trace.api.ConfigDefaults.DEFAULT_RUNTIME_CONTEXT_FIELD_INJECTION;
@@ -253,6 +254,8 @@ import static datadog.trace.api.config.TraceInstrumentationConfig.OBFUSCATION_QU
 import static datadog.trace.api.config.TraceInstrumentationConfig.PLAY_REPORT_HTTP_STATUS;
 import static datadog.trace.api.config.TraceInstrumentationConfig.RABBIT_PROPAGATION_DISABLED_EXCHANGES;
 import static datadog.trace.api.config.TraceInstrumentationConfig.RABBIT_PROPAGATION_DISABLED_QUEUES;
+import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_MEMO_POOL_ENABLED;
+import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_MEMO_POOL_SIZE;
 import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_OUTLINE_POOL_ENABLED;
 import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_OUTLINE_POOL_SIZE;
 import static datadog.trace.api.config.TraceInstrumentationConfig.RESOLVER_TYPE_POOL_SIZE;
@@ -609,7 +612,9 @@ public class Config {
 
   private final boolean internalExitOnFailure;
 
+  private final boolean resolverMemoPoolEnabled;
   private final boolean resolverOutlinePoolEnabled;
+  private final int resolverMemoPoolSize;
   private final int resolverOutlinePoolSize;
   private final int resolverTypePoolSize;
   private final boolean resolverUseLoadClassEnabled;
@@ -1277,6 +1282,9 @@ public class Config {
 
     internalExitOnFailure = configProvider.getBoolean(INTERNAL_EXIT_ON_FAILURE, false);
 
+    resolverMemoPoolEnabled = configProvider.getBoolean(RESOLVER_MEMO_POOL_ENABLED, true);
+    resolverMemoPoolSize =
+        configProvider.getInteger(RESOLVER_MEMO_POOL_SIZE, DEFAULT_RESOLVER_MEMO_POOL_SIZE);
     resolverOutlinePoolEnabled = configProvider.getBoolean(RESOLVER_OUTLINE_POOL_ENABLED, true);
     resolverOutlinePoolSize =
         configProvider.getInteger(RESOLVER_OUTLINE_POOL_SIZE, DEFAULT_RESOLVER_OUTLINE_POOL_SIZE);
@@ -2082,6 +2090,14 @@ public class Config {
 
   public boolean isInternalExitOnFailure() {
     return internalExitOnFailure;
+  }
+
+  public boolean isResolverMemoPoolEnabled() {
+    return resolverMemoPoolEnabled;
+  }
+
+  public int getResolverMemoPoolSize() {
+    return resolverMemoPoolSize;
   }
 
   public boolean isResolverOutlinePoolEnabled() {
@@ -3062,6 +3078,10 @@ public class Config {
         + idGenerationStrategy
         + ", internalExitOnFailure="
         + internalExitOnFailure
+        + ", resolverMemoPoolEnabled="
+        + resolverMemoPoolEnabled
+        + ", resolverMemoPoolSize="
+        + resolverMemoPoolSize
         + ", resolverOutlinePoolEnabled="
         + resolverOutlinePoolEnabled
         + ", resolverOutlinePoolSize="

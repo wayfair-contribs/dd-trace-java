@@ -236,4 +236,46 @@ class InstrumentationBridgeTest extends DDSpecification {
     then:
     noExceptionThrown()
   }
+
+  def "bridge calls module when a String.repeat(int count) method is detected"() {
+    setup:
+    final module = Mock(IastModule)
+    InstrumentationBridge.registerIastModule(module)
+    final self = 'abc'
+    final count = 3
+    final result = 'abcabcabc'
+
+    when:
+    InstrumentationBridge.onStringRepeat(self, count, result)
+
+    then:
+    1 * module.onStringRepeat(self, count, result)
+  }
+
+  def "bridge calls don't fail with null module when a String.repeat(int count) method is detected"() {
+    setup:
+    InstrumentationBridge.registerIastModule(null)
+
+    when:
+    InstrumentationBridge.onStringRepeat('abc', 3, 'abcabcabc')
+
+    then:
+    noExceptionThrown()
+  }
+
+  def "bridge calls don't leak exceptions when a String.repeat(int count) method is detected"() {
+    setup:
+    final module = Mock(IastModule)
+    InstrumentationBridge.registerIastModule(module)
+    final self = 'abc'
+    final count = 3
+    final result = 'abcabcabc'
+
+    when:
+    InstrumentationBridge.onStringRepeat(self, count, result)
+
+    then:
+    1 * module.onStringRepeat(self, count, result) >> { throw new Error('Boom!!!') }
+    noExceptionThrown()
+  }
 }

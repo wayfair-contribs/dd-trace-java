@@ -1,0 +1,43 @@
+plugins {
+  id 'idea'
+}
+
+apply from: "$rootDir/gradle/java.gradle"
+apply plugin: 'org.unbroken-dome.test-sets'
+apply plugin: 'call-site-instrumentation'
+
+muzzle {
+  pass {
+    coreJdk()
+  }
+}
+
+idea {
+  module {
+    jdkName = '11'
+  }
+}
+
+csi {
+  javaVersion = JavaLanguageVersion.of(11)
+}
+
+testSets {
+  latestDepTest {
+    dirName = 'test'
+  }
+}
+
+dependencies {
+  testRuntimeClasspath project(':dd-java-agent:instrumentation:iast-instrumenter')
+}
+
+[JavaCompile, GroovyCompile].each {
+  tasks.withType(it).configureEach {
+    if (it.name != 'compileCsiJava') {
+      sourceCompatibility = JavaVersion.VERSION_1_8
+      targetCompatibility = JavaVersion.VERSION_1_8
+      setJavaVersion(it, 11)
+    }
+  }
+}

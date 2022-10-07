@@ -18,6 +18,7 @@ import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
 import datadog.trace.bootstrap.instrumentation.api.AgentTracer;
 import datadog.trace.util.stacktrace.StackWalker;
 import datadog.trace.util.stacktrace.StackWalkerFactory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,6 +39,7 @@ public final class IastModuleImpl implements IastModule {
     this.overheadController = overheadController;
   }
 
+  @Override
   public void onCipherAlgorithm(@Nullable final String algorithm) {
     if (algorithm == null) {
       return;
@@ -67,6 +69,7 @@ public final class IastModuleImpl implements IastModule {
     reporter.report(span, vulnerability);
   }
 
+  @Override
   public void onHashingAlgorithm(@Nullable final String algorithm) {
     if (algorithm == null) {
       return;
@@ -221,6 +224,28 @@ public final class IastModuleImpl implements IastModule {
       return;
     }
     taintedObjects.taint(result, to.getRanges());
+  }
+
+  @Override
+  @SuppressFBWarnings("ES_COMPARING_PARAMETER_STRING_WITH_EQ")
+  public void onStringRepeat(String self, int count, String result) {
+    if (!canBeTainted(self) || !canBeTainted(result) || self == result) {
+      return;
+    }
+    final IastRequestContext ctx = IastRequestContext.get();
+    if (ctx == null) {
+      return;
+    }
+    final TaintedObjects taintedObjects = ctx.getTaintedObjects();
+    final Range[] selfRanges = getRanges(taintedObjects, self);
+    if (selfRanges.length == 0) {
+      return;
+    }
+    final Range[] ranges = new Range[selfRanges.length * count];
+    for (int i = 0; i < count; i++) {
+      Ranges.copyShift(selfRanges, ranges, i * selfRanges.length, i * self.length());
+    }
+    taintedObjects.taint(result, ranges);
   }
 
   private static Range[] getRanges(final TaintedObject taintedObject) {

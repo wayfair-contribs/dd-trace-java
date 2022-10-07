@@ -112,6 +112,16 @@ public abstract class InstrumentationBridge {
     }
   }
 
+  public static void onStringRepeat(final String self, int count, final String result) {
+    try {
+      if (MODULE != null) {
+        MODULE.onStringRepeat(self, count, result);
+      }
+    } catch (final Throwable t) {
+      onUnexpectedException("Callback for onStringRepeat threw.", t);
+    }
+  }
+
   private static void onUnexpectedException(final String message, final Throwable error) {
     LOG.warn(message, error);
   }

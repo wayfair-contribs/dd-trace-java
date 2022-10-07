@@ -27,4 +27,6 @@ public interface IastModule {
   void onStringBuilderAppend(@Nullable StringBuilder builder, @Nullable CharSequence param);
 
   void onStringBuilderToString(@Nullable StringBuilder builder, @Nullable String result);
+
+  void onStringRepeat(String self, int count, String result);
 }

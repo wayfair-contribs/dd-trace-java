@@ -1,0 +1,65 @@
+if (project.hasProperty('refs')) {
+
+  final executeCommand = { final String command ->
+    final proc = command.execute()
+    final output = new StringWriter()
+    proc.waitForProcessOutput(output, System.err)
+    return output.toString().split('\n').collect { it.trim() }.findAll {!it.empty }
+  }
+
+  final containsAnyFile = { final Set<java.nio.file.Path> files, final Project project ->
+    try {
+      final sourceSets = project.extensions.getByType(SourceSetContainer)
+      final projectDir = project.projectDir.toPath()
+      final matchingFiles = files.findAll { it.startsWith(projectDir) }.collect {it.toFile()}
+      if (matchingFiles.empty) {
+        return false
+      }
+      final sourceSet = sourceSets.find { sourceSet ->
+        return matchingFiles.any {sourceSet.allSource.contains(it) }
+      }
+      if (sourceSet != null) {
+        return true
+      }
+    } catch (final e) {
+      // ignore projects without source sets
+    }
+    return false
+  }
+
+  final addCheckDependency = { final Project project, final Task task ->
+    try {
+      final check = project.tasks.getByName('check')
+      check.configure {
+        outputs.upToDateWhen { false } // force rerun
+      }
+      task.dependsOn(check)
+    } catch (e) {
+      // ignore projects without check task
+    }
+  }
+
+  gradle.projectsEvaluated {
+    final refList = refs.split('\\|').toList().collect { (it as String).trim() }.findAll { !it.empty}
+    final commits = refList.collect {executeCommand.call("git rev-list $it") }.flatten()
+    println "[pre-push]: Running pre-push hook for commits: ${commits}"
+    final affectedFiles = commits
+      .collect { executeCommand("git diff-tree --no-commit-id --name-only -r $it") }
+      .flatten()
+      .collect {rootDir.toPath().resolve(it) }
+      .toSet()
+    final projects = new HashSet<Project>()
+    final remaining = [project]
+    while (!remaining.empty) {
+      final current = remaining.removeLast()
+      if (containsAnyFile.call(affectedFiles, current)) {
+        projects.add(current)
+      } else {
+        remaining.addAll(current.subprojects)
+      }
+    }
+    final prePush = project.tasks.register('pre-push').get()
+    println "[pre-push]: Running check targets on projects: ${projects}"
+    projects.each { addCheckDependency.call(it, prePush) }
+  }
+}

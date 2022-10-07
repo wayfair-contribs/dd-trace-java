@@ -1,0 +1,30 @@
+#!/bin/bash
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+
+Z40=0000000000000000000000000000000000000000
+IFS=" "
+PUSH_COMMAND=`ps -ocommand= -p $PPID`
+
+if [[ "$PUSH_COMMAND" =~ force|-f ]]; then
+  echo "[pre-push]: Not running hook for a force push"
+  exit 0
+fi
+
+REFS=""
+while read _ LOCAL_SHA _ REMOTE_SHA
+do
+	if [ "$LOCAL_SHA" != $Z40 ]
+	then
+	  if [ "$REMOTE_SHA" = $Z40 ]
+    then
+      # New branch, examine all commits from HEAD
+      REFS="${REFS}HEAD..${LOCAL_SHA}|"
+    else
+    	# Update to existing branch, examine new commits
+    	REFS="${REFS}${REMOTE_SHA}..${LOCAL_SHA}|"
+    fi
+	fi
+done
+
+./gradlew pre-push -Prefs="$REFS"

@@ -3,7 +3,9 @@ package com.datadog.profiling.async;
 import com.datadog.profiling.controller.OngoingRecording;
 import com.datadog.profiling.controller.RecordingData;
 import com.datadog.profiling.controller.UnsupportedEnvironmentException;
+import com.datadog.profiling.utils.Arch;
 import com.datadog.profiling.utils.LibraryHelper;
+import com.datadog.profiling.utils.OperatingSystem;
 import com.datadog.profiling.utils.ProfilingMode;
 import datadog.trace.api.Platform;
 import datadog.trace.api.config.ProfilingConfig;
@@ -30,8 +32,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class AsyncProfiler {
   private static final Logger log = LoggerFactory.getLogger(AsyncProfiler.class);
-
-  public static final String TYPE = "async";
 
   private static final class Singleton {
     private static final AsyncProfiler INSTANCE = newInstance();
@@ -113,7 +113,7 @@ public final class AsyncProfiler {
 
     long maxheap = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax();
     this.memleakIntervalDefault =
-        maxheap <= 0 ? 1 * 1024 * 1024 : maxheap / Math.max(1, getMemleakCapacity());
+        maxheap <= 0 ? 1024 * 1024 : maxheap / Math.max(1, getMemleakCapacity());
   }
 
   public static AsyncProfiler getInstance() {

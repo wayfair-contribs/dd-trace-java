@@ -15,11 +15,13 @@
  */
 package com.datadog.profiling.controller;
 
+import com.datadog.profiling.utils.Arch;
 import datadog.trace.api.Platform;
 import datadog.trace.api.config.ProfilingConfig;
 import datadog.trace.bootstrap.config.provider.ConfigProvider;
 import de.thetaphi.forbiddenapis.SuppressForbidden;
 import java.lang.reflect.InvocationTargetException;
+import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +49,11 @@ public final class ControllerFactory {
       return className;
     }
   }
+
+  private static final boolean ASYNC_PROFILER_ENABLED_DEFAULT =
+      ProfilingConfig.PROFILING_ASYNC_ENABLED_DEFAULT
+          || Platform.isJ9()
+          || EnumSet.of(Arch.x86, Arch.x64).contains(Arch.current());
 
   /**
    * Returns the created controller.
@@ -77,8 +84,7 @@ public final class ControllerFactory {
     if (impl == Implementation.NONE) {
       if (Platform.isLinux()
           && configProvider.getBoolean(
-              ProfilingConfig.PROFILING_ASYNC_ENABLED,
-              ProfilingConfig.PROFILING_ASYNC_ENABLED_DEFAULT || Platform.isJ9())) {
+              ProfilingConfig.PROFILING_ASYNC_ENABLED, ASYNC_PROFILER_ENABLED_DEFAULT)) {
         try {
           Class<?> asyncProfilerClass = Class.forName("com.datadog.profiling.async.AsyncProfiler");
           if ((boolean)

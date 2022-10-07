@@ -1,4 +1,4 @@
-package com.datadog.profiling.async;
+package com.datadog.profiling.utils;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** A simple implementation to detect the current architecture */
-enum Arch {
+public enum Arch {
   x64("x86_64", "amd64", "k8"),
   x86("x86", "i386", "i486", "i586", "i686"),
   arm("ARM", "arm64"),

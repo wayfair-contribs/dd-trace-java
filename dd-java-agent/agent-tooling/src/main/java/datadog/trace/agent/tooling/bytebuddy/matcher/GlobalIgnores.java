@@ -1,5 +1,7 @@
 package datadog.trace.agent.tooling.bytebuddy.matcher;
 
+import static datadog.trace.agent.tooling.bytebuddy.matcher.TargetSystemAwareMatcher.IAST_ENABLED_FLAG;
+
 /**
  * Global ignores used by the agent.
  *
@@ -27,6 +29,8 @@ public class GlobalIgnores {
         return name.endsWith("Proxy");
       case 4:
         return !name.endsWith("HttpMessageConverter");
+      case IAST_ENABLED_FLAG:
+        return false;
       default:
         break;
     }

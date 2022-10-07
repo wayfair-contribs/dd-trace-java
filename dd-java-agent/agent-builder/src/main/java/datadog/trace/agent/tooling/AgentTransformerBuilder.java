@@ -16,6 +16,7 @@ import datadog.trace.agent.tooling.bytebuddy.matcher.FailSafeRawMatcher;
 import datadog.trace.agent.tooling.bytebuddy.matcher.KnownTypesMatcher;
 import datadog.trace.agent.tooling.bytebuddy.matcher.ShouldInjectFieldsRawMatcher;
 import datadog.trace.agent.tooling.bytebuddy.matcher.SingleTypeMatcher;
+import datadog.trace.agent.tooling.bytebuddy.matcher.TargetSystemAwareMatcher;
 import datadog.trace.agent.tooling.context.FieldBackedContextInjector;
 import datadog.trace.agent.tooling.context.FieldBackedContextRequestRewriter;
 import datadog.trace.api.Config;
@@ -78,7 +79,7 @@ public class AgentTransformerBuilder
     ignoreMatcher = instrumenter.methodIgnoreMatcher();
     adviceBuilder =
         agentBuilder
-            .type(matcher)
+            .type(new TargetSystemAwareMatcher(instrumenter, matcher))
             .and(NOT_DECORATOR_MATCHER)
             .and(
                 new AgentBuilder.RawMatcher() {

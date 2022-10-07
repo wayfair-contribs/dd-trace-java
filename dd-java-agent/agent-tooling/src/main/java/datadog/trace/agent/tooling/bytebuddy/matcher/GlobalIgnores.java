@@ -18,7 +18,9 @@ public class GlobalIgnores {
 
   public static boolean isIgnored(String name, boolean skipAdditionalIgnores) {
     // ignored classes/packages are now maintained in the 'ignored_class_name.trie' resource
-    switch (IgnoredClassNameTrie.apply(name)) {
+    // try to get value from cache otherwise use apply
+    Integer allowCode = GlobalIgnoresCache.getAllowCode(name);
+    switch (allowCode) {
       case 0:
         return false; // global allow
       case 1:

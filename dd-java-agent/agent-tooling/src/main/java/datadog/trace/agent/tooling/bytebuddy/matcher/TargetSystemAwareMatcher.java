@@ -27,9 +27,10 @@ public class TargetSystemAwareMatcher implements AgentBuilder.RawMatcher {
       final JavaModule module,
       final Class<?> classBeingRedefined,
       final ProtectionDomain protectionDomain) {
-    // try to cache this query somehow
-    final int ignored = IgnoredClassNameTrie.apply(typeDescription.getName());
-    if (ignored == IAST_ENABLED_FLAG
+
+    // try to get value from cache otherwise use apply
+    Integer allowCode = GlobalIgnoresCache.getAllowCode(typeDescription.getName());
+    if (allowCode == IAST_ENABLED_FLAG
         && instrumenter.getTargetSystem() != Instrumenter.TargetSystem.IAST) {
       return false;
     }

@@ -78,7 +78,7 @@ public final class MemoizedMatchers implements HierarchyMatchers.Supplier {
   @Override
   public ElementMatcher.Junction<TypeDescription> declaresContextField(
       String keyClassName, String contextClassName) {
-    return null; // FIXME
+    return new ShouldInjectFieldsMatcher(keyClassName, contextClassName);
   }
 
   static final class HasSuperMethod

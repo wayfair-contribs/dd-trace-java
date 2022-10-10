@@ -5,9 +5,9 @@ import javax.annotation.Nullable;
 
 public interface IastModule {
 
-  void onCipherAlgorithm(@Nonnull String algorithm);
+  void onCipherAlgorithm(@Nullable String algorithm);
 
-  void onHashingAlgorithm(@Nonnull String algorithm);
+  void onHashingAlgorithm(@Nullable String algorithm);
 
   /**
    * An HTTP request parameter name is used. This should be used when it cannot be determined
@@ -21,5 +21,18 @@ public interface IastModule {
    */
   void onParameterValue(@Nullable String paramName, @Nullable String paramValue);
 
-  void onConcat(@Nullable String left, @Nullable String right, @Nullable String result);
+  void onStringConcat(@Nullable String left, @Nullable String right, @Nullable String result);
+
+  void onStringBuilderInit(@Nullable StringBuilder builder, @Nullable CharSequence param);
+
+  void onStringBuilderAppend(@Nullable StringBuilder builder, @Nullable CharSequence param);
+
+  void onStringBuilderToString(@Nullable StringBuilder builder, @Nullable String result);
+
+  void onStringConcatFactory(
+      @Nullable String[] args,
+      @Nullable String result,
+      @Nullable String recipe,
+      @Nullable Object[] dynamicConstants,
+      @Nonnull int[] recipeOffsets);
 }

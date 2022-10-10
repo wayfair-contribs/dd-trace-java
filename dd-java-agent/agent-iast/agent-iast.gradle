@@ -1,5 +1,5 @@
 plugins {
-  id "com.github.johnrengelman.shadow"
+  id 'com.github.johnrengelman.shadow'
   id 'me.champeau.jmh'
 }
 
@@ -17,6 +17,11 @@ dependencies {
   testImplementation project(':utils:test-utils')
 
   jmh project(':utils:test-utils')
+  jmh project(':dd-trace-core')
+  jmh project(':dd-java-agent:agent-builder')
+  jmh project(':dd-java-agent:instrumentation:iast-instrumenter')
+  jmh project(':dd-java-agent:instrumentation:java-lang')
+  jmh 'org.apache.commons:commons-math3:3.6.1'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8

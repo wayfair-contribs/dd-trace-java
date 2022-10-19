@@ -27,6 +27,10 @@ public interface IastModule {
 
   void onStringTrim(@Nullable String self, @Nullable String result);
 
+  void onStringToUpperCase(@Nullable String self, @Nullable String result);
+
+  void onStringToLowerCase(@Nullable String self, @Nullable String result);
+
   void onStringBuilderAppend(@Nullable StringBuilder builder, @Nullable CharSequence param);
 
   void onStringBuilderToString(@Nullable StringBuilder builder, @Nullable String result);

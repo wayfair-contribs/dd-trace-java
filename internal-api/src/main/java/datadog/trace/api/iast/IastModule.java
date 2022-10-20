@@ -1,6 +1,5 @@
 package datadog.trace.api.iast;
 
-import datadog.trace.util.Maybe;
 import javax.annotation.Nullable;
 
 public interface IastModule {
@@ -33,6 +32,4 @@ public interface IastModule {
       @Nullable String self, int beginIndex, int endIndex, @Nullable CharSequence result);
 
   void onStringJoin(@Nullable String result, CharSequence delimiter, CharSequence... elements);
-
-  Maybe<String> onStringJoin(CharSequence delimiter, Iterable<? extends CharSequence> elements);
 }

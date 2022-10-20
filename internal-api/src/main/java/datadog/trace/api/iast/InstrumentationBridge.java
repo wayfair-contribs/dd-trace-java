@@ -1,6 +1,5 @@
 package datadog.trace.api.iast;
 
-import datadog.trace.util.Maybe;
 import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,19 +131,6 @@ public abstract class InstrumentationBridge {
     } catch (final Throwable t) {
       onUnexpectedException("Callback for onStringJoin threw.", t);
     }
-  }
-
-  public static Maybe<String> onStringJoin(
-      CharSequence delimiter, Iterable<? extends CharSequence> elements) {
-    Maybe<String> maybe = Maybe.Values.empty();
-    try {
-      if (MODULE != null) {
-        maybe = MODULE.onStringJoin(delimiter, elements);
-      }
-    } catch (final Throwable t) {
-      onUnexpectedException("Callback for onStringJoin threw.", t);
-    }
-    return maybe;
   }
 
   private static void onUnexpectedException(final String message, final Throwable error) {

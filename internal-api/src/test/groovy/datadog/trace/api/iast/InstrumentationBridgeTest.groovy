@@ -273,7 +273,7 @@ class InstrumentationBridgeTest extends DDSpecification {
     noExceptionThrown()
   }
 
-  def "bridge calls module when a String.join(CharSequence delimiter, CharSequence[] elements) method is detected"() {
+  def "bridge calls module when a String join method is detected"() {
     setup:
     final module = Mock(IastModule)
     InstrumentationBridge.registerIastModule(module)
@@ -290,21 +290,7 @@ class InstrumentationBridgeTest extends DDSpecification {
     1 * module.onStringJoin(result, delimiter, elements)
   }
 
-  def "bridge calls module when a String.join(CharSequence delimiter, Iterable<? extends CharSequence> elements) method is detected"() {
-    setup:
-    final module = Mock(IastModule)
-    InstrumentationBridge.registerIastModule(module)
-    final elements = ["1", "3"]
-    final delimiter = "-"
-
-    when:
-    InstrumentationBridge.onStringJoin(delimiter, elements)
-
-    then:
-    1 * module.onStringJoin(delimiter, elements)
-  }
-
-  def "bridge calls don't fail with null module when a String.join(CharSequence delimiter, CharSequence[] elements) method is detected"() {
+  def "bridge calls don't fail with null module when a String join method is detected"() {
     setup:
     InstrumentationBridge.registerIastModule(null)
     final elements = new CharSequence[2]
@@ -320,20 +306,8 @@ class InstrumentationBridgeTest extends DDSpecification {
     noExceptionThrown()
   }
 
-  def "bridge calls don't fail with null module when a String.join(CharSequence delimiter, Iterable<? extends CharSequence> elements) method is detected"() {
-    setup:
-    InstrumentationBridge.registerIastModule(null)
-    final elements = ["1", "3"]
-    final delimiter = "-"
 
-    when:
-    InstrumentationBridge.onStringJoin(delimiter, elements)
-
-    then:
-    noExceptionThrown()
-  }
-
-  def "bridge calls don't leak exceptions when String.join(CharSequence delimiter, CharSequence[] elements) method is detected"() {
+  def "bridge calls don't leak exceptions when String join method is detected"() {
     setup:
     final module = Mock(IastModule)
     InstrumentationBridge.registerIastModule(module)
@@ -348,21 +322,6 @@ class InstrumentationBridgeTest extends DDSpecification {
 
     then:
     1 * module.onStringJoin(result, delimiter, elements) >> { throw new Error('Boom!!!') }
-    noExceptionThrown()
-  }
-
-  def "bridge calls don't leak exceptions when String.join(CharSequence delimiter, Iterable<? extends CharSequence> elements) method is detected"() {
-    setup:
-    final module = Mock(IastModule)
-    InstrumentationBridge.registerIastModule(module)
-    final elements = ["1", "3"]
-    final delimiter = "-"
-
-    when:
-    InstrumentationBridge.onStringJoin(delimiter, elements)
-
-    then:
-    1 * module.onStringJoin(delimiter, elements) >> { throw new Error('Boom!!!') }
     noExceptionThrown()
   }
 }

@@ -16,16 +16,12 @@ import datadog.trace.api.Config;
 import datadog.trace.api.iast.IastModule;
 import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
 import datadog.trace.bootstrap.instrumentation.api.AgentTracer;
-import datadog.trace.util.Maybe;
 import datadog.trace.util.stacktrace.StackWalker;
 import datadog.trace.util.stacktrace.StackWalkerFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -217,6 +213,10 @@ public final class IastModuleImpl implements IastModule {
       return;
     }
     final TaintedObjects taintedObjects = ctx.getTaintedObjects();
+    // String.join may internally call StringJoiner, if StringJoiner did the job don't do it twice
+    if (getTainted(taintedObjects, result) != null) {
+      return;
+    }
     List<Range> newRanges = new ArrayList<>();
     int pos = 0;
     // Delimiter info
@@ -239,55 +239,6 @@ public final class IastModuleImpl implements IastModule {
     if (!newRanges.isEmpty()) {
       taintedObjects.taint(result, newRanges.toArray(new Range[0]));
     }
-  }
-
-  @Override
-  public Maybe<String> onStringJoin(
-      CharSequence delimiter, Iterable<? extends CharSequence> elements) {
-
-    final IastRequestContext ctx = IastRequestContext.get();
-    if (ctx == null) {
-      return Maybe.Values.empty();
-    }
-
-    Objects.requireNonNull(delimiter);
-    Objects.requireNonNull(elements);
-    StringJoiner joiner = new StringJoiner(delimiter);
-
-    final TaintedObjects taintedObjects = ctx.getTaintedObjects();
-    List<Range> newRanges = new ArrayList<>();
-    int pos = 0;
-    // Delimiter info
-    int delimiterLength = delimiter.length();
-    Range[] delimiterRanges = getRanges(getTainted(taintedObjects, delimiter));
-    boolean delimiterHasRanges = delimiterRanges.length > 0;
-
-    Iterator<? extends CharSequence> iterator = elements.iterator();
-    boolean hasExceptions = false;
-    while (iterator.hasNext()) {
-      CharSequence element = iterator.next();
-      joiner.add(element);
-      try {
-        if (!hasExceptions) {
-          pos =
-              getPositionAndUpdateRangesInStringJoin(
-                  taintedObjects,
-                  newRanges,
-                  pos,
-                  delimiterRanges,
-                  delimiterLength,
-                  element,
-                  delimiterHasRanges && iterator.hasNext());
-        }
-      } catch (Throwable e) {
-        hasExceptions = true;
-      }
-    }
-    String result = joiner.toString();
-    if (!newRanges.isEmpty() && !hasExceptions) {
-      taintedObjects.taint(result, newRanges.toArray(new Range[0]));
-    }
-    return Maybe.Values.of(result);
   }
 
   @Override

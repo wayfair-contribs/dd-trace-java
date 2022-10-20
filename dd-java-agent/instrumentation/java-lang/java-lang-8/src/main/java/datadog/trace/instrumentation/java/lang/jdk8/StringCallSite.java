@@ -3,8 +3,9 @@ package datadog.trace.instrumentation.java.lang.jdk8;
 import datadog.trace.agent.tooling.csi.CallSite;
 import datadog.trace.api.iast.IastAdvice;
 import datadog.trace.api.iast.InstrumentationBridge;
-import datadog.trace.util.Maybe;
 import datadog.trace.util.stacktrace.StackUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 @CallSite(spi = IastAdvice.class)
 public class StringCallSite {
@@ -25,14 +26,17 @@ public class StringCallSite {
       @CallSite.Argument final CharSequence delimiter,
       @CallSite.Argument final Iterable<? extends CharSequence> elements)
       throws Throwable {
+    // Iterate the iterable to guarantee the default behavior for custom mutable Iterables
+    List<CharSequence> copy = new ArrayList<>();
+    String result;
     try {
-      Maybe<String> maybe = InstrumentationBridge.onStringJoin(delimiter, elements);
-      if (!maybe.isPresent()) {
-        return String.join(delimiter, elements);
-      }
-      return maybe.get();
+      elements.forEach(copy::add);
+      result = String.join(delimiter, copy);
     } catch (final Throwable e) {
       throw StackUtils.filterDatadog(e);
     }
+    InstrumentationBridge.onStringJoin(
+        delimiter, copy.toArray(new CharSequence[copy.size()]), result);
+    return result;
   }
 }

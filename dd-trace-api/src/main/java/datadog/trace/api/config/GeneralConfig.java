@@ -66,5 +66,6 @@ public final class GeneralConfig {
   static final boolean DEFAULT_DATA_STREAMS_ENABLED = false;
   static final boolean DEFAULT_TELEMETRY_ENABLED = true;
   static final int DEFAULT_TELEMETRY_HEARTBEAT_INTERVAL = 60; // in seconds
+
   private GeneralConfig() {}
 }

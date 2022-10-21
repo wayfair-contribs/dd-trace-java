@@ -1,6 +1,5 @@
 package datadog.trace.api.config;
 
-import static datadog.trace.api.config.GeneralFeatureConfig.newHashMap;
 import static datadog.trace.api.DDTags.HOST_TAG;
 import static datadog.trace.api.DDTags.LANGUAGE_TAG_KEY;
 import static datadog.trace.api.DDTags.LANGUAGE_TAG_VALUE;
@@ -8,9 +7,9 @@ import static datadog.trace.api.DDTags.SERVICE_TAG;
 import static datadog.trace.api.config.CrashTrackingConfig.CRASH_TRACKING_AGENTLESS;
 import static datadog.trace.api.config.CrashTrackingConfig.CRASH_TRACKING_AGENTLESS_DEFAULT;
 import static datadog.trace.api.config.CrashTrackingConfig.CRASH_TRACKING_TAGS;
+import static datadog.trace.api.config.GeneralFeatureConfig.newHashMap;
 
 import datadog.trace.bootstrap.config.provider.ConfigProvider;
-
 import java.util.Collections;
 import java.util.Map;
 
@@ -20,11 +19,15 @@ public class CrashTrackingFeatureConfig extends AbstractFeatureConfig {
   private final boolean crashTrackingAgentless;
   private final Map<String, String> crashTrackingTags;
 
-  public CrashTrackingFeatureConfig(ConfigProvider configProvider, GeneralFeatureConfig generalConfig, TracerFeatureConfig tracerConfig) {
+  public CrashTrackingFeatureConfig(
+      ConfigProvider configProvider,
+      GeneralFeatureConfig generalConfig,
+      TracerFeatureConfig tracerConfig) {
     super(configProvider);
     this.generalConfig = generalConfig;
     this.tracerConfig = tracerConfig;
-    this.crashTrackingAgentless = configProvider.getBoolean(CRASH_TRACKING_AGENTLESS, CRASH_TRACKING_AGENTLESS_DEFAULT);
+    this.crashTrackingAgentless =
+        configProvider.getBoolean(CRASH_TRACKING_AGENTLESS, CRASH_TRACKING_AGENTLESS_DEFAULT);
     this.crashTrackingTags = configProvider.getMergedMap(CRASH_TRACKING_TAGS);
   }
 
@@ -35,10 +38,16 @@ public class CrashTrackingFeatureConfig extends AbstractFeatureConfig {
   public String getFinalCrashTrackingTelemetryUrl() {
     if (this.crashTrackingAgentless) {
       // when agentless crashTracking is turned on we send directly to our intake
-      return "https://all-http-intake.logs." + this.generalConfig.getSite() + "/api/v2/apmtelemetry";
+      return "https://all-http-intake.logs."
+          + this.generalConfig.getSite()
+          + "/api/v2/apmtelemetry";
     } else {
       // when agentless are not set we send to the dd trace agent running locally
-      return "http://" + this.tracerConfig.getAgentHost() + ":" + this.tracerConfig.getAgentPort() + "/telemetry/proxy/api/v2/apmtelemetry";
+      return "http://"
+          + this.tracerConfig.getAgentHost()
+          + ":"
+          + this.tracerConfig.getAgentPort()
+          + "/telemetry/proxy/api/v2/apmtelemetry";
     }
   }
 

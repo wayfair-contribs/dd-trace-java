@@ -27,13 +27,24 @@ public class RemoteFeatureConfig extends AbstractFeatureConfig {
 
   public RemoteFeatureConfig(ConfigProvider configProvider) {
     super(configProvider);
-    this.remoteConfigEnabled = configProvider.getBoolean(REMOTE_CONFIG_ENABLED, DEFAULT_REMOTE_CONFIG_ENABLED);
-    this.remoteConfigIntegrityCheckEnabled = configProvider.getBoolean(REMOTE_CONFIG_INTEGRITY_CHECK_ENABLED, DEFAULT_REMOTE_CONFIG_INTEGRITY_CHECK_ENABLED);
+    this.remoteConfigEnabled =
+        configProvider.getBoolean(REMOTE_CONFIG_ENABLED, DEFAULT_REMOTE_CONFIG_ENABLED);
+    this.remoteConfigIntegrityCheckEnabled =
+        configProvider.getBoolean(
+            REMOTE_CONFIG_INTEGRITY_CHECK_ENABLED, DEFAULT_REMOTE_CONFIG_INTEGRITY_CHECK_ENABLED);
     this.remoteConfigUrl = configProvider.getString(REMOTE_CONFIG_URL);
-    this.remoteConfigInitialPollInterval = configProvider.getInteger(REMOTE_CONFIG_INITIAL_POLL_INTERVAL, DEFAULT_REMOTE_CONFIG_INITIAL_POLL_INTERVAL);
-    this.remoteConfigMaxPayloadSize = configProvider.getInteger(REMOTE_CONFIG_MAX_PAYLOAD_SIZE, DEFAULT_REMOTE_CONFIG_MAX_PAYLOAD_SIZE) * 1024L;
-    this.remoteConfigTargetsKeyId = configProvider.getString(REMOTE_CONFIG_TARGETS_KEY_ID, DEFAULT_REMOTE_CONFIG_TARGETS_KEY_ID);
-    this.remoteConfigTargetsKey = configProvider.getString(REMOTE_CONFIG_TARGETS_KEY, DEFAULT_REMOTE_CONFIG_TARGETS_KEY);
+    this.remoteConfigInitialPollInterval =
+        configProvider.getInteger(
+            REMOTE_CONFIG_INITIAL_POLL_INTERVAL, DEFAULT_REMOTE_CONFIG_INITIAL_POLL_INTERVAL);
+    this.remoteConfigMaxPayloadSize =
+        configProvider.getInteger(
+                REMOTE_CONFIG_MAX_PAYLOAD_SIZE, DEFAULT_REMOTE_CONFIG_MAX_PAYLOAD_SIZE)
+            * 1024L;
+    this.remoteConfigTargetsKeyId =
+        configProvider.getString(
+            REMOTE_CONFIG_TARGETS_KEY_ID, DEFAULT_REMOTE_CONFIG_TARGETS_KEY_ID);
+    this.remoteConfigTargetsKey =
+        configProvider.getString(REMOTE_CONFIG_TARGETS_KEY, DEFAULT_REMOTE_CONFIG_TARGETS_KEY);
   }
 
   public long getRemoteConfigMaxPayloadSizeBytes() {

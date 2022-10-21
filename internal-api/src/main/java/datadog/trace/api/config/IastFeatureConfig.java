@@ -1,12 +1,5 @@
 package datadog.trace.api.config;
 
-import static datadog.trace.api.config.IastConfig.IAST_DEDUPLICATION_ENABLED;
-import static datadog.trace.api.config.IastConfig.IAST_ENABLED;
-import static datadog.trace.api.config.IastConfig.IAST_MAX_CONCURRENT_REQUESTS;
-import static datadog.trace.api.config.IastConfig.IAST_REQUEST_SAMPLING;
-import static datadog.trace.api.config.IastConfig.IAST_VULNERABILITIES_PER_REQUEST;
-import static datadog.trace.api.config.IastConfig.IAST_WEAK_CIPHER_ALGORITHMS;
-import static datadog.trace.api.config.IastConfig.IAST_WEAK_HASH_ALGORITHMS;
 import static datadog.trace.api.config.IastConfig.DEFAULT_IAST_DEDUPLICATION_ENABLED;
 import static datadog.trace.api.config.IastConfig.DEFAULT_IAST_ENABLED;
 import static datadog.trace.api.config.IastConfig.DEFAULT_IAST_MAX_CONCURRENT_REQUESTS;
@@ -14,14 +7,20 @@ import static datadog.trace.api.config.IastConfig.DEFAULT_IAST_REQUEST_SAMPLING;
 import static datadog.trace.api.config.IastConfig.DEFAULT_IAST_VULNERABILITIES_PER_REQUEST;
 import static datadog.trace.api.config.IastConfig.DEFAULT_IAST_WEAK_CIPHER_ALGORITHMS;
 import static datadog.trace.api.config.IastConfig.DEFAULT_IAST_WEAK_HASH_ALGORITHMS;
+import static datadog.trace.api.config.IastConfig.IAST_DEDUPLICATION_ENABLED;
+import static datadog.trace.api.config.IastConfig.IAST_ENABLED;
+import static datadog.trace.api.config.IastConfig.IAST_MAX_CONCURRENT_REQUESTS;
+import static datadog.trace.api.config.IastConfig.IAST_REQUEST_SAMPLING;
+import static datadog.trace.api.config.IastConfig.IAST_VULNERABILITIES_PER_REQUEST;
+import static datadog.trace.api.config.IastConfig.IAST_WEAK_CIPHER_ALGORITHMS;
+import static datadog.trace.api.config.IastConfig.IAST_WEAK_HASH_ALGORITHMS;
 import static datadog.trace.util.CollectionUtils.tryMakeImmutableSet;
 
 import datadog.trace.bootstrap.config.provider.ConfigProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IastFeatureConfig extends AbstractFeatureConfig {
   private static final Logger LOGGER = LoggerFactory.getLogger(IastFeatureConfig.class);
@@ -36,13 +35,24 @@ public class IastFeatureConfig extends AbstractFeatureConfig {
 
   public IastFeatureConfig(ConfigProvider configProvider) {
     super(configProvider);
-    this.iastWeakHashAlgorithms = tryMakeImmutableSet(configProvider.getSet(IAST_WEAK_HASH_ALGORITHMS, DEFAULT_IAST_WEAK_HASH_ALGORITHMS));
-    this.iastWeakCipherAlgorithms = getPattern(DEFAULT_IAST_WEAK_CIPHER_ALGORITHMS, configProvider.getString(IAST_WEAK_CIPHER_ALGORITHMS));
-    this.iastDeduplicationEnabled = configProvider.getBoolean(IAST_DEDUPLICATION_ENABLED, DEFAULT_IAST_DEDUPLICATION_ENABLED);
+    this.iastWeakHashAlgorithms =
+        tryMakeImmutableSet(
+            configProvider.getSet(IAST_WEAK_HASH_ALGORITHMS, DEFAULT_IAST_WEAK_HASH_ALGORITHMS));
+    this.iastWeakCipherAlgorithms =
+        getPattern(
+            DEFAULT_IAST_WEAK_CIPHER_ALGORITHMS,
+            configProvider.getString(IAST_WEAK_CIPHER_ALGORITHMS));
+    this.iastDeduplicationEnabled =
+        configProvider.getBoolean(IAST_DEDUPLICATION_ENABLED, DEFAULT_IAST_DEDUPLICATION_ENABLED);
     this.iastEnabled = configProvider.getBoolean(IAST_ENABLED, DEFAULT_IAST_ENABLED);
-    this.iastMaxConcurrentRequests = configProvider.getInteger(IAST_MAX_CONCURRENT_REQUESTS, DEFAULT_IAST_MAX_CONCURRENT_REQUESTS);
-    this.iastVulnerabilitiesPerRequest = configProvider.getInteger(IAST_VULNERABILITIES_PER_REQUEST, DEFAULT_IAST_VULNERABILITIES_PER_REQUEST);
-    this.iastRequestSampling = configProvider.getFloat(IAST_REQUEST_SAMPLING, DEFAULT_IAST_REQUEST_SAMPLING);
+    this.iastMaxConcurrentRequests =
+        configProvider.getInteger(
+            IAST_MAX_CONCURRENT_REQUESTS, DEFAULT_IAST_MAX_CONCURRENT_REQUESTS);
+    this.iastVulnerabilitiesPerRequest =
+        configProvider.getInteger(
+            IAST_VULNERABILITIES_PER_REQUEST, DEFAULT_IAST_VULNERABILITIES_PER_REQUEST);
+    this.iastRequestSampling =
+        configProvider.getFloat(IAST_REQUEST_SAMPLING, DEFAULT_IAST_REQUEST_SAMPLING);
   }
 
   private static Pattern getPattern(String defaultValue, String userValue) {
@@ -83,5 +93,4 @@ public class IastFeatureConfig extends AbstractFeatureConfig {
   public float getIastRequestSampling() {
     return this.iastRequestSampling;
   }
-
 }

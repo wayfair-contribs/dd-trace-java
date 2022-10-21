@@ -18,9 +18,6 @@ import datadog.trace.api.config.TraceInstrumentationFeatureConfig;
 import datadog.trace.api.config.TracerFeatureConfig;
 import datadog.trace.bootstrap.config.provider.ConfigProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +25,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Config reads values with the following priority: 1) system properties, 2) environment variables,
@@ -35,7 +34,6 @@ import java.util.regex.Pattern;
  * to ensure a valid config.
  *
  * <p>
- *
  */
 @Deprecated
 public class Config {
@@ -66,10 +64,13 @@ public class Config {
     this.generalConfig = new GeneralFeatureConfig(configProvider);
     this.tracerConfig = new TracerFeatureConfig(configProvider);
     this.iastConfig = new IastFeatureConfig(configProvider);
-    this.jmxFetchConfig = new JmxFetchFeatureConfig(configProvider, this.generalConfig, this.tracerConfig);
+    this.jmxFetchConfig =
+        new JmxFetchFeatureConfig(configProvider, this.generalConfig, this.tracerConfig);
     this.traceInstrumentationConfig = new TraceInstrumentationFeatureConfig(configProvider);
-    this.profilingConfig = new ProfilingFeatureConfig(configProvider, this.generalConfig, this.tracerConfig);
-    this.crashTrackingConfig = new CrashTrackingFeatureConfig(configProvider, this.generalConfig, this.tracerConfig);
+    this.profilingConfig =
+        new ProfilingFeatureConfig(configProvider, this.generalConfig, this.tracerConfig);
+    this.crashTrackingConfig =
+        new CrashTrackingFeatureConfig(configProvider, this.generalConfig, this.tracerConfig);
     this.appSecConfig = new AppSecFeatureConfig(configProvider);
     this.ciVisibilityConfig = new CiVisibilityFeatureConfig(configProvider);
     this.remoteConfig = new RemoteFeatureConfig(configProvider);
@@ -794,7 +795,8 @@ public class Config {
   }
 
   public boolean isRabbitPropagationDisabledForDestination(final String queueOrExchange) {
-    return this.traceInstrumentationConfig.isRabbitPropagationDisabledForDestination(queueOrExchange);
+    return this.traceInstrumentationConfig.isRabbitPropagationDisabledForDestination(
+        queueOrExchange);
   }
 
   public boolean isMessageBrokerSplitByDestination() {
@@ -989,7 +991,7 @@ public class Config {
   }
 
   public String getFinalProfilingUrl() {
-      return this.profilingConfig.getFinalProfilingUrl();
+    return this.profilingConfig.getFinalProfilingUrl();
   }
 
   public String getFinalCrashTrackingTelemetryUrl() {
@@ -1003,12 +1005,14 @@ public class Config {
 
   public boolean isIntegrationShortcutMatchingEnabled(
       final Iterable<String> integrationNames, final boolean defaultEnabled) {
-    return this.traceInstrumentationConfig.isIntegrationShortcutMatchingEnabled(integrationNames, defaultEnabled);
+    return this.traceInstrumentationConfig.isIntegrationShortcutMatchingEnabled(
+        integrationNames, defaultEnabled);
   }
 
   public boolean isJmxFetchIntegrationEnabled(
       final Iterable<String> integrationNames, final boolean defaultEnabled) {
-    return this.traceInstrumentationConfig.isJmxFetchIntegrationEnabled(integrationNames, defaultEnabled);
+    return this.traceInstrumentationConfig.isJmxFetchIntegrationEnabled(
+        integrationNames, defaultEnabled);
   }
 
   public boolean isRuleEnabled(final String name) {
@@ -1036,7 +1040,8 @@ public class Config {
 
   public boolean isEndToEndDurationEnabled(
       final boolean defaultEnabled, final String... integrationNames) {
-    return this.traceInstrumentationConfig.isEndToEndDurationEnabled(defaultEnabled, integrationNames);
+    return this.traceInstrumentationConfig.isEndToEndDurationEnabled(
+        defaultEnabled, integrationNames);
   }
 
   public boolean isLegacyTracingEnabled(
@@ -1046,12 +1051,14 @@ public class Config {
 
   public boolean isTraceAnalyticsIntegrationEnabled(
       final SortedSet<String> integrationNames, final boolean defaultEnabled) {
-    return this.traceInstrumentationConfig.isTraceAnalyticsIntegrationEnabled(integrationNames, defaultEnabled);
+    return this.traceInstrumentationConfig.isTraceAnalyticsIntegrationEnabled(
+        integrationNames, defaultEnabled);
   }
 
   public boolean isTraceAnalyticsIntegrationEnabled(
       final boolean defaultEnabled, final String... integrationNames) {
-    return this.traceInstrumentationConfig.isTraceAnalyticsIntegrationEnabled(defaultEnabled, integrationNames);
+    return this.traceInstrumentationConfig.isTraceAnalyticsIntegrationEnabled(
+        defaultEnabled, integrationNames);
   }
 
   public boolean isSamplingMechanismValidationDisabled() {
@@ -1103,365 +1110,365 @@ public class Config {
   }
 
   @Override
-  public String toString() {  // TODO Fix after decoupling
+  public String toString() { // TODO Fix after decoupling
     return "Config{"
         + "runtimeId='"
-//        + runtimeId
+        //        + runtimeId
         + '\''
         + ", runtimeVersion='"
-//        + runtimeVersion
+        //        + runtimeVersion
         + ", apiKey="
-//        + (apiKey == null ? "null" : "****")
+        //        + (apiKey == null ? "null" : "****")
         + ", site='"
-//        + site
+        //        + site
         + '\''
         + ", hostName='"
-//        + hostName
+        //        + hostName
         + '\''
         + ", serviceName='"
-//        + serviceName
+        //        + serviceName
         + '\''
         + ", serviceNameSetByUser="
-//        + serviceNameSetByUser
+        //        + serviceNameSetByUser
         + ", rootContextServiceName="
-//        + rootContextServiceName
+        //        + rootContextServiceName
         + ", traceEnabled="
-//        + traceEnabled
+        //        + traceEnabled
         + ", integrationsEnabled="
-//        + integrationsEnabled
+        //        + integrationsEnabled
         + ", integrationSynapseLegacyOperationName="
-//        + integrationSynapseLegacyOperationName
+        //        + integrationSynapseLegacyOperationName
         + ", writerType='"
-//        + writerType
+        //        + writerType
         + '\''
         + ", agentConfiguredUsingDefault="
-//        + agentConfiguredUsingDefault
+        //        + agentConfiguredUsingDefault
         + ", agentUrl='"
-//        + agentUrl
+        //        + agentUrl
         + '\''
         + ", agentHost='"
-//        + agentHost
+        //        + agentHost
         + '\''
         + ", agentPort="
-//        + agentPort
+        //        + agentPort
         + ", agentUnixDomainSocket='"
-//        + agentUnixDomainSocket
+        //        + agentUnixDomainSocket
         + '\''
         + ", agentTimeout="
-//        + agentTimeout
+        //        + agentTimeout
         + ", noProxyHosts="
-//        + noProxyHosts
+        //        + noProxyHosts
         + ", prioritySamplingEnabled="
-//        + prioritySamplingEnabled
+        //        + prioritySamplingEnabled
         + ", prioritySamplingForce='"
-//        + prioritySamplingForce
+        //        + prioritySamplingForce
         + '\''
         + ", traceResolverEnabled="
-//        + traceResolverEnabled
+        //        + traceResolverEnabled
         + ", serviceMapping="
-//        + serviceMapping
+        //        + serviceMapping
         + ", tags="
-//        + tags
+        //        + tags
         + ", spanTags="
-//        + spanTags
+        //        + spanTags
         + ", jmxTags="
-//        + jmxTags
+        //        + jmxTags
         + ", excludedClasses="
-//        + excludedClasses
+        //        + excludedClasses
         + ", excludedClassesFile="
-//        + excludedClassesFile
+        //        + excludedClassesFile
         + ", excludedClassLoaders="
-//        + excludedClassLoaders
+        //        + excludedClassLoaders
         + ", excludedCodeSources="
-//        + excludedCodeSources
+        //        + excludedCodeSources
         + ", requestHeaderTags="
-//        + requestHeaderTags
+        //        + requestHeaderTags
         + ", responseHeaderTags="
-//        + responseHeaderTags
+        //        + responseHeaderTags
         + ", httpServerErrorStatuses="
-//        + httpServerErrorStatuses
+        //        + httpServerErrorStatuses
         + ", httpClientErrorStatuses="
-//        + httpClientErrorStatuses
+        //        + httpClientErrorStatuses
         + ", httpServerTagQueryString="
-//        + httpServerTagQueryString
+        //        + httpServerTagQueryString
         + ", httpServerRawQueryString="
-//        + httpServerRawQueryString
+        //        + httpServerRawQueryString
         + ", httpServerRawResource="
-//        + httpServerRawResource
+        //        + httpServerRawResource
         + ", httpServerRouteBasedNaming="
-//        + httpServerRouteBasedNaming
+        //        + httpServerRouteBasedNaming
         + ", httpServerPathResourceNameMapping="
-//        + httpServerPathResourceNameMapping
+        //        + httpServerPathResourceNameMapping
         + ", httpClientTagQueryString="
-//        + httpClientTagQueryString
+        //        + httpClientTagQueryString
         + ", httpClientSplitByDomain="
-//        + httpClientSplitByDomain
+        //        + httpClientSplitByDomain
         + ", dbClientSplitByInstance="
-//        + dbClientSplitByInstance
+        //        + dbClientSplitByInstance
         + ", dbClientSplitByInstanceTypeSuffix="
-//        + dbClientSplitByInstanceTypeSuffix
+        //        + dbClientSplitByInstanceTypeSuffix
         + ", splitByTags="
-//        + splitByTags
+        //        + splitByTags
         + ", scopeDepthLimit="
-//        + scopeDepthLimit
+        //        + scopeDepthLimit
         + ", scopeStrictMode="
-//        + scopeStrictMode
+        //        + scopeStrictMode
         + ", scopeInheritAsyncPropagation="
-//        + scopeInheritAsyncPropagation
+        //        + scopeInheritAsyncPropagation
         + ", scopeIterationKeepAlive="
-//        + scopeIterationKeepAlive
+        //        + scopeIterationKeepAlive
         + ", partialFlushMinSpans="
-//        + partialFlushMinSpans
+        //        + partialFlushMinSpans
         + ", traceStrictWritesEnabled="
-//        + traceStrictWritesEnabled
+        //        + traceStrictWritesEnabled
         + ", runtimeContextFieldInjection="
-//        + runtimeContextFieldInjection
+        //        + runtimeContextFieldInjection
         + ", serialVersionUIDFieldInjection="
-//        + serialVersionUIDFieldInjection
+        //        + serialVersionUIDFieldInjection
         + ", propagationStylesToExtract="
-//        + propagationStylesToExtract
+        //        + propagationStylesToExtract
         + ", propagationStylesToInject="
-//        + propagationStylesToInject
+        //        + propagationStylesToInject
         + ", clockSyncPeriod="
-//        + clockSyncPeriod
+        //        + clockSyncPeriod
         + ", jmxFetchEnabled="
-//        + jmxFetchEnabled
+        //        + jmxFetchEnabled
         + ", dogStatsDStartDelay="
-//        + dogStatsDStartDelay
+        //        + dogStatsDStartDelay
         + ", jmxFetchConfigDir='"
-//        + jmxFetchConfigDir
+        //        + jmxFetchConfigDir
         + '\''
         + ", jmxFetchConfigs="
-//        + jmxFetchConfigs
+        //        + jmxFetchConfigs
         + ", jmxFetchMetricsConfigs="
-//        + jmxFetchMetricsConfigs
+        //        + jmxFetchMetricsConfigs
         + ", jmxFetchCheckPeriod="
-//        + jmxFetchCheckPeriod
+        //        + jmxFetchCheckPeriod
         + ", jmxFetchInitialRefreshBeansPeriod="
-//        + jmxFetchInitialRefreshBeansPeriod
+        //        + jmxFetchInitialRefreshBeansPeriod
         + ", jmxFetchRefreshBeansPeriod="
-//        + jmxFetchRefreshBeansPeriod
+        //        + jmxFetchRefreshBeansPeriod
         + ", jmxFetchStatsdHost='"
-//        + jmxFetchStatsdHost
+        //        + jmxFetchStatsdHost
         + '\''
         + ", jmxFetchStatsdPort="
-//        + jmxFetchStatsdPort
+        //        + jmxFetchStatsdPort
         + ", jmxFetchMultipleRuntimeServicesEnabled="
-//        + jmxFetchMultipleRuntimeServicesEnabled
+        //        + jmxFetchMultipleRuntimeServicesEnabled
         + ", jmxFetchMultipleRuntimeServicesLimit="
-//        + jmxFetchMultipleRuntimeServicesLimit
+        //        + jmxFetchMultipleRuntimeServicesLimit
         + ", healthMetricsEnabled="
-//        + healthMetricsEnabled
+        //        + healthMetricsEnabled
         + ", healthMetricsStatsdHost='"
-//        + healthMetricsStatsdHost
+        //        + healthMetricsStatsdHost
         + '\''
         + ", healthMetricsStatsdPort="
-//        + healthMetricsStatsdPort
+        //        + healthMetricsStatsdPort
         + ", perfMetricsEnabled="
-//        + perfMetricsEnabled
+        //        + perfMetricsEnabled
         + ", tracerMetricsEnabled="
-//        + tracerMetricsEnabled
+        //        + tracerMetricsEnabled
         + ", tracerMetricsBufferingEnabled="
-//        + tracerMetricsBufferingEnabled
+        //        + tracerMetricsBufferingEnabled
         + ", tracerMetricsMaxAggregates="
-//        + tracerMetricsMaxAggregates
+        //        + tracerMetricsMaxAggregates
         + ", tracerMetricsMaxPending="
-//        + tracerMetricsMaxPending
+        //        + tracerMetricsMaxPending
         + ", logsInjectionEnabled="
-//        + logsInjectionEnabled
+        //        + logsInjectionEnabled
         + ", logsMDCTagsInjectionEnabled="
-//        + logsMDCTagsInjectionEnabled
+        //        + logsMDCTagsInjectionEnabled
         + ", reportHostName="
-//        + reportHostName
+        //        + reportHostName
         + ", traceAnnotations='"
-//        + traceAnnotations
+        //        + traceAnnotations
         + '\''
         + ", traceMethods='"
-//        + traceMethods
+        //        + traceMethods
         + '\''
         + ", traceExecutorsAll="
-//        + traceExecutorsAll
+        //        + traceExecutorsAll
         + ", traceExecutors="
-//        + traceExecutors
+        //        + traceExecutors
         + ", traceAnalyticsEnabled="
-//        + traceAnalyticsEnabled
+        //        + traceAnalyticsEnabled
         + ", traceSamplingServiceRules="
-//        + traceSamplingServiceRules
+        //        + traceSamplingServiceRules
         + ", traceSamplingOperationRules="
-//        + traceSamplingOperationRules
+        //        + traceSamplingOperationRules
         + ", traceSamplingJsonRules="
-//        + traceSamplingRules
+        //        + traceSamplingRules
         + ", traceSampleRate="
-//        + traceSampleRate
+        //        + traceSampleRate
         + ", traceRateLimit="
-//        + traceRateLimit
+        //        + traceRateLimit
         + ", profilingEnabled="
-//        + profilingEnabled
+        //        + profilingEnabled
         + ", profilingAgentless="
-//        + profilingAgentless
+        //        + profilingAgentless
         + ", profilingUrl='"
-//        + profilingUrl
+        //        + profilingUrl
         + '\''
         + ", profilingTags="
-//        + profilingTags
+        //        + profilingTags
         + ", profilingStartDelay="
-//        + profilingStartDelay
+        //        + profilingStartDelay
         + ", profilingStartForceFirst="
-//        + profilingStartForceFirst
+        //        + profilingStartForceFirst
         + ", profilingUploadPeriod="
-//        + profilingUploadPeriod
+        //        + profilingUploadPeriod
         + ", profilingTemplateOverrideFile='"
-//        + profilingTemplateOverrideFile
+        //        + profilingTemplateOverrideFile
         + '\''
         + ", profilingUploadTimeout="
-//        + profilingUploadTimeout
+        //        + profilingUploadTimeout
         + ", profilingUploadCompression='"
-//        + profilingUploadCompression
+        //        + profilingUploadCompression
         + '\''
         + ", profilingProxyHost='"
-//        + profilingProxyHost
+        //        + profilingProxyHost
         + '\''
         + ", profilingProxyPort="
-//        + profilingProxyPort
+        //        + profilingProxyPort
         + ", profilingProxyUsername='"
-//        + profilingProxyUsername
+        //        + profilingProxyUsername
         + '\''
         + ", profilingProxyPassword="
-//        + (profilingProxyPassword == null ? "null" : "****")
+        //        + (profilingProxyPassword == null ? "null" : "****")
         + ", profilingExceptionSampleLimit="
-//        + profilingExceptionSampleLimit
+        //        + profilingExceptionSampleLimit
         + ", profilingExceptionHistogramTopItems="
-//        + profilingExceptionHistogramTopItems
+        //        + profilingExceptionHistogramTopItems
         + ", profilingExceptionHistogramMaxCollectionSize="
-//        + profilingExceptionHistogramMaxCollectionSize
+        //        + profilingExceptionHistogramMaxCollectionSize
         + ", profilingExcludeAgentThreads="
-//        + profilingExcludeAgentThreads
+        //        + profilingExcludeAgentThreads
         + ", crashTrackingTags="
-//        + crashTrackingTags
+        //        + crashTrackingTags
         + ", crashTrackingAgentless="
-//        + crashTrackingAgentless
+        //        + crashTrackingAgentless
         + ", remoteConfigEnabled="
-//        + remoteConfigEnabled
+        //        + remoteConfigEnabled
         + ", remoteConfigUrl="
-//        + remoteConfigUrl
+        //        + remoteConfigUrl
         + ", remoteConfigInitialPollInterval="
-//        + remoteConfigInitialPollInterval
+        //        + remoteConfigInitialPollInterval
         + ", remoteConfigMaxPayloadSize="
-//        + remoteConfigMaxPayloadSize
+        //        + remoteConfigMaxPayloadSize
         + ", remoteConfigIntegrityCheckEnabled="
-//        + remoteConfigIntegrityCheckEnabled
+        //        + remoteConfigIntegrityCheckEnabled
         + ", debuggerEnabled="
-//        + debuggerEnabled
+        //        + debuggerEnabled
         + ", debuggerUploadTimeout="
-//        + debuggerUploadTimeout
+        //        + debuggerUploadTimeout
         + ", debuggerUploadFlushInterval="
-//        + debuggerUploadFlushInterval
+        //        + debuggerUploadFlushInterval
         + ", debuggerClassFileDumpEnabled="
-//        + debuggerClassFileDumpEnabled
+        //        + debuggerClassFileDumpEnabled
         + ", debuggerPollInterval="
-//        + debuggerPollInterval
+        //        + debuggerPollInterval
         + ", debuggerDiagnosticsInterval="
-//        + debuggerDiagnosticsInterval
+        //        + debuggerDiagnosticsInterval
         + ", debuggerMetricEnabled="
-//        + debuggerMetricEnabled
+        //        + debuggerMetricEnabled
         + ", debuggerProbeFileLocation="
-//        + debuggerProbeFileLocation
+        //        + debuggerProbeFileLocation
         + ", debuggerUploadBatchSize="
-//        + debuggerUploadBatchSize
+        //        + debuggerUploadBatchSize
         + ", debuggerMaxPayloadSize="
-//        + debuggerMaxPayloadSize
+        //        + debuggerMaxPayloadSize
         + ", debuggerVerifyByteCode="
-//        + debuggerVerifyByteCode
+        //        + debuggerVerifyByteCode
         + ", debuggerInstrumentTheWorld="
-//        + debuggerInstrumentTheWorld
+        //        + debuggerInstrumentTheWorld
         + ", debuggerExcludeFile="
-//        + debuggerExcludeFile
+        //        + debuggerExcludeFile
         + ", awsPropagationEnabled="
-//        + awsPropagationEnabled
+        //        + awsPropagationEnabled
         + ", sqsPropagationEnabled="
-//        + sqsPropagationEnabled
+        //        + sqsPropagationEnabled
         + ", kafkaClientPropagationEnabled="
-//        + kafkaClientPropagationEnabled
+        //        + kafkaClientPropagationEnabled
         + ", kafkaClientPropagationDisabledTopics="
-//        + kafkaClientPropagationDisabledTopics
+        //        + kafkaClientPropagationDisabledTopics
         + ", kafkaClientBase64DecodingEnabled="
-//        + kafkaClientBase64DecodingEnabled
+        //        + kafkaClientBase64DecodingEnabled
         + ", jmsPropagationEnabled="
-//        + jmsPropagationEnabled
+        //        + jmsPropagationEnabled
         + ", jmsPropagationDisabledTopics="
-//        + jmsPropagationDisabledTopics
+        //        + jmsPropagationDisabledTopics
         + ", jmsPropagationDisabledQueues="
-//        + jmsPropagationDisabledQueues
+        //        + jmsPropagationDisabledQueues
         + ", rabbitPropagationEnabled="
-//        + rabbitPropagationEnabled
+        //        + rabbitPropagationEnabled
         + ", rabbitPropagationDisabledQueues="
-//        + rabbitPropagationDisabledQueues
+        //        + rabbitPropagationDisabledQueues
         + ", rabbitPropagationDisabledExchanges="
-//        + rabbitPropagationDisabledExchanges
+        //        + rabbitPropagationDisabledExchanges
         + ", messageBrokerSplitByDestination="
-//        + messageBrokerSplitByDestination
+        //        + messageBrokerSplitByDestination
         + ", hystrixTagsEnabled="
-//        + hystrixTagsEnabled
+        //        + hystrixTagsEnabled
         + ", hystrixMeasuredEnabled="
-//        + hystrixMeasuredEnabled
+        //        + hystrixMeasuredEnabled
         + ", igniteCacheIncludeKeys="
-//        + igniteCacheIncludeKeys
+        //        + igniteCacheIncludeKeys
         + ", servletPrincipalEnabled="
-//        + servletPrincipalEnabled
+        //        + servletPrincipalEnabled
         + ", servletAsyncTimeoutError="
-//        + servletAsyncTimeoutError
+        //        + servletAsyncTimeoutError
         + ", datadogTagsLimit="
-//        + xDatadogTagsMaxLength
+        //        + xDatadogTagsMaxLength
         + ", traceAgentV05Enabled="
-//        + traceAgentV05Enabled
+        //        + traceAgentV05Enabled
         + ", debugEnabled="
-//        + debugEnabled
+        //        + debugEnabled
         + ", configFile='"
         + configFileStatus
         + '\''
         + ", idGenerationStrategy="
-//        + idGenerationStrategy
+        //        + idGenerationStrategy
         + ", internalExitOnFailure="
-//        + internalExitOnFailure
+        //        + internalExitOnFailure
         + ", resolverOutlinePoolEnabled="
-//        + resolverOutlinePoolEnabled
+        //        + resolverOutlinePoolEnabled
         + ", resolverOutlinePoolSize="
-//        + resolverOutlinePoolSize
+        //        + resolverOutlinePoolSize
         + ", resolverTypePoolSize="
-//        + resolverTypePoolSize
+        //        + resolverTypePoolSize
         + ", resolverUseLoadClassEnabled="
-//        + resolverUseLoadClassEnabled
+        //        + resolverUseLoadClassEnabled
         + ", jdbcPreparedStatementClassName='"
-//        + jdbcPreparedStatementClassName
+        //        + jdbcPreparedStatementClassName
         + '\''
         + ", jdbcConnectionClassName='"
-//        + jdbcConnectionClassName
+        //        + jdbcConnectionClassName
         + '\''
         + ", grpcIgnoredInboundMethods="
-//        + grpcIgnoredInboundMethods
+        //        + grpcIgnoredInboundMethods
         + ", grpcIgnoredOutboundMethods="
-//        + grpcIgnoredOutboundMethods
+        //        + grpcIgnoredOutboundMethods
         + ", grpcServerErrorStatuses="
-//        + grpcServerErrorStatuses
+        //        + grpcServerErrorStatuses
         + ", grpcClientErrorStatuses="
-//        + grpcClientErrorStatuses
+        //        + grpcClientErrorStatuses
         + ", configProvider="
         + configProvider
         + ", appSecEnabled="
-//        + appSecEnabled
+        //        + appSecEnabled
         + ", appSecReportingInband="
-//        + appSecReportingInband
+        //        + appSecReportingInband
         + ", appSecRulesFile='"
-//        + appSecRulesFile
+        //        + appSecRulesFile
         + "'"
         + ", appSecHttpBlockedTemplateHtml="
-//        + appSecHttpBlockedTemplateHtml
+        //        + appSecHttpBlockedTemplateHtml
         + ", appSecHttpBlockedTemplateJson="
-//        + appSecHttpBlockedTemplateJson
+        //        + appSecHttpBlockedTemplateJson
         + ", cwsEnabled="
-//        + cwsEnabled
+        //        + cwsEnabled
         + ", cwsTlsRefresh="
-//        + cwsTlsRefresh
+        //        + cwsTlsRefresh
         + '}';
   }
 }

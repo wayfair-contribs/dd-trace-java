@@ -1,7 +1,6 @@
 package datadog.trace.api.config;
 
 import datadog.trace.api.PropagationStyle;
-
 import java.util.BitSet;
 
 /**
@@ -31,8 +30,7 @@ public final class TracerConfig {
   public static final String TRACE_AGENT_ARGS = "trace.agent.args";
   public static final String PRIORITY_SAMPLING = "priority.sampling";
   public static final String PRIORITY_SAMPLING_FORCE = "priority.sampling.force";
-  @Deprecated
-  public static final String TRACE_RESOLVER_ENABLED = "trace.resolver.enabled";
+  @Deprecated public static final String TRACE_RESOLVER_ENABLED = "trace.resolver.enabled";
   public static final String SERVICE_MAPPING = "service.mapping";
 
   public static final String SPAN_TAGS = "trace.span.tags";
@@ -116,6 +114,5 @@ public final class TracerConfig {
     DEFAULT_HTTP_CLIENT_ERROR_STATUSES.set(400, 500);
   }
 
-  private TracerConfig() {
-  }
+  private TracerConfig() {}
 }

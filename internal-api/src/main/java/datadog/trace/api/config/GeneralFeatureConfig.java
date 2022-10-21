@@ -60,10 +60,6 @@ import datadog.trace.api.WellKnownTags;
 import datadog.trace.bootstrap.config.provider.CapturedEnvironmentConfigSource;
 import datadog.trace.bootstrap.config.provider.ConfigProvider;
 import datadog.trace.bootstrap.config.provider.SystemPropertiesConfigSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -78,18 +74,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GeneralFeatureConfig {
   private static final Logger LOGGER = LoggerFactory.getLogger(GeneralFeatureConfig.class);
 
   private final long startTimeMillis;
   /**
-   * this is a random UUID that gets generated on JVM start up and is attached to every root span and every JMX metric that is sent out.
+   * this is a random UUID that gets generated on JVM start up and is attached to every root span
+   * and every JMX metric that is sent out.
    */
   private final String runtimeId;
-  /**
-   * This is the version of the runtime, ex: 1.8.0_332, 11.0.15, 17.0.3
-   */
+  /** This is the version of the runtime, ex: 1.8.0_332, 11.0.15, 17.0.3 */
   private final String runtimeVersion;
 
   /**
@@ -139,7 +137,9 @@ public class GeneralFeatureConfig {
 
     this.hostName = initHostName();
 
-    String userProvidedServiceName = configProvider.getStringExcludingSource(SERVICE, null, CapturedEnvironmentConfigSource.class, SERVICE_NAME);
+    String userProvidedServiceName =
+        configProvider.getStringExcludingSource(
+            SERVICE, null, CapturedEnvironmentConfigSource.class, SERVICE_NAME);
 
     if (userProvidedServiceName == null) {
       this.serviceNameSetByUser = false;
@@ -159,25 +159,32 @@ public class GeneralFeatureConfig {
     this.primaryTag = configProvider.getString(PRIMARY_TAG);
 
     this.debugEnabled = isDebugMode();
-    this.reportHostName = configProvider.getBoolean(TRACE_REPORT_HOSTNAME, DEFAULT_TRACE_REPORT_HOSTNAME);
+    this.reportHostName =
+        configProvider.getBoolean(TRACE_REPORT_HOSTNAME, DEFAULT_TRACE_REPORT_HOSTNAME);
     this.azureAppServices = configProvider.getBoolean(AZURE_APP_SERVICES, false);
 
     this.dogStatsDConfig = new DogStatsDConfig(configProvider);
 
-
     boolean runtimeMetricsEnabled = configProvider.getBoolean(RUNTIME_METRICS_ENABLED, true);
 
     // Writer.Builder createMonitor will use the values of the JMX fetch & agent to fill-in defaults
-    this.healthMetricsEnabled = runtimeMetricsEnabled && configProvider.getBoolean(HEALTH_METRICS_ENABLED, DEFAULT_HEALTH_METRICS_ENABLED);
+    this.healthMetricsEnabled =
+        runtimeMetricsEnabled
+            && configProvider.getBoolean(HEALTH_METRICS_ENABLED, DEFAULT_HEALTH_METRICS_ENABLED);
     this.healthMetricsStatsdHost = configProvider.getString(HEALTH_METRICS_STATSD_HOST);
     this.healthMetricsStatsdPort = configProvider.getInteger(HEALTH_METRICS_STATSD_PORT);
-    this.perfMetricsEnabled = runtimeMetricsEnabled && isJavaVersionAtLeast(8) && configProvider.getBoolean(PERF_METRICS_ENABLED, DEFAULT_PERF_METRICS_ENABLED);
+    this.perfMetricsEnabled =
+        runtimeMetricsEnabled
+            && isJavaVersionAtLeast(8)
+            && configProvider.getBoolean(PERF_METRICS_ENABLED, DEFAULT_PERF_METRICS_ENABLED);
 
-    this.tracerMetricsEnabled = isJavaVersionAtLeast(8) && configProvider.getBoolean(TRACER_METRICS_ENABLED, false);
-    this.tracerMetricsBufferingEnabled = configProvider.getBoolean(TRACER_METRICS_BUFFERING_ENABLED, false);
-    this.tracerMetricsMaxAggregates = configProvider.getInteger(TRACER_METRICS_MAX_AGGREGATES, 2048);
+    this.tracerMetricsEnabled =
+        isJavaVersionAtLeast(8) && configProvider.getBoolean(TRACER_METRICS_ENABLED, false);
+    this.tracerMetricsBufferingEnabled =
+        configProvider.getBoolean(TRACER_METRICS_BUFFERING_ENABLED, false);
+    this.tracerMetricsMaxAggregates =
+        configProvider.getInteger(TRACER_METRICS_MAX_AGGREGATES, 2048);
     this.tracerMetricsMaxPending = configProvider.getInteger(TRACER_METRICS_MAX_PENDING, 2048);
-
 
     telemetryEnabled = configProvider.getBoolean(TELEMETRY_ENABLED, DEFAULT_TELEMETRY_ENABLED);
     int telemetryInterval =
@@ -195,8 +202,6 @@ public class GeneralFeatureConfig {
 
     dataStreamsEnabled =
         configProvider.getBoolean(DATA_STREAMS_ENABLED, DEFAULT_DATA_STREAMS_ENABLED);
-
-
 
     // Setting this last because we have a few places where this can come from
     this.apiKey = tmpApiKey;
@@ -218,10 +223,12 @@ public class GeneralFeatureConfig {
     // Note: we do not use defined default here
     // FIXME: We should use better authentication mechanism
     final String apiKeyFile = configProvider.getString(API_KEY_FILE);
-    String tmpApiKey = configProvider.getStringExcludingSource(API_KEY, null, SystemPropertiesConfigSource.class);
+    String tmpApiKey =
+        configProvider.getStringExcludingSource(API_KEY, null, SystemPropertiesConfigSource.class);
     if (apiKeyFile != null) {
       try {
-        tmpApiKey = new String(Files.readAllBytes(Paths.get(apiKeyFile)), StandardCharsets.UTF_8).trim();
+        tmpApiKey =
+            new String(Files.readAllBytes(Paths.get(apiKeyFile)), StandardCharsets.UTF_8).trim();
       } catch (final IOException e) {
         LOGGER.error("Cannot read API key from file {}, skipping", apiKeyFile, e);
       }
@@ -231,18 +238,26 @@ public class GeneralFeatureConfig {
       tmpApiKey = getEnv(propertyNameToEnvironmentVariableName(PROFILING_API_KEY_OLD));
       if (oldProfilingApiKeyFile != null) {
         try {
-          tmpApiKey = new String(Files.readAllBytes(Paths.get(oldProfilingApiKeyFile)), StandardCharsets.UTF_8).trim();
+          tmpApiKey =
+              new String(
+                      Files.readAllBytes(Paths.get(oldProfilingApiKeyFile)), StandardCharsets.UTF_8)
+                  .trim();
         } catch (final IOException e) {
           LOGGER.error("Cannot read API key from file {}, skipping", oldProfilingApiKeyFile, e);
         }
       }
     }
     if (tmpApiKey == null) {
-      final String veryOldProfilingApiKeyFile = configProvider.getString(PROFILING_API_KEY_FILE_VERY_OLD);
+      final String veryOldProfilingApiKeyFile =
+          configProvider.getString(PROFILING_API_KEY_FILE_VERY_OLD);
       tmpApiKey = getEnv(propertyNameToEnvironmentVariableName(PROFILING_API_KEY_VERY_OLD));
       if (veryOldProfilingApiKeyFile != null) {
         try {
-          tmpApiKey = new String(Files.readAllBytes(Paths.get(veryOldProfilingApiKeyFile)), StandardCharsets.UTF_8).trim();
+          tmpApiKey =
+              new String(
+                      Files.readAllBytes(Paths.get(veryOldProfilingApiKeyFile)),
+                      StandardCharsets.UTF_8)
+                  .trim();
         } catch (final IOException e) {
           LOGGER.error("Cannot read API key from file {}, skipping", veryOldProfilingApiKeyFile, e);
         }
@@ -251,9 +266,7 @@ public class GeneralFeatureConfig {
     return tmpApiKey;
   }
 
-  /**
-   * Returns the detected hostname. First tries locally, then using DNS
-   */
+  /** Returns the detected hostname. First tries locally, then using DNS */
   private static String initHostName() {
     String possibleHostname;
 
@@ -270,7 +283,9 @@ public class GeneralFeatureConfig {
     }
 
     // Try hostname command
-    try (final BufferedReader reader = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec("hostname").getInputStream()))) {
+    try (final BufferedReader reader =
+        new BufferedReader(
+            new InputStreamReader(Runtime.getRuntime().exec("hostname").getInputStream()))) {
       possibleHostname = reader.readLine();
     } catch (final Throwable ignore) {
       // Ignore.  Hostname command is not always available
@@ -342,7 +357,10 @@ public class GeneralFeatureConfig {
    * @return new unmodifiable copy of {@param map} where properties are overwritten from environment
    */
   @Nonnull
-  private Map<String, String> getMapWithPropertiesDefinedByEnvironment(@Nonnull ConfigProvider configProvider, @Nonnull final Map<String, String> map, @Nonnull final String... propNames) {
+  private Map<String, String> getMapWithPropertiesDefinedByEnvironment(
+      @Nonnull ConfigProvider configProvider,
+      @Nonnull final Map<String, String> map,
+      @Nonnull final String... propNames) {
     final Map<String, String> res = new HashMap<>(map);
     for (final String propName : propNames) {
       final String val = configProvider.getString(propName);
@@ -398,9 +416,7 @@ public class GeneralFeatureConfig {
     return this.serviceNameSetByUser;
   }
 
-  /**
-   * @return A map of tags to be applied only to the local application root span.
-   */
+  /** @return A map of tags to be applied only to the local application root span. */
   public Map<String, Object> getLocalRootSpanTags() {
     final Map<String, String> runtimeTags = getRuntimeTags();
     final Map<String, Object> result = new HashMap<>(runtimeTags.size() + 1);
@@ -441,7 +457,8 @@ public class GeneralFeatureConfig {
 
     // The type of application instance running in Azure.
     // Possible values: app, function
-    if (getEnv("FUNCTIONS_WORKER_RUNTIME") != null || getEnv("FUNCTIONS_EXTENSIONS_VERSION") != null) {
+    if (getEnv("FUNCTIONS_WORKER_RUNTIME") != null
+        || getEnv("FUNCTIONS_EXTENSIONS_VERSION") != null) {
       aasTags.put("aas.site.kind", "functionapp");
       aasTags.put("aas.site.type", "function");
     } else {
@@ -469,11 +486,21 @@ public class GeneralFeatureConfig {
 
     if (subscriptionId != null && siteName != null && resourceGroup != null) {
       // The resource ID of the site instance in Azure App Services
-      String resourceId = "/subscriptions/" + subscriptionId + "/resourcegroups/" + resourceGroup + "/providers/microsoft.web/sites/" + siteName;
+      String resourceId =
+          "/subscriptions/"
+              + subscriptionId
+              + "/resourcegroups/"
+              + resourceGroup
+              + "/providers/microsoft.web/sites/"
+              + siteName;
       resourceId = resourceId.toLowerCase();
       aasTags.put("aas.resource.id", resourceId);
     } else {
-      LOGGER.warn("Unable to generate resource id subscription id: {}, site name: {}, resource group {}", subscriptionId, siteName, resourceGroup);
+      LOGGER.warn(
+          "Unable to generate resource id subscription id: {}, site name: {}, resource group {}",
+          subscriptionId,
+          siteName,
+          resourceGroup);
     }
 
     // The instance ID in Azure
@@ -502,7 +529,13 @@ public class GeneralFeatureConfig {
   }
 
   public WellKnownTags getWellKnownTags() {
-    return new WellKnownTags(getRuntimeId(), this.reportHostName ? getHostName() : "", getEnv(), this.serviceName, getVersion(), LANGUAGE_TAG_VALUE);
+    return new WellKnownTags(
+        getRuntimeId(),
+        this.reportHostName ? getHostName() : "",
+        getEnv(),
+        this.serviceName,
+        getVersion(),
+        LANGUAGE_TAG_VALUE);
   }
 
   public String getPrimaryTag() {
@@ -615,6 +648,7 @@ public class GeneralFeatureConfig {
   public boolean isInternalExitOnFailure() {
     return this.internalExitOnFailure;
   }
+
   public Map<String, String> getMergedSpanTags() {
     // Do not include runtimeId into span tags: we only want that added to the root span
     final Map<String, String> result = newHashMap(getGlobalTags().size() + this.spanTags.size());
@@ -631,13 +665,17 @@ public class GeneralFeatureConfig {
 
     public DogStatsDConfig(ConfigProvider configProvider) {
       this.namedPipe = configProvider.getString(DOGSTATSD_NAMED_PIPE);
-      this.startDelay = configProvider.getInteger(DOGSTATSD_START_DELAY, DEFAULT_DOGSTATSD_START_DELAY, JMX_FETCH_START_DELAY);
+      this.startDelay =
+          configProvider.getInteger(
+              DOGSTATSD_START_DELAY, DEFAULT_DOGSTATSD_START_DELAY, JMX_FETCH_START_DELAY);
       this.path = configProvider.getString(DOGSTATSD_PATH);
       String dogStatsDArgsString = configProvider.getString(DOGSTATSD_ARGS);
       if (dogStatsDArgsString == null) {
         this.args = Collections.emptyList();
       } else {
-        this.args = Collections.unmodifiableList(new ArrayList<>(parseStringIntoSetOfNonEmptyStrings(dogStatsDArgsString)));
+        this.args =
+            Collections.unmodifiableList(
+                new ArrayList<>(parseStringIntoSetOfNonEmptyStrings(dogStatsDArgsString)));
       }
     }
   }

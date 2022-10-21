@@ -35,22 +35,29 @@ public class AppSecFeatureConfig extends AbstractFeatureConfig {
     super(configProvider);
     String appSecEnabled = configProvider.getString(APPSEC_ENABLED, DEFAULT_APPSEC_ENABLED);
     this.appSecEnabled = ProductActivationConfig.fromString(appSecEnabled);
-    this.appSecReportingInband = configProvider.getBoolean(APPSEC_REPORTING_INBAND, DEFAULT_APPSEC_REPORTING_INBAND);
+    this.appSecReportingInband =
+        configProvider.getBoolean(APPSEC_REPORTING_INBAND, DEFAULT_APPSEC_REPORTING_INBAND);
     this.appSecRulesFile = configProvider.getString(APPSEC_RULES_FILE, null);
 
     // Default AppSec report timeout min=5, max=60
     this.appSecReportMaxTimeout = configProvider.getInteger(APPSEC_REPORT_TIMEOUT_SEC, 60);
     this.appSecReportMinTimeout = Math.min(this.appSecReportMaxTimeout, 5);
 
-    this.appSecTraceRateLimit = configProvider.getInteger(APPSEC_TRACE_RATE_LIMIT, DEFAULT_APPSEC_TRACE_RATE_LIMIT);
+    this.appSecTraceRateLimit =
+        configProvider.getInteger(APPSEC_TRACE_RATE_LIMIT, DEFAULT_APPSEC_TRACE_RATE_LIMIT);
 
-    this.appSecWafMetrics = configProvider.getBoolean(APPSEC_WAF_METRICS, DEFAULT_APPSEC_WAF_METRICS);
+    this.appSecWafMetrics =
+        configProvider.getBoolean(APPSEC_WAF_METRICS, DEFAULT_APPSEC_WAF_METRICS);
 
-    this.appSecObfuscationParameterKeyRegexp = configProvider.getString(APPSEC_OBFUSCATION_PARAMETER_KEY_REGEXP, null);
-    this.appSecObfuscationParameterValueRegexp = configProvider.getString(APPSEC_OBFUSCATION_PARAMETER_VALUE_REGEXP, null);
+    this.appSecObfuscationParameterKeyRegexp =
+        configProvider.getString(APPSEC_OBFUSCATION_PARAMETER_KEY_REGEXP, null);
+    this.appSecObfuscationParameterValueRegexp =
+        configProvider.getString(APPSEC_OBFUSCATION_PARAMETER_VALUE_REGEXP, null);
 
-    this.appSecHttpBlockedTemplateHtml = configProvider.getString(APPSEC_HTTP_BLOCKED_TEMPLATE_HTML, null);
-    this.appSecHttpBlockedTemplateJson = configProvider.getString(APPSEC_HTTP_BLOCKED_TEMPLATE_JSON, null);
+    this.appSecHttpBlockedTemplateHtml =
+        configProvider.getString(APPSEC_HTTP_BLOCKED_TEMPLATE_HTML, null);
+    this.appSecHttpBlockedTemplateJson =
+        configProvider.getString(APPSEC_HTTP_BLOCKED_TEMPLATE_JSON, null);
   }
 
   public ProductActivationConfig getAppSecEnabledConfig() {
@@ -64,7 +71,6 @@ public class AppSecFeatureConfig extends AbstractFeatureConfig {
   public String getAppSecRulesFile() {
     return this.appSecRulesFile;
   }
-
 
   public int getAppSecReportMinTimeout() {
     return this.appSecReportMinTimeout;

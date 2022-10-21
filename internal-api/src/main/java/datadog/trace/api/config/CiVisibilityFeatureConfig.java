@@ -7,13 +7,12 @@ import static datadog.trace.api.config.CiVisibilityConfig.DEFAULT_CIVISIBILITY_A
 import static datadog.trace.api.config.CiVisibilityConfig.DEFAULT_CIVISIBILITY_ENABLED;
 
 import datadog.trace.bootstrap.config.provider.ConfigProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CiVisibilityFeatureConfig extends AbstractFeatureConfig {
   private static final Logger LOGGER = LoggerFactory.getLogger(CiVisibilityConfig.class);
@@ -23,8 +22,11 @@ public class CiVisibilityFeatureConfig extends AbstractFeatureConfig {
 
   public CiVisibilityFeatureConfig(ConfigProvider configProvider) {
     super(configProvider);
-    this.ciVisibilityEnabled = configProvider.getBoolean(CIVISIBILITY_ENABLED, DEFAULT_CIVISIBILITY_ENABLED);
-    this.ciVisibilityAgentlessEnabled = configProvider.getBoolean(CIVISIBILITY_AGENTLESS_ENABLED, DEFAULT_CIVISIBILITY_AGENTLESS_ENABLED);
+    this.ciVisibilityEnabled =
+        configProvider.getBoolean(CIVISIBILITY_ENABLED, DEFAULT_CIVISIBILITY_ENABLED);
+    this.ciVisibilityAgentlessEnabled =
+        configProvider.getBoolean(
+            CIVISIBILITY_AGENTLESS_ENABLED, DEFAULT_CIVISIBILITY_AGENTLESS_ENABLED);
     this.ciVisibilityAgentlessUrl = parseAgentlessUrl(configProvider);
   }
 
@@ -35,7 +37,8 @@ public class CiVisibilityFeatureConfig extends AbstractFeatureConfig {
       try {
         parsedCiVisibilityUri = new URL(ciVisibilityAgentlessUrlStr).toURI();
       } catch (MalformedURLException | URISyntaxException ex) {
-        LOGGER.error("Cannot parse CI Visibility agentless URL '{}', skipping", ciVisibilityAgentlessUrlStr);
+        LOGGER.error(
+            "Cannot parse CI Visibility agentless URL '{}', skipping", ciVisibilityAgentlessUrlStr);
       }
     }
     if (parsedCiVisibilityUri != null) {

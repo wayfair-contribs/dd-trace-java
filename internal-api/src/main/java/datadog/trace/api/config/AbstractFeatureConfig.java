@@ -1,11 +1,10 @@
 package datadog.trace.api.config;
 
 import datadog.trace.bootstrap.config.provider.ConfigProvider;
-
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 public class AbstractFeatureConfig {
   protected final ConfigProvider configProvider;
@@ -19,14 +18,19 @@ public class AbstractFeatureConfig {
     return isEnabled(Collections.singletonList(settingName), "", settingSuffix, defaultEnabled);
   }
 
-  protected boolean isEnabled(final Iterable<String> integrationNames, final String settingPrefix, final String settingSuffix, final boolean defaultEnabled) {
+  protected boolean isEnabled(
+      final Iterable<String> integrationNames,
+      final String settingPrefix,
+      final String settingSuffix,
+      final boolean defaultEnabled) {
     // If default is enabled, we want to disable individually.
     // If default is disabled, we want to enable individually.
     boolean anyEnabled = defaultEnabled;
     for (final String name : integrationNames) {
       final String configKey = settingPrefix + name + settingSuffix;
       final String fullKey = configKey.startsWith("trace.") ? configKey : "trace." + configKey;
-      final boolean configEnabled = this.configProvider.getBoolean(fullKey, defaultEnabled, configKey);
+      final boolean configEnabled =
+          this.configProvider.getBoolean(fullKey, defaultEnabled, configKey);
       if (defaultEnabled) {
         anyEnabled &= configEnabled;
       } else {

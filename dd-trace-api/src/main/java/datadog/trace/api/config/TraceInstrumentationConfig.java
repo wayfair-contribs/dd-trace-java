@@ -119,6 +119,5 @@ public final class TraceInstrumentationConfig {
     DEFAULT_GRPC_CLIENT_ERROR_STATUSES.set(1, 17);
   }
 
-  private TraceInstrumentationConfig() {
-  }
+  private TraceInstrumentationConfig() {}
 }

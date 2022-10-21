@@ -71,10 +71,6 @@ import static datadog.trace.util.CollectionUtils.tryMakeImmutableSet;
 import datadog.trace.api.IdGenerationStrategy;
 import datadog.trace.api.PropagationStyle;
 import datadog.trace.bootstrap.config.provider.ConfigProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -85,10 +81,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * System properties are {@link TracerFeatureConfig#PREFIX}'ed. Environment variables are the same as the
- * system property, but uppercased and '.' is replaced with '_'.
+ * System properties are {@link TracerFeatureConfig#PREFIX}'ed. Environment variables are the same
+ * as the system property, but uppercased and '.' is replaced with '_'.
  */
 public class TracerFeatureConfig extends AbstractFeatureConfig {
   private static final Logger LOGGER = LoggerFactory.getLogger(TracerFeatureConfig.class);
@@ -136,9 +135,12 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
 
   public TracerFeatureConfig(ConfigProvider configProvider) {
     super(configProvider);
-    this.idGenerationStrategy = configProvider.getEnum(ID_GENERATION_STRATEGY, IdGenerationStrategy.class, RANDOM);
+    this.idGenerationStrategy =
+        configProvider.getEnum(ID_GENERATION_STRATEGY, IdGenerationStrategy.class, RANDOM);
     if (idGenerationStrategy != RANDOM) {
-      LOGGER.warn("*** you are using an unsupported id generation strategy {} - this can impact correctness of traces", idGenerationStrategy);
+      LOGGER.warn(
+          "*** you are using an unsupported id generation strategy {} - this can impact correctness of traces",
+          idGenerationStrategy);
     }
     this.writerType = configProvider.getString(WRITER_TYPE, DEFAULT_AGENT_WRITER_TYPE);
     this.agentConfig = new AgentConfig(configProvider);
@@ -151,16 +153,22 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
     if (traceAgentArgsString == null) {
       this.traceAgentArgs = Collections.emptyList();
     } else {
-      this.traceAgentArgs = Collections.unmodifiableList(new ArrayList<>(parseStringIntoSetOfNonEmptyStrings(traceAgentArgsString)));
+      this.traceAgentArgs =
+          Collections.unmodifiableList(
+              new ArrayList<>(parseStringIntoSetOfNonEmptyStrings(traceAgentArgsString)));
     }
 
-    this.prioritySamplingEnabled = configProvider.getBoolean(PRIORITY_SAMPLING, DEFAULT_PRIORITY_SAMPLING_ENABLED);
-    this.prioritySamplingForce = configProvider.getString(PRIORITY_SAMPLING_FORCE, DEFAULT_PRIORITY_SAMPLING_FORCE);
+    this.prioritySamplingEnabled =
+        configProvider.getBoolean(PRIORITY_SAMPLING, DEFAULT_PRIORITY_SAMPLING_ENABLED);
+    this.prioritySamplingForce =
+        configProvider.getString(PRIORITY_SAMPLING_FORCE, DEFAULT_PRIORITY_SAMPLING_FORCE);
 
-    this.traceResolverEnabled = configProvider.getBoolean(TRACE_RESOLVER_ENABLED, DEFAULT_TRACE_RESOLVER_ENABLED);
+    this.traceResolverEnabled =
+        configProvider.getBoolean(TRACE_RESOLVER_ENABLED, DEFAULT_TRACE_RESOLVER_ENABLED);
     this.serviceMapping = configProvider.getMergedMap(SERVICE_MAPPING);
 
-    this.traceAnalyticsEnabled = configProvider.getBoolean(TRACE_ANALYTICS_ENABLED, DEFAULT_TRACE_ANALYTICS_ENABLED);
+    this.traceAnalyticsEnabled =
+        configProvider.getBoolean(TRACE_ANALYTICS_ENABLED, DEFAULT_TRACE_ANALYTICS_ENABLED);
     String traceClientIpHeader = configProvider.getString(TRACE_CLIENT_IP_HEADER);
     if (traceClientIpHeader == null) {
       traceClientIpHeader = configProvider.getString(APPSEC_IP_ADDR_HEADER);
@@ -169,8 +177,10 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
       traceClientIpHeader = traceClientIpHeader.toLowerCase(Locale.ROOT);
     }
     this.traceClientIpHeader = traceClientIpHeader;
-    this.traceClientIpHeaderDisabled = configProvider.getBoolean(TRACE_CLIENT_IP_HEADER_DISABLED, false);
-    this.traceClientIpResolverEnabled = configProvider.getBoolean(TRACE_CLIENT_IP_RESOLVER_ENABLED, true);
+    this.traceClientIpHeaderDisabled =
+        configProvider.getBoolean(TRACE_CLIENT_IP_HEADER_DISABLED, false);
+    this.traceClientIpResolverEnabled =
+        configProvider.getBoolean(TRACE_CLIENT_IP_RESOLVER_ENABLED, true);
 
     this.traceSamplingServiceRules = configProvider.getMergedMap(TRACE_SAMPLING_SERVICE_RULES);
     this.traceSamplingOperationRules = configProvider.getMergedMap(TRACE_SAMPLING_OPERATION_RULES);
@@ -187,28 +197,50 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
         logIgnoredSettingWarning(RESPONSE_HEADER_TAGS, HEADER_TAGS, ".legacy.parsing.enabled");
       }
     } else {
-      this.requestHeaderTags = configProvider.getMergedMapWithOptionalMappings("http.request.headers.", true, HEADER_TAGS, REQUEST_HEADER_TAGS);
-      this.responseHeaderTags = configProvider.getMergedMapWithOptionalMappings("http.response.headers.", true, HEADER_TAGS, RESPONSE_HEADER_TAGS);
+      this.requestHeaderTags =
+          configProvider.getMergedMapWithOptionalMappings(
+              "http.request.headers.", true, HEADER_TAGS, REQUEST_HEADER_TAGS);
+      this.responseHeaderTags =
+          configProvider.getMergedMapWithOptionalMappings(
+              "http.response.headers.", true, HEADER_TAGS, RESPONSE_HEADER_TAGS);
     }
-    this.httpServerPathResourceNameMapping = configProvider.getOrderedMap(TRACE_HTTP_SERVER_PATH_RESOURCE_NAME_MAPPING);
-    this.httpServerErrorStatuses = configProvider.getIntegerRange(HTTP_SERVER_ERROR_STATUSES, DEFAULT_HTTP_SERVER_ERROR_STATUSES);
-    this.httpClientErrorStatuses = configProvider.getIntegerRange(HTTP_CLIENT_ERROR_STATUSES, DEFAULT_HTTP_CLIENT_ERROR_STATUSES);
+    this.httpServerPathResourceNameMapping =
+        configProvider.getOrderedMap(TRACE_HTTP_SERVER_PATH_RESOURCE_NAME_MAPPING);
+    this.httpServerErrorStatuses =
+        configProvider.getIntegerRange(
+            HTTP_SERVER_ERROR_STATUSES, DEFAULT_HTTP_SERVER_ERROR_STATUSES);
+    this.httpClientErrorStatuses =
+        configProvider.getIntegerRange(
+            HTTP_CLIENT_ERROR_STATUSES, DEFAULT_HTTP_CLIENT_ERROR_STATUSES);
     this.splitByTags = tryMakeImmutableSet(configProvider.getList(SPLIT_BY_TAGS));
 
     this.scopeDepthLimit = configProvider.getInteger(SCOPE_DEPTH_LIMIT, DEFAULT_SCOPE_DEPTH_LIMIT);
     this.scopeStrictMode = configProvider.getBoolean(SCOPE_STRICT_MODE, false);
-    this.scopeInheritAsyncPropagation = configProvider.getBoolean(SCOPE_INHERIT_ASYNC_PROPAGATION, true);
-    this.scopeIterationKeepAlive = configProvider.getInteger(SCOPE_ITERATION_KEEP_ALIVE, DEFAULT_SCOPE_ITERATION_KEEP_ALIVE);
+    this.scopeInheritAsyncPropagation =
+        configProvider.getBoolean(SCOPE_INHERIT_ASYNC_PROPAGATION, true);
+    this.scopeIterationKeepAlive =
+        configProvider.getInteger(SCOPE_ITERATION_KEEP_ALIVE, DEFAULT_SCOPE_ITERATION_KEEP_ALIVE);
 
-    this.partialFlushMinSpans = configProvider.getInteger(PARTIAL_FLUSH_MIN_SPANS, DEFAULT_PARTIAL_FLUSH_MIN_SPANS);
+    this.partialFlushMinSpans =
+        configProvider.getInteger(PARTIAL_FLUSH_MIN_SPANS, DEFAULT_PARTIAL_FLUSH_MIN_SPANS);
     this.traceStrictWritesEnabled = configProvider.getBoolean(TRACE_STRICT_WRITES_ENABLED, false);
 
-    this.logExtractHeaderNames = configProvider.getBoolean(PROPAGATION_EXTRACT_LOG_HEADER_NAMES_ENABLED, DEFAULT_PROPAGATION_EXTRACT_LOG_HEADER_NAMES_ENABLED);
-    this.propagationStylesToExtract = getPropagationStyleSetSettingFromEnvironmentOrDefault(PROPAGATION_STYLE_EXTRACT, DEFAULT_PROPAGATION_STYLE_EXTRACT);
-    this.propagationStylesToInject = getPropagationStyleSetSettingFromEnvironmentOrDefault(PROPAGATION_STYLE_INJECT, DEFAULT_PROPAGATION_STYLE_INJECT);
-    this.traceAgentV05Enabled = configProvider.getBoolean(ENABLE_TRACE_AGENT_V05, DEFAULT_TRACE_AGENT_V05_ENABLED);
+    this.logExtractHeaderNames =
+        configProvider.getBoolean(
+            PROPAGATION_EXTRACT_LOG_HEADER_NAMES_ENABLED,
+            DEFAULT_PROPAGATION_EXTRACT_LOG_HEADER_NAMES_ENABLED);
+    this.propagationStylesToExtract =
+        getPropagationStyleSetSettingFromEnvironmentOrDefault(
+            PROPAGATION_STYLE_EXTRACT, DEFAULT_PROPAGATION_STYLE_EXTRACT);
+    this.propagationStylesToInject =
+        getPropagationStyleSetSettingFromEnvironmentOrDefault(
+            PROPAGATION_STYLE_INJECT, DEFAULT_PROPAGATION_STYLE_INJECT);
+    this.traceAgentV05Enabled =
+        configProvider.getBoolean(ENABLE_TRACE_AGENT_V05, DEFAULT_TRACE_AGENT_V05_ENABLED);
     this.clockSyncPeriod = configProvider.getInteger(CLOCK_SYNC_PERIOD, DEFAULT_CLOCK_SYNC_PERIOD);
-    this.xDatadogTagsMaxLength = configProvider.getInteger(TRACE_X_DATADOG_TAGS_MAX_LENGTH, DEFAULT_TRACE_X_DATADOG_TAGS_MAX_LENGTH);
+    this.xDatadogTagsMaxLength =
+        configProvider.getInteger(
+            TRACE_X_DATADOG_TAGS_MAX_LENGTH, DEFAULT_TRACE_X_DATADOG_TAGS_MAX_LENGTH);
   }
 
   /**
@@ -224,7 +256,8 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
   }
 
   @Nonnull
-  private static Set<PropagationStyle> convertStringSetToPropagationStyleSet(final Set<String> input) {
+  private static Set<PropagationStyle> convertStringSetToPropagationStyleSet(
+      final Set<String> input) {
     // Using LinkedHashSet to preserve original string order
     final Set<PropagationStyle> result = new LinkedHashSet<>();
     for (final String value : input) {
@@ -237,20 +270,28 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
     return Collections.unmodifiableSet(result);
   }
 
-  private void logIgnoredSettingWarning(String setting, String overridingSetting, String overridingSuffix) {
-    LOGGER.warn("Setting {} ignored since {}{} is enabled.", propertyNameToSystemPropertyName(setting), propertyNameToSystemPropertyName(overridingSetting), overridingSuffix);
+  private void logIgnoredSettingWarning(
+      String setting, String overridingSetting, String overridingSuffix) {
+    LOGGER.warn(
+        "Setting {} ignored since {}{} is enabled.",
+        propertyNameToSystemPropertyName(setting),
+        propertyNameToSystemPropertyName(overridingSetting),
+        overridingSuffix);
   }
 
   /**
    * Calls configProvider.getString(String, String) and converts the result to a set of strings
    * splitting by space or comma.
    */
-  private Set<PropagationStyle> getPropagationStyleSetSettingFromEnvironmentOrDefault(final String name, final String defaultValue) {
+  private Set<PropagationStyle> getPropagationStyleSetSettingFromEnvironmentOrDefault(
+      final String name, final String defaultValue) {
     final String value = configProvider.getString(name, defaultValue);
-    Set<PropagationStyle> result = convertStringSetToPropagationStyleSet(parseStringIntoSetOfNonEmptyStrings(value));
+    Set<PropagationStyle> result =
+        convertStringSetToPropagationStyleSet(parseStringIntoSetOfNonEmptyStrings(value));
     if (result.isEmpty()) {
       // Treat empty parsing result as no value and use default instead
-      result = convertStringSetToPropagationStyleSet(parseStringIntoSetOfNonEmptyStrings(defaultValue));
+      result =
+          convertStringSetToPropagationStyleSet(parseStringIntoSetOfNonEmptyStrings(defaultValue));
     }
     return result;
   }
@@ -421,7 +462,8 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
   }
 
   public boolean isSamplingMechanismValidationDisabled() {
-    return this.configProvider.getBoolean(TracerConfig.SAMPLING_MECHANISM_VALIDATION_DISABLED, false);
+    return this.configProvider.getBoolean(
+        TracerConfig.SAMPLING_MECHANISM_VALIDATION_DISABLED, false);
   }
 
   public boolean isTraceAgentV05Enabled() {
@@ -443,9 +485,7 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
     private final int port;
     private final String unixDomainSocket;
     private final String namedPipe;
-    /**
-     * The agent timeout (in seconds).
-     */
+    /** The agent timeout (in seconds). */
     private final int timeout;
 
     public AgentConfig(ConfigProvider configProvider) {
@@ -474,7 +514,8 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
       }
 
       if (agentPortFromEnvironment < 0) {
-        agentPortFromEnvironment = configProvider.getInteger(TRACE_AGENT_PORT, -1, AGENT_PORT_LEGACY);
+        agentPortFromEnvironment =
+            configProvider.getInteger(TRACE_AGENT_PORT, -1, AGENT_PORT_LEGACY);
         rebuildAgentUrl = true;
       }
 
@@ -509,12 +550,13 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
 
       this.namedPipe = configProvider.getString(AGENT_NAMED_PIPE);
 
-      this.configuredUsingDefault = agentHostFromEnvironment == null && agentPortFromEnvironment < 0 && unixSocketFromEnvironment == null && this.namedPipe == null;
+      this.configuredUsingDefault =
+          agentHostFromEnvironment == null
+              && agentPortFromEnvironment < 0
+              && unixSocketFromEnvironment == null
+              && this.namedPipe == null;
 
       this.timeout = configProvider.getInteger(AGENT_TIMEOUT, DEFAULT_AGENT_TIMEOUT);
     }
   }
 }
-
-
-

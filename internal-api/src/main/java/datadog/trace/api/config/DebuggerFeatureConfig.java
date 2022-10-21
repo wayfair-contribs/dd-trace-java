@@ -48,18 +48,35 @@ public class DebuggerFeatureConfig extends AbstractFeatureConfig {
     super(configProvider);
     this.tracerConfig = tracerConfig;
     this.debuggerEnabled = configProvider.getBoolean(DEBUGGER_ENABLED, DEFAULT_DEBUGGER_ENABLED);
-    this.debuggerUploadTimeout = configProvider.getInteger(DEBUGGER_UPLOAD_TIMEOUT, DEFAULT_DEBUGGER_UPLOAD_TIMEOUT);
-    this.debuggerUploadFlushInterval = configProvider.getInteger(DEBUGGER_UPLOAD_FLUSH_INTERVAL, DEFAULT_DEBUGGER_UPLOAD_FLUSH_INTERVAL);
-    this.debuggerClassFileDumpEnabled = configProvider.getBoolean(DEBUGGER_CLASSFILE_DUMP_ENABLED, DEFAULT_DEBUGGER_CLASSFILE_DUMP_ENABLED);
-    this.debuggerPollInterval = configProvider.getInteger(DEBUGGER_POLL_INTERVAL, DEFAULT_DEBUGGER_POLL_INTERVAL);
-    this.debuggerDiagnosticsInterval = configProvider.getInteger(DEBUGGER_DIAGNOSTICS_INTERVAL, DEFAULT_DEBUGGER_DIAGNOSTICS_INTERVAL);
+    this.debuggerUploadTimeout =
+        configProvider.getInteger(DEBUGGER_UPLOAD_TIMEOUT, DEFAULT_DEBUGGER_UPLOAD_TIMEOUT);
+    this.debuggerUploadFlushInterval =
+        configProvider.getInteger(
+            DEBUGGER_UPLOAD_FLUSH_INTERVAL, DEFAULT_DEBUGGER_UPLOAD_FLUSH_INTERVAL);
+    this.debuggerClassFileDumpEnabled =
+        configProvider.getBoolean(
+            DEBUGGER_CLASSFILE_DUMP_ENABLED, DEFAULT_DEBUGGER_CLASSFILE_DUMP_ENABLED);
+    this.debuggerPollInterval =
+        configProvider.getInteger(DEBUGGER_POLL_INTERVAL, DEFAULT_DEBUGGER_POLL_INTERVAL);
+    this.debuggerDiagnosticsInterval =
+        configProvider.getInteger(
+            DEBUGGER_DIAGNOSTICS_INTERVAL, DEFAULT_DEBUGGER_DIAGNOSTICS_INTERVAL);
     boolean runtimeMetricsEnabled = configProvider.getBoolean(RUNTIME_METRICS_ENABLED, true);
-    this.debuggerMetricEnabled = runtimeMetricsEnabled && configProvider.getBoolean(DEBUGGER_METRICS_ENABLED, DEFAULT_DEBUGGER_METRICS_ENABLED);
+    this.debuggerMetricEnabled =
+        runtimeMetricsEnabled
+            && configProvider.getBoolean(
+                DEBUGGER_METRICS_ENABLED, DEFAULT_DEBUGGER_METRICS_ENABLED);
     this.debuggerProbeFileLocation = configProvider.getString(DEBUGGER_PROBE_FILE_LOCATION);
-    this.debuggerUploadBatchSize = configProvider.getInteger(DEBUGGER_UPLOAD_BATCH_SIZE, DEFAULT_DEBUGGER_UPLOAD_BATCH_SIZE);
-    this.debuggerMaxPayloadSize = configProvider.getInteger(DEBUGGER_MAX_PAYLOAD_SIZE, DEFAULT_DEBUGGER_MAX_PAYLOAD_SIZE) * 1024L;
-    this.debuggerVerifyByteCode = configProvider.getBoolean(DEBUGGER_VERIFY_BYTECODE, DEFAULT_DEBUGGER_VERIFY_BYTECODE);
-    this.debuggerInstrumentTheWorld = configProvider.getBoolean(DEBUGGER_INSTRUMENT_THE_WORLD, DEFAULT_DEBUGGER_INSTRUMENT_THE_WORLD);
+    this.debuggerUploadBatchSize =
+        configProvider.getInteger(DEBUGGER_UPLOAD_BATCH_SIZE, DEFAULT_DEBUGGER_UPLOAD_BATCH_SIZE);
+    this.debuggerMaxPayloadSize =
+        configProvider.getInteger(DEBUGGER_MAX_PAYLOAD_SIZE, DEFAULT_DEBUGGER_MAX_PAYLOAD_SIZE)
+            * 1024L;
+    this.debuggerVerifyByteCode =
+        configProvider.getBoolean(DEBUGGER_VERIFY_BYTECODE, DEFAULT_DEBUGGER_VERIFY_BYTECODE);
+    this.debuggerInstrumentTheWorld =
+        configProvider.getBoolean(
+            DEBUGGER_INSTRUMENT_THE_WORLD, DEFAULT_DEBUGGER_INSTRUMENT_THE_WORLD);
     this.debuggerExcludeFile = configProvider.getString(DEBUGGER_EXCLUDE_FILE);
   }
 

@@ -73,7 +73,6 @@ import static datadog.trace.util.CollectionUtils.tryMakeImmutableList;
 import static datadog.trace.util.CollectionUtils.tryMakeImmutableSet;
 
 import datadog.trace.bootstrap.config.provider.ConfigProvider;
-
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
@@ -146,51 +145,79 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
 
     this.traceEnabled = configProvider.getBoolean(TRACE_ENABLED, DEFAULT_TRACE_ENABLED);
 
-    this.integrationsEnabled = configProvider.getBoolean(INTEGRATIONS_ENABLED, DEFAULT_INTEGRATIONS_ENABLED);
-    this.integrationSynapseLegacyOperationName = configProvider.getBoolean(INTEGRATION_SYNAPSE_LEGACY_OPERATION_NAME, false);
+    this.integrationsEnabled =
+        configProvider.getBoolean(INTEGRATIONS_ENABLED, DEFAULT_INTEGRATIONS_ENABLED);
+    this.integrationSynapseLegacyOperationName =
+        configProvider.getBoolean(INTEGRATION_SYNAPSE_LEGACY_OPERATION_NAME, false);
 
     this.traceAnnotations = configProvider.getString(TRACE_ANNOTATIONS, DEFAULT_TRACE_ANNOTATIONS);
 
-    this.logsInjectionEnabled = configProvider.getBoolean(LOGS_INJECTION_ENABLED, DEFAULT_LOGS_INJECTION_ENABLED);
-    this.logsMDCTagsInjectionEnabled = configProvider.getBoolean(LOGS_MDC_TAGS_INJECTION_ENABLED, true);
+    this.logsInjectionEnabled =
+        configProvider.getBoolean(LOGS_INJECTION_ENABLED, DEFAULT_LOGS_INJECTION_ENABLED);
+    this.logsMDCTagsInjectionEnabled =
+        configProvider.getBoolean(LOGS_MDC_TAGS_INJECTION_ENABLED, true);
 
     this.traceMethods = configProvider.getString(TRACE_METHODS, DEFAULT_TRACE_METHODS);
 
-    this.traceExecutorsAll = configProvider.getBoolean(TRACE_EXECUTORS_ALL, DEFAULT_TRACE_EXECUTORS_ALL);
+    this.traceExecutorsAll =
+        configProvider.getBoolean(TRACE_EXECUTORS_ALL, DEFAULT_TRACE_EXECUTORS_ALL);
     this.traceExecutors = tryMakeImmutableList(configProvider.getList(TRACE_EXECUTORS));
-    this.traceThreadPoolExecutorsExclude = tryMakeImmutableSet(configProvider.getList(TRACE_THREAD_POOL_EXECUTORS_EXCLUDE));
+    this.traceThreadPoolExecutorsExclude =
+        tryMakeImmutableSet(configProvider.getList(TRACE_THREAD_POOL_EXECUTORS_EXCLUDE));
 
     this.excludedClasses = tryMakeImmutableList(configProvider.getList(TRACE_CLASSES_EXCLUDE));
     this.excludedClassesFile = configProvider.getString(TRACE_CLASSES_EXCLUDE_FILE);
-    this.excludedClassLoaders = tryMakeImmutableSet(configProvider.getList(TRACE_CLASSLOADERS_EXCLUDE));
-    this.excludedCodeSources = tryMakeImmutableList(configProvider.getList(TRACE_CODESOURCES_EXCLUDE));
+    this.excludedClassLoaders =
+        tryMakeImmutableSet(configProvider.getList(TRACE_CLASSLOADERS_EXCLUDE));
+    this.excludedCodeSources =
+        tryMakeImmutableList(configProvider.getList(TRACE_CODESOURCES_EXCLUDE));
 
-    this.httpServerTagQueryString = configProvider.getBoolean(HTTP_SERVER_TAG_QUERY_STRING, DEFAULT_HTTP_SERVER_TAG_QUERY_STRING);
+    this.httpServerTagQueryString =
+        configProvider.getBoolean(
+            HTTP_SERVER_TAG_QUERY_STRING, DEFAULT_HTTP_SERVER_TAG_QUERY_STRING);
     this.httpServerRawQueryString = configProvider.getBoolean(HTTP_SERVER_RAW_QUERY_STRING, true);
     this.httpServerRawResource = configProvider.getBoolean(HTTP_SERVER_RAW_RESOURCE, false);
-    this.httpServerRouteBasedNaming = configProvider.getBoolean(HTTP_SERVER_ROUTE_BASED_NAMING, DEFAULT_HTTP_SERVER_ROUTE_BASED_NAMING);
-    this.httpClientTagQueryString = configProvider.getBoolean(HTTP_CLIENT_TAG_QUERY_STRING, DEFAULT_HTTP_CLIENT_TAG_QUERY_STRING);
-    this.httpClientSplitByDomain = configProvider.getBoolean(HTTP_CLIENT_HOST_SPLIT_BY_DOMAIN, DEFAULT_HTTP_CLIENT_SPLIT_BY_DOMAIN);
+    this.httpServerRouteBasedNaming =
+        configProvider.getBoolean(
+            HTTP_SERVER_ROUTE_BASED_NAMING, DEFAULT_HTTP_SERVER_ROUTE_BASED_NAMING);
+    this.httpClientTagQueryString =
+        configProvider.getBoolean(
+            HTTP_CLIENT_TAG_QUERY_STRING, DEFAULT_HTTP_CLIENT_TAG_QUERY_STRING);
+    this.httpClientSplitByDomain =
+        configProvider.getBoolean(
+            HTTP_CLIENT_HOST_SPLIT_BY_DOMAIN, DEFAULT_HTTP_CLIENT_SPLIT_BY_DOMAIN);
 
-    this.dbClientSplitByInstance = configProvider.getBoolean(DB_CLIENT_HOST_SPLIT_BY_INSTANCE, DEFAULT_DB_CLIENT_HOST_SPLIT_BY_INSTANCE);
-    this.dbClientSplitByInstanceTypeSuffix = configProvider.getBoolean(DB_CLIENT_HOST_SPLIT_BY_INSTANCE_TYPE_SUFFIX, DEFAULT_DB_CLIENT_HOST_SPLIT_BY_INSTANCE_TYPE_SUFFIX);
+    this.dbClientSplitByInstance =
+        configProvider.getBoolean(
+            DB_CLIENT_HOST_SPLIT_BY_INSTANCE, DEFAULT_DB_CLIENT_HOST_SPLIT_BY_INSTANCE);
+    this.dbClientSplitByInstanceTypeSuffix =
+        configProvider.getBoolean(
+            DB_CLIENT_HOST_SPLIT_BY_INSTANCE_TYPE_SUFFIX,
+            DEFAULT_DB_CLIENT_HOST_SPLIT_BY_INSTANCE_TYPE_SUFFIX);
 
     this.awsPropagationEnabled = isPropagationEnabled(true, "aws");
     this.sqsPropagationEnabled = awsPropagationEnabled && isPropagationEnabled(true, "sqs");
 
     this.kafkaClientPropagationEnabled = isPropagationEnabled(true, "kafka", "kafka.client");
-    this.kafkaClientPropagationDisabledTopics = tryMakeImmutableSet(configProvider.getList(KAFKA_CLIENT_PROPAGATION_DISABLED_TOPICS));
-    this.kafkaClientBase64DecodingEnabled = configProvider.getBoolean(KAFKA_CLIENT_BASE64_DECODING_ENABLED, false);
+    this.kafkaClientPropagationDisabledTopics =
+        tryMakeImmutableSet(configProvider.getList(KAFKA_CLIENT_PROPAGATION_DISABLED_TOPICS));
+    this.kafkaClientBase64DecodingEnabled =
+        configProvider.getBoolean(KAFKA_CLIENT_BASE64_DECODING_ENABLED, false);
 
     this.jmsPropagationEnabled = isPropagationEnabled(true, "jms");
-    this.jmsPropagationDisabledTopics = tryMakeImmutableSet(configProvider.getList(JMS_PROPAGATION_DISABLED_TOPICS));
-    this.jmsPropagationDisabledQueues = tryMakeImmutableSet(configProvider.getList(JMS_PROPAGATION_DISABLED_QUEUES));
+    this.jmsPropagationDisabledTopics =
+        tryMakeImmutableSet(configProvider.getList(JMS_PROPAGATION_DISABLED_TOPICS));
+    this.jmsPropagationDisabledQueues =
+        tryMakeImmutableSet(configProvider.getList(JMS_PROPAGATION_DISABLED_QUEUES));
 
     this.rabbitPropagationEnabled = isPropagationEnabled(true, "rabbit", "rabbitmq");
-    this.rabbitPropagationDisabledQueues = tryMakeImmutableSet(configProvider.getList(RABBIT_PROPAGATION_DISABLED_QUEUES));
-    this.rabbitPropagationDisabledExchanges = tryMakeImmutableSet(configProvider.getList(RABBIT_PROPAGATION_DISABLED_EXCHANGES));
+    this.rabbitPropagationDisabledQueues =
+        tryMakeImmutableSet(configProvider.getList(RABBIT_PROPAGATION_DISABLED_QUEUES));
+    this.rabbitPropagationDisabledExchanges =
+        tryMakeImmutableSet(configProvider.getList(RABBIT_PROPAGATION_DISABLED_EXCHANGES));
 
-    this.messageBrokerSplitByDestination = configProvider.getBoolean(MESSAGE_BROKER_SPLIT_BY_DESTINATION, false);
+    this.messageBrokerSplitByDestination =
+        configProvider.getBoolean(MESSAGE_BROKER_SPLIT_BY_DESTINATION, false);
     this.hystrixTagsEnabled = configProvider.getBoolean(HYSTRIX_TAGS_ENABLED, false);
     this.hystrixMeasuredEnabled = configProvider.getBoolean(HYSTRIX_MEASURED_ENABLED, false);
     this.igniteCacheIncludeKeys = configProvider.getBoolean(IGNITE_CACHE_INCLUDE_KEYS, false);
@@ -199,22 +226,39 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
 
     this.servletPrincipalEnabled = configProvider.getBoolean(SERVLET_PRINCIPAL_ENABLED, false);
     this.servletAsyncTimeoutError = configProvider.getBoolean(SERVLET_ASYNC_TIMEOUT_ERROR, true);
-    this.jdbcPreparedStatementClassName = configProvider.getString(JDBC_PREPARED_STATEMENT_CLASS_NAME, "");
+    this.jdbcPreparedStatementClassName =
+        configProvider.getString(JDBC_PREPARED_STATEMENT_CLASS_NAME, "");
     this.jdbcConnectionClassName = configProvider.getString(JDBC_CONNECTION_CLASS_NAME, "");
 
-    this.rootContextServiceName = configProvider.getString(SERVLET_ROOT_CONTEXT_SERVICE_NAME, DEFAULT_SERVLET_ROOT_CONTEXT_SERVICE_NAME);
-    this.runtimeContextFieldInjection = configProvider.getBoolean(RUNTIME_CONTEXT_FIELD_INJECTION, DEFAULT_RUNTIME_CONTEXT_FIELD_INJECTION);
-    this.serialVersionUIDFieldInjection = configProvider.getBoolean(SERIALVERSIONUID_FIELD_INJECTION, DEFAULT_SERIALVERSIONUID_FIELD_INJECTION);
+    this.rootContextServiceName =
+        configProvider.getString(
+            SERVLET_ROOT_CONTEXT_SERVICE_NAME, DEFAULT_SERVLET_ROOT_CONTEXT_SERVICE_NAME);
+    this.runtimeContextFieldInjection =
+        configProvider.getBoolean(
+            RUNTIME_CONTEXT_FIELD_INJECTION, DEFAULT_RUNTIME_CONTEXT_FIELD_INJECTION);
+    this.serialVersionUIDFieldInjection =
+        configProvider.getBoolean(
+            SERIALVERSIONUID_FIELD_INJECTION, DEFAULT_SERIALVERSIONUID_FIELD_INJECTION);
 
-    this.grpcIgnoredInboundMethods = tryMakeImmutableSet(configProvider.getList(GRPC_IGNORED_INBOUND_METHODS));
-    this.grpcIgnoredOutboundMethods = tryMakeImmutableSet(configProvider.getList(GRPC_IGNORED_OUTBOUND_METHODS));
-    this.grpcServerTrimPackageResource = configProvider.getBoolean(GRPC_SERVER_TRIM_PACKAGE_RESOURCE, false);
-    this.grpcServerErrorStatuses = configProvider.getIntegerRange(GRPC_SERVER_ERROR_STATUSES, DEFAULT_GRPC_SERVER_ERROR_STATUSES);
-    this.grpcClientErrorStatuses = configProvider.getIntegerRange(GRPC_CLIENT_ERROR_STATUSES, DEFAULT_GRPC_CLIENT_ERROR_STATUSES);
+    this.grpcIgnoredInboundMethods =
+        tryMakeImmutableSet(configProvider.getList(GRPC_IGNORED_INBOUND_METHODS));
+    this.grpcIgnoredOutboundMethods =
+        tryMakeImmutableSet(configProvider.getList(GRPC_IGNORED_OUTBOUND_METHODS));
+    this.grpcServerTrimPackageResource =
+        configProvider.getBoolean(GRPC_SERVER_TRIM_PACKAGE_RESOURCE, false);
+    this.grpcServerErrorStatuses =
+        configProvider.getIntegerRange(
+            GRPC_SERVER_ERROR_STATUSES, DEFAULT_GRPC_SERVER_ERROR_STATUSES);
+    this.grpcClientErrorStatuses =
+        configProvider.getIntegerRange(
+            GRPC_CLIENT_ERROR_STATUSES, DEFAULT_GRPC_CLIENT_ERROR_STATUSES);
 
-    this.resolverOutlinePoolEnabled = configProvider.getBoolean(RESOLVER_OUTLINE_POOL_ENABLED, true);
-    this.resolverOutlinePoolSize = configProvider.getInteger(RESOLVER_OUTLINE_POOL_SIZE, DEFAULT_RESOLVER_OUTLINE_POOL_SIZE);
-    this.resolverTypePoolSize = configProvider.getInteger(RESOLVER_TYPE_POOL_SIZE, DEFAULT_RESOLVER_TYPE_POOL_SIZE);
+    this.resolverOutlinePoolEnabled =
+        configProvider.getBoolean(RESOLVER_OUTLINE_POOL_ENABLED, true);
+    this.resolverOutlinePoolSize =
+        configProvider.getInteger(RESOLVER_OUTLINE_POOL_SIZE, DEFAULT_RESOLVER_OUTLINE_POOL_SIZE);
+    this.resolverTypePoolSize =
+        configProvider.getInteger(RESOLVER_TYPE_POOL_SIZE, DEFAULT_RESOLVER_TYPE_POOL_SIZE);
     this.resolverUseLoadClassEnabled = configProvider.getBoolean(RESOLVER_USE_LOADCLASS, true);
   }
 
@@ -233,7 +277,6 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   public String getTraceAnnotations() {
     return this.traceAnnotations;
   }
-
 
   public boolean isLogsInjectionEnabled() {
     return this.logsInjectionEnabled;
@@ -328,7 +371,9 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   }
 
   public boolean isJmsPropagationDisabledForDestination(final String queueOrTopic) {
-    return null != queueOrTopic && (this.jmsPropagationDisabledQueues.contains(queueOrTopic) || this.jmsPropagationDisabledTopics.contains(queueOrTopic));
+    return null != queueOrTopic
+        && (this.jmsPropagationDisabledQueues.contains(queueOrTopic)
+            || this.jmsPropagationDisabledTopics.contains(queueOrTopic));
   }
 
   public boolean isKafkaClientBase64DecodingEnabled() {
@@ -340,7 +385,9 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   }
 
   public boolean isRabbitPropagationDisabledForDestination(final String queueOrExchange) {
-    return null != queueOrExchange && (this.rabbitPropagationDisabledQueues.contains(queueOrExchange) || this.rabbitPropagationDisabledExchanges.contains(queueOrExchange));
+    return null != queueOrExchange
+        && (this.rabbitPropagationDisabledQueues.contains(queueOrExchange)
+            || this.rabbitPropagationDisabledExchanges.contains(queueOrExchange));
   }
 
   public boolean isMessageBrokerSplitByDestination() {
@@ -431,19 +478,24 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
     return this.resolverUseLoadClassEnabled;
   }
 
-  public boolean isPropagationEnabled(final boolean defaultEnabled, final String... integrationNames) {
+  public boolean isPropagationEnabled(
+      final boolean defaultEnabled, final String... integrationNames) {
     return isEnabled(Arrays.asList(integrationNames), "", ".propagation.enabled", defaultEnabled);
   }
 
-  public boolean isIntegrationEnabled(final Iterable<String> integrationNames, final boolean defaultEnabled) {
+  public boolean isIntegrationEnabled(
+      final Iterable<String> integrationNames, final boolean defaultEnabled) {
     return isEnabled(integrationNames, "integration.", ".enabled", defaultEnabled);
   }
 
-  public boolean isIntegrationShortcutMatchingEnabled(final Iterable<String> integrationNames, final boolean defaultEnabled) {
-    return isEnabled(integrationNames, "integration.", ".matching.shortcut.enabled", defaultEnabled);
+  public boolean isIntegrationShortcutMatchingEnabled(
+      final Iterable<String> integrationNames, final boolean defaultEnabled) {
+    return isEnabled(
+        integrationNames, "integration.", ".matching.shortcut.enabled", defaultEnabled);
   }
 
-  public boolean isJmxFetchIntegrationEnabled(final Iterable<String> integrationNames, final boolean defaultEnabled) {
+  public boolean isJmxFetchIntegrationEnabled(
+      final Iterable<String> integrationNames, final boolean defaultEnabled) {
     return isEnabled(integrationNames, "jmxfetch.", ".enabled", defaultEnabled);
   }
 
@@ -453,23 +505,29 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
 
   public boolean isRuleEnabled(final String name, boolean defaultEnabled) {
     boolean enabled = configProvider.getBoolean("trace." + name + ".enabled", defaultEnabled);
-    boolean lowerEnabled = configProvider.getBoolean("trace." + name.toLowerCase() + ".enabled", defaultEnabled);
+    boolean lowerEnabled =
+        configProvider.getBoolean("trace." + name.toLowerCase() + ".enabled", defaultEnabled);
     return defaultEnabled ? enabled && lowerEnabled : enabled || lowerEnabled;
   }
 
-  public boolean isEndToEndDurationEnabled(final boolean defaultEnabled, final String... integrationNames) {
+  public boolean isEndToEndDurationEnabled(
+      final boolean defaultEnabled, final String... integrationNames) {
     return isEnabled(Arrays.asList(integrationNames), "", ".e2e.duration.enabled", defaultEnabled);
   }
 
-  public boolean isLegacyTracingEnabled(final boolean defaultEnabled, final String... integrationNames) {
-    return isEnabled(Arrays.asList(integrationNames), "", ".legacy.tracing.enabled", defaultEnabled);
+  public boolean isLegacyTracingEnabled(
+      final boolean defaultEnabled, final String... integrationNames) {
+    return isEnabled(
+        Arrays.asList(integrationNames), "", ".legacy.tracing.enabled", defaultEnabled);
   }
 
-  public boolean isTraceAnalyticsIntegrationEnabled(final SortedSet<String> integrationNames, final boolean defaultEnabled) {
+  public boolean isTraceAnalyticsIntegrationEnabled(
+      final SortedSet<String> integrationNames, final boolean defaultEnabled) {
     return isEnabled(integrationNames, "", ".analytics.enabled", defaultEnabled);
   }
 
-  public boolean isTraceAnalyticsIntegrationEnabled(final boolean defaultEnabled, final String... integrationNames) {
+  public boolean isTraceAnalyticsIntegrationEnabled(
+      final boolean defaultEnabled, final String... integrationNames) {
     return isEnabled(Arrays.asList(integrationNames), "", ".analytics.enabled", defaultEnabled);
   }
 }

@@ -9,5 +9,6 @@ public final class CiVisibilityConfig {
 
   static final boolean DEFAULT_CIVISIBILITY_ENABLED = false;
   static final boolean DEFAULT_CIVISIBILITY_AGENTLESS_ENABLED = false;
+
   private CiVisibilityConfig() {}
 }

@@ -25,6 +25,8 @@ class SpringBootOpenLibertySmokeTest extends AbstractServerSmokeTest {
     command.addAll((String[]) [
       "-Ddd.writer.type=MultiWriter:TraceStructureWriter:${output.getAbsolutePath()},DDAgentWriter",
       "-Ddd.jmxfetch.enabled=false",
+      // FIXME
+      "-Ddd.remote_config.enabled=false",
       "-jar",
       openLibertyShadowJar,
       "--server.port=${httpPort}"

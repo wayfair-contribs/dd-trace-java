@@ -16,6 +16,7 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,7 +91,7 @@ public class CallSiteSpecification implements Validatable {
   public abstract static class AdviceSpecification implements Validatable {
 
     protected final MethodType advice;
-    private final Map<Integer, ParameterSpecification> parameters;
+    private final Map<Integer /* param idx on the advice */, ParameterSpecification> parameters;
     protected final String signature;
     protected MethodType pointcut;
     protected Executable pointcutMethod;
@@ -127,10 +128,6 @@ public class CallSiteSpecification implements Validatable {
           validateThisSpecCompatibility(context, adviceArgumentTypes);
           validateArgumentSpecCompatibility(context, adviceArgumentTypes, pointcutParameters);
           validateReturnSpecCompatibility(context, adviceArgumentTypes);
-          if (!pointcutParameters.isEmpty()) {
-            context.addError(
-                ErrorCode.ADVICE_POINT_CUT_PARAMETERS_NOT_CONSUMED, pointcutParameters);
-          }
         }
       } catch (ResolutionException e) {
         e.getErrors().forEach(context::addError);
@@ -402,6 +399,28 @@ public class CallSiteSpecification implements Validatable {
       return dynamicInvoke;
     }
 
+    /* Whether not all of the pointcut arguments are consumed or they're not
+     * consumed in sequential order or there are no pointcut arguments at all */
+    public boolean isPositionalArguments() {
+      if (parameters.isEmpty()) {
+        return true;
+      }
+      if (pointcut.getMethodType().getArgumentTypes().length != getArguments().count()) {
+        return true;
+      }
+
+      Iterator<ArgumentSpecification> iterator = getArguments().iterator();
+      int i = 0;
+      while (iterator.hasNext()) {
+        ArgumentSpecification spec = iterator.next();
+        if (spec.getIndex() != i) {
+          return true;
+        }
+        i++;
+      }
+      return false;
+    }
+
     public boolean includeThis() {
       if (findThis() != null) {
         return true;
@@ -421,6 +440,10 @@ public class CallSiteSpecification implements Validatable {
     public AllArgsSpecification findAllArguments() {
       return findParameter(AllArgsSpecification.class);
     }
+
+    //    public List<ArgumentSpecification> findSomeArguments() {
+    //      getArguments()
+    //    }
 
     public InvokeDynamicConstantsSpecification findInvokeDynamicConstants() {
       return findParameter(InvokeDynamicConstantsSpecification.class);
@@ -642,7 +665,7 @@ public class CallSiteSpecification implements Validatable {
 
     @Override
     public String toString() {
-      return "@Argument";
+      return "@Argument(" + index + ")";
     }
   }
 

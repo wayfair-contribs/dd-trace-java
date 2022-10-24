@@ -11,8 +11,6 @@ public interface IastModule {
 
   void onJdbcQuery(@Nonnull String queryString);
 
-  void onJdbcQuery(@Nonnull String queryString);
-
   /**
    * An HTTP request parameter name is used. This should be used when it cannot be determined
    * whether the parameter comes in the query string or body (e.g. servlet's getParameter).

@@ -46,6 +46,8 @@ abstract class AbstractTestAgentSmokeTest extends ProcessManager {
     "-Ddd.profiling.enabled=false",
     "-Ddd.${ProfilingConfig.PROFILING_CHECKPOINTS_SAMPLER_RATE_LIMIT}=0",
     "-Ddd.test.no.early.discovery=true",
+    // The mock agent cannot cope with feature discovery or remote config requests.
+    "-Ddd.remote_config.enabled=false",
     "-Ddatadog.slf4j.simpleLogger.defaultLogLevel=debug",
     "-Dorg.slf4j.simpleLogger.defaultLogLevel=debug"
   ]

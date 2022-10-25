@@ -28,18 +28,17 @@ class ReporterTest extends DDSpecification {
     final traceSegment = Mock(TraceSegment)
     final ctx = new IastRequestContext()
     final reqCtx = Stub(RequestContext)
-    final spanId = DDId.from(123456)
     reqCtx.getData(RequestContextSlot.IAST) >> ctx
     reqCtx.getTraceSegment() >> traceSegment
     VulnerabilityBatch batch = null
 
     final span = Stub(AgentSpan)
     span.getRequestContext() >> reqCtx
-    span.getSpanId() >> spanId
+    span.getSpanId() >> DDId.from(123456)
 
     final v = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(spanId, new StackTraceElement("foo", "foo", "foo", 1)),
+      Location.forSpanAndStack(span, new StackTraceElement("foo", "foo", "foo", 1)),
       new Evidence("MD5")
       )
 
@@ -74,23 +73,22 @@ class ReporterTest extends DDSpecification {
     final traceSegment = Mock(TraceSegment)
     final ctx = new IastRequestContext()
     final reqCtx = Stub(RequestContext)
-    final spanId = DDId.from(123456)
     reqCtx.getData(RequestContextSlot.IAST) >> ctx
     reqCtx.getTraceSegment() >> traceSegment
     VulnerabilityBatch batch = null
 
     final span = Stub(AgentSpan)
     span.getRequestContext() >> reqCtx
-    span.getSpanId() >> spanId
+    span.getSpanId() >> DDId.from(123456)
 
     final v1 = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(spanId, new StackTraceElement("foo", "foo", "foo", 1)),
+      Location.forSpanAndStack(span, new StackTraceElement("foo", "foo", "foo", 1)),
       new Evidence("MD5")
       )
     final v2 = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(spanId, new StackTraceElement("foo", "foo", "foo", 2)),
+      Location.forSpanAndStack(span, new StackTraceElement("foo", "foo", "foo", 2)),
       new Evidence("MD4")
       )
 
@@ -171,14 +169,13 @@ class ReporterTest extends DDSpecification {
     given:
     final Reporter reporter = new Reporter()
     final reqCtx = Mock(RequestContext)
-    final spanId = DDId.from(123456)
     reqCtx.getData(RequestContextSlot.IAST) >> null
     final span = Mock(AgentSpan)
     span.getRequestContext() >> reqCtx
-    span.getSpanId() >> spanId
+    span.getSpanId() >> DDId.from(123456)
     final v = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(spanId, new StackTraceElement("foo", "foo", "foo", 1)),
+      Location.forSpanAndStack(span, new StackTraceElement("foo", "foo", "foo", 1)),
       new Evidence("MD5")
       )
 
@@ -196,12 +193,12 @@ class ReporterTest extends DDSpecification {
     given:
     final vulnerability1 = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(DDId.from(123456), new StackTraceElement("foo", "foo", "foo", 1)),
+      Location.forSpanAndStack(span(123456), new StackTraceElement("foo", "foo", "foo", 1)),
       new Evidence("GOOD")
       )
     final vulnerability2 = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(DDId.from(7890), new StackTraceElement("foo", "foo", "foo", 1)),
+      Location.forSpanAndStack(span(768), new StackTraceElement("foo", "foo", "foo", 1)),
       new Evidence("BAD")
       )
 
@@ -213,12 +210,12 @@ class ReporterTest extends DDSpecification {
     given:
     final vulnerability1 = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(DDId.from(123456), new StackTraceElement("foo", "foo", "foo", 1)),
+      Location.forSpanAndStack(span(123456), new StackTraceElement("foo", "foo", "foo", 1)),
       new Evidence("GOOD")
       )
     final vulnerability2 = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(DDId.from(7890), new StackTraceElement("foo", "foo", "foo", 2)),
+      Location.forSpanAndStack(span(768), new StackTraceElement("foo", "foo", "foo", 2)),
       new Evidence("BAD")
       )
 
@@ -234,7 +231,7 @@ class ReporterTest extends DDSpecification {
     final span = spanWithBatch(batch)
     final vulnerability = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(span.spanId, new StackTraceElement("foo", "foo", "foo", 1)),
+      Location.forSpanAndStack(span, new StackTraceElement("foo", "foo", "foo", 1)),
       new Evidence("GOOD")
       )
 
@@ -259,7 +256,7 @@ class ReporterTest extends DDSpecification {
     final span = spanWithBatch(batch)
     final vulnerability = new Vulnerability(
       VulnerabilityType.WEAK_HASH,
-      Location.forSpanAndStack(span.spanId, new StackTraceElement("foo", "foo", "foo", 1)),
+      Location.forSpanAndStack(span, new StackTraceElement("foo", "foo", "foo", 1)),
       new Evidence("GOOD")
       )
 
@@ -286,7 +283,7 @@ class ReporterTest extends DDSpecification {
     final vulnerabilityBuilder = { int index ->
       new Vulnerability(
         VulnerabilityType.WEAK_HASH,
-        Location.forSpanAndStack(span.spanId, new StackTraceElement(index.toString(), index.toString(), index.toString(), index)),
+        Location.forSpanAndStack(span, new StackTraceElement(index.toString(), index.toString(), index.toString(), index)),
         new Evidence("GOOD")
         )
     }
@@ -326,7 +323,7 @@ class ReporterTest extends DDSpecification {
     final vulnerabilityBuilder = { int index ->
       new Vulnerability(
         VulnerabilityType.WEAK_HASH,
-        Location.forSpanAndStack(span.spanId, new StackTraceElement(index.toString(), index.toString(), index.toString(), index)),
+        Location.forSpanAndStack(span, new StackTraceElement(index.toString(), index.toString(), index.toString(), index)),
         new Evidence("GOOD")
         )
     }
@@ -357,5 +354,11 @@ class ReporterTest extends DDSpecification {
     span.getRequestContext() >> reqCtx
     span.getSpanId() >> spanId
     return span
+  }
+
+  private AgentSpan span(final long id) {
+    final span = Mock(AgentSpan)
+    final spanId = DDId.from(id)
+    span.getSpanId() >> spanId
   }
 }

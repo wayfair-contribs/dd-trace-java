@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
-import datadog.trace.api.DDId;
+import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -56,8 +56,8 @@ class AdapterFactory implements JsonAdapter.Factory {
       return null;
     } else if (VulnerabilityBatch.class.equals(rawType)) {
       return new VulnerabilityBatchAdapter(moshi);
-    } else if (DDId.class.equals(rawType)) {
-      return new DDIdAdapter();
+    } else if (AgentSpan.class.equals(rawType)) {
+      return new AgentSpanAdapter();
     }
     return null;
   }

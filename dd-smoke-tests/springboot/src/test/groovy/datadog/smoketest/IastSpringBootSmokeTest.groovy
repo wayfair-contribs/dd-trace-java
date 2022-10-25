@@ -1,14 +1,19 @@
 package datadog.smoketest
 
 import datadog.trace.api.Platform
+import groovy.json.JsonSlurper
 import okhttp3.Request
 import okhttp3.Response
 import spock.lang.IgnoreIf
+
+import java.util.function.Predicate
 
 @IgnoreIf({
   !Platform.isJavaVersionAtLeast(8)
 })
 class IastSpringBootSmokeTest extends AbstractServerSmokeTest {
+
+  private static final String TAG_NAME = '_dd.iast.json'
 
   @Override
   def logLevel() {
@@ -22,7 +27,6 @@ class IastSpringBootSmokeTest extends AbstractServerSmokeTest {
     List<String> command = new ArrayList<>()
     command.add(javaPath())
     command.addAll(defaultJavaProperties)
-    command.addAll(["-Ddd.appsec.enabled=true", "-Ddd.iast.enabled=true", "-Ddd.iast-request-sampling=100"])
     command.addAll([
       "-Ddd.appsec.enabled=true",
       "-Ddd.iast.enabled=true",
@@ -114,12 +118,61 @@ class IastSpringBootSmokeTest extends AbstractServerSmokeTest {
     then:
     response.body().string().contains("MessageDigest.getInstance executed")
     Thread.sleep(100) //This is needed so we allow enough time for the log to be written
-    Boolean vulnerabilityFound = false
-    checkLog {
-      if (it.contains("MD5")) {
-        vulnerabilityFound = true
+    final found = hasVulnerability(type('WEAK_HASH').and(evidence('MD5')))
+    found
+  }
+
+  def "weak hash vulnerability is present on boot"() {
+    when:
+    final found = hasVulnerability(type('WEAK_HASH').and(evidence('SHA1')).and(withSpan()))
+
+    then:
+    found
+  }
+
+  private boolean hasVulnerability(final Predicate<?> predicate) {
+    def found = false
+    final slurper = new JsonSlurper()
+    checkLog { final String log ->
+      final index = log.indexOf(TAG_NAME)
+      if (index >= 0) {
+        final json = slurper.parseText(parseVulnerability(log, index))
+        found |= (json['vulnerabilities'] as Collection).stream().anyMatch(predicate)
       }
     }
-    vulnerabilityFound
+    return found
+  }
+
+  private static String parseVulnerability(final String log, final int index) {
+    final chars = log.toCharArray()
+    final builder = new StringBuilder()
+    def level = 0
+    for (int i = log.indexOf('{', index); i < chars.length; i++) {
+      final current = chars[i]
+      if (current == '{' as char) {
+        level++
+      } else if (current == '}' as char) {
+        level--
+      }
+      builder.append(chars[i])
+      if (level == 0) {
+        break
+      }
+    }
+    return builder.toString()
+  }
+
+  private static Predicate<?> type(final String type) {
+    return { vul -> vul.type == type }
+  }
+
+  private static Predicate<?> evidence(final String value) {
+    return { vul -> vul.evidence.value == value }
+  }
+
+  private static Predicate<?> withSpan() {
+    return { vul ->
+      vul.location.span != null
+    }
   }
 }

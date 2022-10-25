@@ -6,7 +6,6 @@ import com.datadog.iast.taint.TaintedObjects;
 import datadog.trace.api.gateway.RequestContext;
 import datadog.trace.api.gateway.RequestContextSlot;
 import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
-import datadog.trace.bootstrap.instrumentation.api.AgentTracer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 
@@ -38,11 +37,6 @@ public class IastRequestContext {
 
   public TaintedObjects getTaintedObjects() {
     return taintedObjects;
-  }
-
-  @Nullable
-  public static IastRequestContext get() {
-    return get(AgentTracer.activeSpan());
   }
 
   @Nullable

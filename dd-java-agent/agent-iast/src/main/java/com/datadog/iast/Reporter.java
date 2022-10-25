@@ -1,5 +1,7 @@
 package com.datadog.iast;
 
+import static com.datadog.iast.IastAgentSpan.initSpan;
+
 import com.datadog.iast.model.Vulnerability;
 import com.datadog.iast.model.VulnerabilityBatch;
 import datadog.trace.api.Config;
@@ -33,26 +35,32 @@ public class Reporter {
     if (span == null) {
       return;
     }
-    final RequestContext reqCtx = span.getRequestContext();
-    if (reqCtx == null) {
-      return;
-    }
-    final IastRequestContext ctx = reqCtx.getData(RequestContextSlot.IAST);
-    if (ctx == null) {
-      return;
-    }
-    if (duplicated.test(vulnerability)) {
-      return;
-    }
-    final VulnerabilityBatch batch = ctx.getVulnerabilityBatch();
-    batch.add(vulnerability);
-    if (!ctx.getAndSetSpanDataIsSet()) {
-      final TraceSegment segment = reqCtx.getTraceSegment();
-      segment.setDataTop("iast", batch);
-      // Once we have added a vulnerability, try to override sampling and keep the trace.
-      // TODO: We need to check if we can have an API with more fine-grained semantics on why traces
-      // are kept.
-      segment.setTagTop(DDTags.MANUAL_KEEP, true);
+    try (@SuppressWarnings("unused")
+        final AutoCloseable closeable = initSpan(span)) {
+      final RequestContext reqCtx = span.getRequestContext();
+      if (reqCtx == null) {
+        return;
+      }
+      final IastRequestContext ctx = reqCtx.getData(RequestContextSlot.IAST);
+      if (ctx == null) {
+        return;
+      }
+      if (duplicated.test(vulnerability)) {
+        return;
+      }
+      final VulnerabilityBatch batch = ctx.getVulnerabilityBatch();
+      batch.add(vulnerability);
+      if (!ctx.getAndSetSpanDataIsSet()) {
+        final TraceSegment segment = reqCtx.getTraceSegment();
+        segment.setDataTop("iast", batch);
+        // Once we have added a vulnerability, try to override sampling and keep the trace.
+        // TODO: We need to check if we can have an API with more fine-grained semantics on why
+        // traces
+        // are kept.
+        segment.setTagTop(DDTags.MANUAL_KEEP, true);
+      }
+    } catch (final Exception e) {
+      throw new ReportException(e);
     }
   }
 
@@ -85,6 +93,12 @@ public class Reporter {
         hashes.add(vulnerability.getHash());
       }
       return !newVulnerability;
+    }
+  }
+
+  private static class ReportException extends RuntimeException {
+    public ReportException(final Throwable cause) {
+      super(cause);
     }
   }
 }

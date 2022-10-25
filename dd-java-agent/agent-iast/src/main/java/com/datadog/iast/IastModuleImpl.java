@@ -1,5 +1,8 @@
 package com.datadog.iast;
 
+import static com.datadog.iast.IastAgentSpan.activeOrNewSpan;
+import static com.datadog.iast.IastAgentSpan.activeSpan;
+
 import com.datadog.iast.model.Evidence;
 import com.datadog.iast.model.Location;
 import com.datadog.iast.model.Range;
@@ -15,7 +18,6 @@ import com.datadog.iast.taint.TaintedObjects;
 import datadog.trace.api.Config;
 import datadog.trace.api.iast.IastModule;
 import datadog.trace.bootstrap.instrumentation.api.AgentSpan;
-import datadog.trace.bootstrap.instrumentation.api.AgentTracer;
 import datadog.trace.util.stacktrace.StackWalker;
 import datadog.trace.util.stacktrace.StackWalkerFactory;
 import java.util.Locale;
@@ -35,7 +37,7 @@ public final class IastModuleImpl implements IastModule {
     this.overheadController = overheadController;
   }
 
-  public void onCipherAlgorithm(String algorithm) {
+  public void onCipherAlgorithm(@Nullable final String algorithm) {
     if (algorithm == null) {
       return;
     }
@@ -43,7 +45,7 @@ public final class IastModuleImpl implements IastModule {
     if (!config.getIastWeakCipherAlgorithms().matcher(algorithmId).matches()) {
       return;
     }
-    final AgentSpan span = AgentTracer.activeSpan();
+    final AgentSpan span = activeOrNewSpan();
     if (!overheadController.consumeQuota(Operations.REPORT_VULNERABILITY, span)) {
       return;
     }
@@ -53,12 +55,12 @@ public final class IastModuleImpl implements IastModule {
     Vulnerability vulnerability =
         new Vulnerability(
             VulnerabilityType.WEAK_CIPHER,
-            Location.forSpanAndStack(span.getSpanId(), stackTraceElement),
+            Location.forSpanAndStack(span, stackTraceElement),
             new Evidence(algorithm));
     reporter.report(span, vulnerability);
   }
 
-  public void onHashingAlgorithm(String algorithm) {
+  public void onHashingAlgorithm(@Nullable final String algorithm) {
     if (algorithm == null) {
       return;
     }
@@ -66,7 +68,7 @@ public final class IastModuleImpl implements IastModule {
     if (!config.getIastWeakHashAlgorithms().contains(algorithmId)) {
       return;
     }
-    final AgentSpan span = AgentTracer.activeSpan();
+    final AgentSpan span = activeOrNewSpan();
     if (!overheadController.consumeQuota(Operations.REPORT_VULNERABILITY, span)) {
       return;
     }
@@ -76,7 +78,7 @@ public final class IastModuleImpl implements IastModule {
     Vulnerability vulnerability =
         new Vulnerability(
             VulnerabilityType.WEAK_HASH,
-            Location.forSpanAndStack(span.getSpanId(), stackTraceElement),
+            Location.forSpanAndStack(span, stackTraceElement),
             new Evidence(algorithm));
     reporter.report(span, vulnerability);
   }
@@ -86,7 +88,7 @@ public final class IastModuleImpl implements IastModule {
     if (paramName == null || paramName.isEmpty()) {
       return;
     }
-    final IastRequestContext ctx = IastRequestContext.get();
+    final IastRequestContext ctx = IastRequestContext.get(activeSpan());
     if (ctx == null) {
       return;
     }
@@ -101,7 +103,7 @@ public final class IastModuleImpl implements IastModule {
     if (paramValue == null || paramValue.isEmpty()) {
       return;
     }
-    final IastRequestContext ctx = IastRequestContext.get();
+    final IastRequestContext ctx = IastRequestContext.get(activeSpan());
     if (ctx == null) {
       return;
     }
@@ -119,7 +121,7 @@ public final class IastModuleImpl implements IastModule {
     if (!canBeTainted(left) && !canBeTainted(right)) {
       return;
     }
-    final IastRequestContext ctx = IastRequestContext.get();
+    final IastRequestContext ctx = IastRequestContext.get(activeSpan());
     if (ctx == null) {
       return;
     }

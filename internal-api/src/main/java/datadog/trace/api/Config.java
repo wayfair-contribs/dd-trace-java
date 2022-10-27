@@ -1016,14 +1016,11 @@ public class Config {
   }
 
   public boolean isRuleEnabled(final String name) {
-    return isRuleEnabled(name, true);
+    return this.traceInstrumentationConfig.isRuleEnabled(name);
   }
 
   public boolean isRuleEnabled(final String name, boolean defaultEnabled) {
-    boolean enabled = configProvider.getBoolean("trace." + name + ".enabled", defaultEnabled);
-    boolean lowerEnabled =
-        configProvider.getBoolean("trace." + name.toLowerCase() + ".enabled", defaultEnabled);
-    return defaultEnabled ? enabled && lowerEnabled : enabled || lowerEnabled;
+    return this.traceInstrumentationConfig.isRuleEnabled(name, defaultEnabled);
   }
 
   /**
@@ -1067,7 +1064,7 @@ public class Config {
 
   public <T extends Enum<T>> T getEnumValue(
       final String name, final Class<T> type, final T defaultValue) {
-    return configProvider.getEnum(name, type, defaultValue);
+    return this.configProvider.getEnum(name, type, defaultValue);
   }
 
   /**

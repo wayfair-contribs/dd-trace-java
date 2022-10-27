@@ -488,7 +488,7 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
     /** The agent timeout (in seconds). */
     private final int timeout;
 
-    public AgentConfig(ConfigProvider configProvider) {
+    private AgentConfig(ConfigProvider configProvider) {
       String agentHostFromEnvironment = null;
       int agentPortFromEnvironment = -1;
       String unixSocketFromEnvironment = null;

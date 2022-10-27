@@ -80,8 +80,8 @@ import java.util.Set;
 import java.util.SortedSet;
 
 public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
+  private final StaticConfig staticConfig;
   private final boolean traceEnabled;
-  private final boolean integrationsEnabled;
   private final boolean integrationSynapseLegacyOperationName;
   private final String traceAnnotations;
   private final boolean logsInjectionEnabled;
@@ -90,10 +90,6 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   private final boolean traceExecutorsAll;
   private final List<String> traceExecutors;
   private final Set<String> traceThreadPoolExecutorsExclude;
-  private final List<String> excludedClasses;
-  private final String excludedClassesFile;
-  private final Set<String> excludedClassLoaders;
-  private final List<String> excludedCodeSources;
   private final boolean httpServerTagQueryString;
   private final boolean httpServerRawQueryString;
   private final boolean httpServerRawResource;
@@ -128,25 +124,18 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   private final String jdbcPreparedStatementClassName;
   private final String jdbcConnectionClassName;
   private final String rootContextServiceName;
-  private final boolean runtimeContextFieldInjection;
-  private final boolean serialVersionUIDFieldInjection;
   private final Set<String> grpcIgnoredInboundMethods;
   private final Set<String> grpcIgnoredOutboundMethods;
   private final boolean grpcServerTrimPackageResource;
   private final BitSet grpcServerErrorStatuses;
   private final BitSet grpcClientErrorStatuses;
-  private final boolean resolverOutlinePoolEnabled;
-  private final int resolverOutlinePoolSize;
-  private final int resolverTypePoolSize;
-  private final boolean resolverUseLoadClassEnabled;
 
   public TraceInstrumentationFeatureConfig(ConfigProvider configProvider) {
     super(configProvider);
+    this.staticConfig = new StaticConfig(configProvider);
 
     this.traceEnabled = configProvider.getBoolean(TRACE_ENABLED, DEFAULT_TRACE_ENABLED);
 
-    this.integrationsEnabled =
-        configProvider.getBoolean(INTEGRATIONS_ENABLED, DEFAULT_INTEGRATIONS_ENABLED);
     this.integrationSynapseLegacyOperationName =
         configProvider.getBoolean(INTEGRATION_SYNAPSE_LEGACY_OPERATION_NAME, false);
 
@@ -164,13 +153,6 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
     this.traceExecutors = tryMakeImmutableList(configProvider.getList(TRACE_EXECUTORS));
     this.traceThreadPoolExecutorsExclude =
         tryMakeImmutableSet(configProvider.getList(TRACE_THREAD_POOL_EXECUTORS_EXCLUDE));
-
-    this.excludedClasses = tryMakeImmutableList(configProvider.getList(TRACE_CLASSES_EXCLUDE));
-    this.excludedClassesFile = configProvider.getString(TRACE_CLASSES_EXCLUDE_FILE);
-    this.excludedClassLoaders =
-        tryMakeImmutableSet(configProvider.getList(TRACE_CLASSLOADERS_EXCLUDE));
-    this.excludedCodeSources =
-        tryMakeImmutableList(configProvider.getList(TRACE_CODESOURCES_EXCLUDE));
 
     this.httpServerTagQueryString =
         configProvider.getBoolean(
@@ -233,12 +215,6 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
     this.rootContextServiceName =
         configProvider.getString(
             SERVLET_ROOT_CONTEXT_SERVICE_NAME, DEFAULT_SERVLET_ROOT_CONTEXT_SERVICE_NAME);
-    this.runtimeContextFieldInjection =
-        configProvider.getBoolean(
-            RUNTIME_CONTEXT_FIELD_INJECTION, DEFAULT_RUNTIME_CONTEXT_FIELD_INJECTION);
-    this.serialVersionUIDFieldInjection =
-        configProvider.getBoolean(
-            SERIALVERSIONUID_FIELD_INJECTION, DEFAULT_SERIALVERSIONUID_FIELD_INJECTION);
 
     this.grpcIgnoredInboundMethods =
         tryMakeImmutableSet(configProvider.getList(GRPC_IGNORED_INBOUND_METHODS));
@@ -252,14 +228,6 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
     this.grpcClientErrorStatuses =
         configProvider.getIntegerRange(
             GRPC_CLIENT_ERROR_STATUSES, DEFAULT_GRPC_CLIENT_ERROR_STATUSES);
-
-    this.resolverOutlinePoolEnabled =
-        configProvider.getBoolean(RESOLVER_OUTLINE_POOL_ENABLED, true);
-    this.resolverOutlinePoolSize =
-        configProvider.getInteger(RESOLVER_OUTLINE_POOL_SIZE, DEFAULT_RESOLVER_OUTLINE_POOL_SIZE);
-    this.resolverTypePoolSize =
-        configProvider.getInteger(RESOLVER_TYPE_POOL_SIZE, DEFAULT_RESOLVER_TYPE_POOL_SIZE);
-    this.resolverUseLoadClassEnabled = configProvider.getBoolean(RESOLVER_USE_LOADCLASS, true);
   }
 
   public boolean isTraceEnabled() {
@@ -267,7 +235,7 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   }
 
   public boolean isIntegrationsEnabled() {
-    return this.integrationsEnabled;
+    return this.staticConfig.isIntegrationsEnabled();
   }
 
   public boolean isIntegrationSynapseLegacyOperationName() {
@@ -303,19 +271,19 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   }
 
   public List<String> getExcludedClasses() {
-    return this.excludedClasses;
+    return this.staticConfig.getExcludedClasses();
   }
 
   public String getExcludedClassesFile() {
-    return this.excludedClassesFile;
+    return this.staticConfig.getExcludedClassesFile();
   }
 
   public Set<String> getExcludedClassLoaders() {
-    return this.excludedClassLoaders;
+    return this.staticConfig.getExcludedClassLoaders();
   }
 
   public List<String> getExcludedCodeSources() {
-    return this.excludedCodeSources;
+    return this.staticConfig.getExcludedCodeSources();
   }
 
   public boolean isHttpServerTagQueryString() {
@@ -435,11 +403,11 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   }
 
   public boolean isRuntimeContextFieldInjection() {
-    return this.runtimeContextFieldInjection;
+    return this.staticConfig.isRuntimeContextFieldInjection();
   }
 
   public boolean isSerialVersionUIDFieldInjection() {
-    return this.serialVersionUIDFieldInjection;
+    return this.staticConfig.isSerialVersionUIDFieldInjection();
   }
 
   public Set<String> getGrpcIgnoredInboundMethods() {
@@ -463,19 +431,19 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   }
 
   public boolean isResolverOutlinePoolEnabled() {
-    return this.resolverOutlinePoolEnabled;
+    return this.staticConfig.isResolverOutlinePoolEnabled();
   }
 
   public int getResolverOutlinePoolSize() {
-    return this.resolverOutlinePoolSize;
+    return this.staticConfig.getResolverOutlinePoolSize();
   }
 
   public int getResolverTypePoolSize() {
-    return this.resolverTypePoolSize;
+    return this.staticConfig.getResolverTypePoolSize();
   }
 
   public boolean isResolverUseLoadClassEnabled() {
-    return this.resolverUseLoadClassEnabled;
+    return this.staticConfig.isResolverUseLoadClassEnabled();
   }
 
   public boolean isPropagationEnabled(
@@ -485,18 +453,17 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
 
   public boolean isIntegrationEnabled(
       final Iterable<String> integrationNames, final boolean defaultEnabled) {
-    return isEnabled(integrationNames, "integration.", ".enabled", defaultEnabled);
+    return this.staticConfig.isIntegrationEnabled(integrationNames, defaultEnabled);
   }
 
   public boolean isIntegrationShortcutMatchingEnabled(
       final Iterable<String> integrationNames, final boolean defaultEnabled) {
-    return isEnabled(
-        integrationNames, "integration.", ".matching.shortcut.enabled", defaultEnabled);
+    return this.staticConfig.isIntegrationShortcutMatchingEnabled(integrationNames, defaultEnabled);
   }
 
   public boolean isJmxFetchIntegrationEnabled(
       final Iterable<String> integrationNames, final boolean defaultEnabled) {
-    return isEnabled(integrationNames, "jmxfetch.", ".enabled", defaultEnabled);
+    return this.staticConfig.isJmxFetchIntegrationEnabled(integrationNames, defaultEnabled);
   }
 
   public boolean isRuleEnabled(final String name) {
@@ -529,5 +496,121 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
   public boolean isTraceAnalyticsIntegrationEnabled(
       final boolean defaultEnabled, final String... integrationNames) {
     return isEnabled(Arrays.asList(integrationNames), "", ".analytics.enabled", defaultEnabled);
+  }
+
+  public static class StaticConfig extends AbstractFeatureConfig {
+    private final boolean integrationsEnabled;
+    private final List<String> excludedClasses;
+    private final String excludedClassesFile;
+    private final Set<String> excludedClassLoaders;
+    private final List<String> excludedCodeSources;
+    private final boolean runtimeContextFieldInjection;
+    private final boolean serialVersionUIDFieldInjection;
+    private final boolean resolverOutlinePoolEnabled;
+    private final int resolverOutlinePoolSize;
+    private final int resolverTypePoolSize;
+    private final boolean resolverUseLoadClassEnabled;
+
+    /**
+     * This configuration is frozen at application initialization and cannot be updated at a later
+     * time by user configuration.
+     *
+     * @param configProvider The configuration provider to get configuration value from.
+     */
+    public StaticConfig(ConfigProvider configProvider) {
+      super(configProvider);
+      this.integrationsEnabled =
+          configProvider.getBoolean(INTEGRATIONS_ENABLED, DEFAULT_INTEGRATIONS_ENABLED);
+
+      this.excludedClasses = tryMakeImmutableList(configProvider.getList(TRACE_CLASSES_EXCLUDE));
+      this.excludedClassesFile = configProvider.getString(TRACE_CLASSES_EXCLUDE_FILE);
+      this.excludedClassLoaders =
+          tryMakeImmutableSet(configProvider.getList(TRACE_CLASSLOADERS_EXCLUDE));
+      this.excludedCodeSources =
+          tryMakeImmutableList(configProvider.getList(TRACE_CODESOURCES_EXCLUDE));
+
+      this.runtimeContextFieldInjection =
+          configProvider.getBoolean(
+              RUNTIME_CONTEXT_FIELD_INJECTION, DEFAULT_RUNTIME_CONTEXT_FIELD_INJECTION);
+      this.serialVersionUIDFieldInjection =
+          configProvider.getBoolean(
+              SERIALVERSIONUID_FIELD_INJECTION, DEFAULT_SERIALVERSIONUID_FIELD_INJECTION);
+
+      this.resolverOutlinePoolEnabled =
+          configProvider.getBoolean(RESOLVER_OUTLINE_POOL_ENABLED, true);
+      this.resolverOutlinePoolSize =
+          configProvider.getInteger(RESOLVER_OUTLINE_POOL_SIZE, DEFAULT_RESOLVER_OUTLINE_POOL_SIZE);
+      this.resolverTypePoolSize =
+          configProvider.getInteger(RESOLVER_TYPE_POOL_SIZE, DEFAULT_RESOLVER_TYPE_POOL_SIZE);
+      this.resolverUseLoadClassEnabled = configProvider.getBoolean(RESOLVER_USE_LOADCLASS, true);
+    }
+
+    public static StaticConfig getInstance() {
+      return Singleton.INSTANCE;
+    }
+
+    public boolean isIntegrationsEnabled() {
+      return this.integrationsEnabled;
+    }
+
+    public List<String> getExcludedClasses() {
+      return this.excludedClasses;
+    }
+
+    public String getExcludedClassesFile() {
+      return this.excludedClassesFile;
+    }
+
+    public Set<String> getExcludedClassLoaders() {
+      return this.excludedClassLoaders;
+    }
+
+    public List<String> getExcludedCodeSources() {
+      return this.excludedCodeSources;
+    }
+
+    public boolean isRuntimeContextFieldInjection() {
+      return this.runtimeContextFieldInjection;
+    }
+
+    public boolean isSerialVersionUIDFieldInjection() {
+      return this.serialVersionUIDFieldInjection;
+    }
+
+    public boolean isResolverOutlinePoolEnabled() {
+      return this.resolverOutlinePoolEnabled;
+    }
+
+    public int getResolverOutlinePoolSize() {
+      return this.resolverOutlinePoolSize;
+    }
+
+    public int getResolverTypePoolSize() {
+      return this.resolverTypePoolSize;
+    }
+
+    public boolean isResolverUseLoadClassEnabled() {
+      return this.resolverUseLoadClassEnabled;
+    }
+
+    public boolean isIntegrationEnabled(
+        final Iterable<String> integrationNames, final boolean defaultEnabled) {
+      return isEnabled(integrationNames, "integration.", ".enabled", defaultEnabled);
+    }
+
+    public boolean isIntegrationShortcutMatchingEnabled(
+        final Iterable<String> integrationNames, final boolean defaultEnabled) {
+      return isEnabled(
+          integrationNames, "integration.", ".matching.shortcut.enabled", defaultEnabled);
+    }
+
+    public boolean isJmxFetchIntegrationEnabled(
+        final Iterable<String> integrationNames, final boolean defaultEnabled) {
+      return isEnabled(integrationNames, "jmxfetch.", ".enabled", defaultEnabled);
+    }
+
+    private static class Singleton {
+      private static final StaticConfig INSTANCE = new StaticConfig(ConfigProvider.getInstance());
+    }
   }
 }

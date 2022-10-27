@@ -59,4 +59,17 @@ public class CiVisibilityFeatureConfig extends AbstractFeatureConfig {
   public String getCiVisibilityAgentlessUrl() {
     return this.ciVisibilityAgentlessUrl;
   }
+
+  @Override
+  public String toString() {
+    return "CiVisibilityFeatureConfig{"
+        + "ciVisibilityEnabled="
+        + this.ciVisibilityEnabled
+        + ", ciVisibilityAgentlessEnabled="
+        + this.ciVisibilityAgentlessEnabled
+        + ", ciVisibilityAgentlessUrl='"
+        + this.ciVisibilityAgentlessUrl
+        + '\''
+        + '}';
+  }
 }

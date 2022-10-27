@@ -103,4 +103,37 @@ public class AppSecFeatureConfig extends AbstractFeatureConfig {
   public String getAppSecHttpBlockedTemplateJson() {
     return this.appSecHttpBlockedTemplateJson;
   }
+
+  @Override
+  public String toString() {
+    return "AppSecFeatureConfig{"
+        + "appSecEnabled="
+        + this.appSecEnabled
+        + ", appSecReportingInband="
+        + this.appSecReportingInband
+        + ", appSecRulesFile='"
+        + this.appSecRulesFile
+        + '\''
+        + ", appSecReportMinTimeout="
+        + this.appSecReportMinTimeout
+        + ", appSecReportMaxTimeout="
+        + this.appSecReportMaxTimeout
+        + ", appSecTraceRateLimit="
+        + this.appSecTraceRateLimit
+        + ", appSecWafMetrics="
+        + this.appSecWafMetrics
+        + ", appSecObfuscationParameterKeyRegexp='"
+        + this.appSecObfuscationParameterKeyRegexp
+        + '\''
+        + ", appSecObfuscationParameterValueRegexp='"
+        + this.appSecObfuscationParameterValueRegexp
+        + '\''
+        + ", appSecHttpBlockedTemplateHtml='"
+        + this.appSecHttpBlockedTemplateHtml
+        + '\''
+        + ", appSecHttpBlockedTemplateJson='"
+        + this.appSecHttpBlockedTemplateJson
+        + '\''
+        + '}';
+  }
 }

@@ -74,4 +74,27 @@ public class RemoteFeatureConfig extends AbstractFeatureConfig {
   public String getRemoteConfigTargetsKey() {
     return this.remoteConfigTargetsKey;
   }
+
+  @Override
+  public String toString() {
+    return "RemoteFeatureConfig{"
+        + "remoteConfigEnabled="
+        + this.remoteConfigEnabled
+        + ", remoteConfigIntegrityCheckEnabled="
+        + this.remoteConfigIntegrityCheckEnabled
+        + ", remoteConfigUrl='"
+        + this.remoteConfigUrl
+        + '\''
+        + ", remoteConfigInitialPollInterval="
+        + this.remoteConfigInitialPollInterval
+        + ", remoteConfigMaxPayloadSize="
+        + this.remoteConfigMaxPayloadSize
+        + ", remoteConfigTargetsKeyId='"
+        + this.remoteConfigTargetsKeyId
+        + '\''
+        + ", remoteConfigTargetsKey='"
+        + this.remoteConfigTargetsKey
+        + '\''
+        + '}';
+  }
 }

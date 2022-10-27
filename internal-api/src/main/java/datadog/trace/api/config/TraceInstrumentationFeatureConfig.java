@@ -498,6 +498,108 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
     return isEnabled(Arrays.asList(integrationNames), "", ".analytics.enabled", defaultEnabled);
   }
 
+  @Override
+  public String toString() {
+    return "TraceInstrumentationFeatureConfig{"
+        + "staticConfig="
+        + this.staticConfig
+        + ", traceEnabled="
+        + this.traceEnabled
+        + ", integrationSynapseLegacyOperationName="
+        + this.integrationSynapseLegacyOperationName
+        + ", traceAnnotations='"
+        + this.traceAnnotations
+        + '\''
+        + ", logsInjectionEnabled="
+        + this.logsInjectionEnabled
+        + ", logsMDCTagsInjectionEnabled="
+        + this.logsMDCTagsInjectionEnabled
+        + ", traceMethods='"
+        + this.traceMethods
+        + '\''
+        + ", traceExecutorsAll="
+        + this.traceExecutorsAll
+        + ", traceExecutors="
+        + this.traceExecutors
+        + ", traceThreadPoolExecutorsExclude="
+        + this.traceThreadPoolExecutorsExclude
+        + ", httpServerTagQueryString="
+        + this.httpServerTagQueryString
+        + ", httpServerRawQueryString="
+        + this.httpServerRawQueryString
+        + ", httpServerRawResource="
+        + this.httpServerRawResource
+        + ", httpServerRouteBasedNaming="
+        + this.httpServerRouteBasedNaming
+        + ", httpClientTagQueryString="
+        + this.httpClientTagQueryString
+        + ", httpClientSplitByDomain="
+        + this.httpClientSplitByDomain
+        + ", dbClientSplitByInstance="
+        + this.dbClientSplitByInstance
+        + ", dbClientSplitByInstanceTypeSuffix="
+        + this.dbClientSplitByInstanceTypeSuffix
+        + ", awsPropagationEnabled="
+        + this.awsPropagationEnabled
+        + ", sqsPropagationEnabled="
+        + this.sqsPropagationEnabled
+        + ", kafkaClientPropagationEnabled="
+        + this.kafkaClientPropagationEnabled
+        + ", kafkaClientPropagationDisabledTopics="
+        + this.kafkaClientPropagationDisabledTopics
+        + ", kafkaClientBase64DecodingEnabled="
+        + this.kafkaClientBase64DecodingEnabled
+        + ", jmsPropagationEnabled="
+        + this.jmsPropagationEnabled
+        + ", jmsPropagationDisabledTopics="
+        + this.jmsPropagationDisabledTopics
+        + ", jmsPropagationDisabledQueues="
+        + this.jmsPropagationDisabledQueues
+        + ", rabbitPropagationEnabled="
+        + this.rabbitPropagationEnabled
+        + ", rabbitPropagationDisabledQueues="
+        + this.rabbitPropagationDisabledQueues
+        + ", rabbitPropagationDisabledExchanges="
+        + this.rabbitPropagationDisabledExchanges
+        + ", messageBrokerSplitByDestination="
+        + this.messageBrokerSplitByDestination
+        + ", hystrixTagsEnabled="
+        + this.hystrixTagsEnabled
+        + ", hystrixMeasuredEnabled="
+        + this.hystrixMeasuredEnabled
+        + ", igniteCacheIncludeKeys="
+        + this.igniteCacheIncludeKeys
+        + ", obfuscationQueryRegexp='"
+        + this.obfuscationQueryRegexp
+        + '\''
+        + ", playReportHttpStatus="
+        + this.playReportHttpStatus
+        + ", servletPrincipalEnabled="
+        + this.servletPrincipalEnabled
+        + ", servletAsyncTimeoutError="
+        + this.servletAsyncTimeoutError
+        + ", jdbcPreparedStatementClassName='"
+        + this.jdbcPreparedStatementClassName
+        + '\''
+        + ", jdbcConnectionClassName='"
+        + this.jdbcConnectionClassName
+        + '\''
+        + ", rootContextServiceName='"
+        + this.rootContextServiceName
+        + '\''
+        + ", grpcIgnoredInboundMethods="
+        + this.grpcIgnoredInboundMethods
+        + ", grpcIgnoredOutboundMethods="
+        + this.grpcIgnoredOutboundMethods
+        + ", grpcServerTrimPackageResource="
+        + this.grpcServerTrimPackageResource
+        + ", grpcServerErrorStatuses="
+        + this.grpcServerErrorStatuses
+        + ", grpcClientErrorStatuses="
+        + this.grpcClientErrorStatuses
+        + '}';
+  }
+
   public static class StaticConfig extends AbstractFeatureConfig {
     private final boolean integrationsEnabled;
     private final List<String> excludedClasses;
@@ -607,6 +709,35 @@ public class TraceInstrumentationFeatureConfig extends AbstractFeatureConfig {
     public boolean isJmxFetchIntegrationEnabled(
         final Iterable<String> integrationNames, final boolean defaultEnabled) {
       return isEnabled(integrationNames, "jmxfetch.", ".enabled", defaultEnabled);
+    }
+
+    @Override
+    public String toString() {
+      return "StaticConfig{"
+          + "integrationsEnabled="
+          + this.integrationsEnabled
+          + ", excludedClasses="
+          + this.excludedClasses
+          + ", excludedClassesFile='"
+          + this.excludedClassesFile
+          + '\''
+          + ", excludedClassLoaders="
+          + this.excludedClassLoaders
+          + ", excludedCodeSources="
+          + this.excludedCodeSources
+          + ", runtimeContextFieldInjection="
+          + this.runtimeContextFieldInjection
+          + ", serialVersionUIDFieldInjection="
+          + this.serialVersionUIDFieldInjection
+          + ", resolverOutlinePoolEnabled="
+          + this.resolverOutlinePoolEnabled
+          + ", resolverOutlinePoolSize="
+          + this.resolverOutlinePoolSize
+          + ", resolverTypePoolSize="
+          + this.resolverTypePoolSize
+          + ", resolverUseLoadClassEnabled="
+          + this.resolverUseLoadClassEnabled
+          + '}';
     }
 
     private static class Singleton {

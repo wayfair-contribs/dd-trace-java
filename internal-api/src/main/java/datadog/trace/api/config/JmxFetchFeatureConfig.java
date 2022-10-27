@@ -143,4 +143,38 @@ public class JmxFetchFeatureConfig extends AbstractFeatureConfig {
     result.put(SERVICE_TAG, this.generalConfig.getServiceName());
     return Collections.unmodifiableMap(result);
   }
+
+  @Override
+  public String toString() {
+    return "JmxFetchFeatureConfig{"
+        + "generalConfig="
+        + this.generalConfig
+        + ", jmxFetchEnabled="
+        + this.jmxFetchEnabled
+        + ", jmxFetchConfigDir='"
+        + this.jmxFetchConfigDir
+        + '\''
+        + ", jmxFetchConfigs="
+        + this.jmxFetchConfigs
+        + ", jmxFetchMetricsConfigs="
+        + this.jmxFetchMetricsConfigs
+        + ", jmxFetchCheckPeriod="
+        + this.jmxFetchCheckPeriod
+        + ", jmxFetchInitialRefreshBeansPeriod="
+        + this.jmxFetchInitialRefreshBeansPeriod
+        + ", jmxFetchRefreshBeansPeriod="
+        + this.jmxFetchRefreshBeansPeriod
+        + ", jmxFetchStatsdHost='"
+        + this.jmxFetchStatsdHost
+        + '\''
+        + ", jmxFetchStatsdPort="
+        + this.jmxFetchStatsdPort
+        + ", jmxFetchMultipleRuntimeServicesEnabled="
+        + this.jmxFetchMultipleRuntimeServicesEnabled
+        + ", jmxFetchMultipleRuntimeServicesLimit="
+        + this.jmxFetchMultipleRuntimeServicesLimit
+        + ", jmxTags="
+        + this.jmxTags
+        + '}';
+  }
 }

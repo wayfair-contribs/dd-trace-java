@@ -558,5 +558,114 @@ public class TracerFeatureConfig extends AbstractFeatureConfig {
 
       this.timeout = configProvider.getInteger(AGENT_TIMEOUT, DEFAULT_AGENT_TIMEOUT);
     }
+
+    @Override
+    public String toString() {
+      return "AgentConfig{"
+          + "configuredUsingDefault="
+          + this.configuredUsingDefault
+          + ", url='"
+          + this.url
+          + '\''
+          + ", host='"
+          + this.host
+          + '\''
+          + ", port="
+          + this.port
+          + ", unixDomainSocket='"
+          + this.unixDomainSocket
+          + '\''
+          + ", namedPipe='"
+          + this.namedPipe
+          + '\''
+          + ", timeout="
+          + this.timeout
+          + '}';
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "TracerFeatureConfig{"
+        + "idGenerationStrategy="
+        + this.idGenerationStrategy
+        + ", writerType='"
+        + this.writerType
+        + '\''
+        + ", agentConfig="
+        + this.agentConfig
+        + ", noProxyHosts="
+        + this.noProxyHosts
+        + ", traceAgentPath='"
+        + this.traceAgentPath
+        + '\''
+        + ", traceAgentArgs="
+        + this.traceAgentArgs
+        + ", prioritySamplingEnabled="
+        + this.prioritySamplingEnabled
+        + ", prioritySamplingForce='"
+        + this.prioritySamplingForce
+        + '\''
+        + ", traceResolverEnabled="
+        + this.traceResolverEnabled
+        + ", serviceMapping="
+        + this.serviceMapping
+        + ", traceAnalyticsEnabled="
+        + this.traceAnalyticsEnabled
+        + ", traceClientIpHeader='"
+        + this.traceClientIpHeader
+        + '\''
+        + ", traceClientIpHeaderDisabled="
+        + this.traceClientIpHeaderDisabled
+        + ", traceClientIpResolverEnabled="
+        + this.traceClientIpResolverEnabled
+        + ", traceSamplingServiceRules="
+        + this.traceSamplingServiceRules
+        + ", traceSamplingOperationRules="
+        + this.traceSamplingOperationRules
+        + ", traceSamplingRules='"
+        + this.traceSamplingRules
+        + '\''
+        + ", traceSampleRate="
+        + this.traceSampleRate
+        + ", traceRateLimit="
+        + this.traceRateLimit
+        + ", requestHeaderTags="
+        + this.requestHeaderTags
+        + ", responseHeaderTags="
+        + this.responseHeaderTags
+        + ", httpServerErrorStatuses="
+        + this.httpServerErrorStatuses
+        + ", httpClientErrorStatuses="
+        + this.httpClientErrorStatuses
+        + ", httpServerPathResourceNameMapping="
+        + this.httpServerPathResourceNameMapping
+        + ", splitByTags="
+        + this.splitByTags
+        + ", scopeDepthLimit="
+        + this.scopeDepthLimit
+        + ", scopeStrictMode="
+        + this.scopeStrictMode
+        + ", scopeInheritAsyncPropagation="
+        + this.scopeInheritAsyncPropagation
+        + ", scopeIterationKeepAlive="
+        + this.scopeIterationKeepAlive
+        + ", partialFlushMinSpans="
+        + this.partialFlushMinSpans
+        + ", traceStrictWritesEnabled="
+        + this.traceStrictWritesEnabled
+        + ", logExtractHeaderNames="
+        + this.logExtractHeaderNames
+        + ", propagationStylesToExtract="
+        + this.propagationStylesToExtract
+        + ", propagationStylesToInject="
+        + this.propagationStylesToInject
+        + ", traceAgentV05Enabled="
+        + this.traceAgentV05Enabled
+        + ", clockSyncPeriod="
+        + this.clockSyncPeriod
+        + ", xDatadogTagsMaxLength="
+        + this.xDatadogTagsMaxLength
+        + '}';
   }
 }

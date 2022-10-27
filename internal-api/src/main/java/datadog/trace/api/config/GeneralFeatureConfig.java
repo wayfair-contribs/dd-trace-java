@@ -678,5 +678,95 @@ public class GeneralFeatureConfig {
                 new ArrayList<>(parseStringIntoSetOfNonEmptyStrings(dogStatsDArgsString)));
       }
     }
+
+    @Override
+    public String toString() {
+      return "DogStatsDConfig{"
+          + "namedPipe='"
+          + this.namedPipe
+          + '\''
+          + ", startDelay="
+          + this.startDelay
+          + ", path='"
+          + this.path
+          + '\''
+          + ", args="
+          + this.args
+          + '}';
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "GeneralFeatureConfig{"
+        + "startTimeMillis="
+        + this.startTimeMillis
+        + ", runtimeId='"
+        + this.runtimeId
+        + '\''
+        + ", runtimeVersion='"
+        + this.runtimeVersion
+        + '\''
+        + ", apiKey='"
+        + this.apiKey
+        + '\''
+        + ", site='"
+        + this.site
+        + '\''
+        + ", hostName='"
+        + this.hostName
+        + '\''
+        + ", serviceName='"
+        + this.serviceName
+        + '\''
+        + ", serviceNameSetByUser="
+        + this.serviceNameSetByUser
+        + ", tags="
+        + this.tags
+        + ", spanTags="
+        + this.spanTags
+        + ", primaryTag='"
+        + this.primaryTag
+        + '\''
+        + ", debugEnabled="
+        + this.debugEnabled
+        + ", reportHostName="
+        + this.reportHostName
+        + ", azureAppServices="
+        + this.azureAppServices
+        + ", env='"
+        + this.env
+        + '\''
+        + ", version='"
+        + this.version
+        + '\''
+        + ", dogStatsDConfig="
+        + this.dogStatsDConfig
+        + ", healthMetricsEnabled="
+        + this.healthMetricsEnabled
+        + ", healthMetricsStatsdHost='"
+        + this.healthMetricsStatsdHost
+        + '\''
+        + ", healthMetricsStatsdPort="
+        + this.healthMetricsStatsdPort
+        + ", perfMetricsEnabled="
+        + this.perfMetricsEnabled
+        + ", tracerMetricsEnabled="
+        + this.tracerMetricsEnabled
+        + ", tracerMetricsBufferingEnabled="
+        + this.tracerMetricsBufferingEnabled
+        + ", tracerMetricsMaxAggregates="
+        + this.tracerMetricsMaxAggregates
+        + ", tracerMetricsMaxPending="
+        + this.tracerMetricsMaxPending
+        + ", internalExitOnFailure="
+        + this.internalExitOnFailure
+        + ", dataStreamsEnabled="
+        + this.dataStreamsEnabled
+        + ", telemetryEnabled="
+        + this.telemetryEnabled
+        + ", telemetryHeartbeatInterval="
+        + this.telemetryHeartbeatInterval
+        + '}';
   }
 }

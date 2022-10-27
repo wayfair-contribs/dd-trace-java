@@ -24,4 +24,14 @@ public class CwsFeatureConfig extends AbstractFeatureConfig {
   public int getCwsTlsRefresh() {
     return this.cwsTlsRefresh;
   }
+
+  @Override
+  public String toString() {
+    return "CwsFeatureConfig{"
+        + "cwsEnabled="
+        + this.cwsEnabled
+        + ", cwsTlsRefresh="
+        + this.cwsTlsRefresh
+        + '}';
+  }
 }

@@ -27,7 +27,6 @@ public class IastFeatureConfig extends AbstractFeatureConfig {
   private final Set<String> iastWeakHashAlgorithms;
   private final Pattern iastWeakCipherAlgorithms;
   private final boolean iastDeduplicationEnabled;
-
   private final boolean iastEnabled;
   private final int iastMaxConcurrentRequests;
   private final int iastVulnerabilitiesPerRequest;

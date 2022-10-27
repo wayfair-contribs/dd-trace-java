@@ -141,4 +141,40 @@ public class DebuggerFeatureConfig extends AbstractFeatureConfig {
     // by default send to datadog agent
     return this.tracerConfig.getAgentUrl() + "/debugger/v1/input";
   }
+
+  @Override
+  public String toString() {
+    return "DebuggerFeatureConfig{"
+        + "tracerConfig="
+        + this.tracerConfig
+        + ", debuggerEnabled="
+        + this.debuggerEnabled
+        + ", debuggerUploadTimeout="
+        + this.debuggerUploadTimeout
+        + ", debuggerUploadFlushInterval="
+        + this.debuggerUploadFlushInterval
+        + ", debuggerClassFileDumpEnabled="
+        + this.debuggerClassFileDumpEnabled
+        + ", debuggerPollInterval="
+        + this.debuggerPollInterval
+        + ", debuggerDiagnosticsInterval="
+        + this.debuggerDiagnosticsInterval
+        + ", debuggerMetricEnabled="
+        + this.debuggerMetricEnabled
+        + ", debuggerProbeFileLocation='"
+        + this.debuggerProbeFileLocation
+        + '\''
+        + ", debuggerUploadBatchSize="
+        + this.debuggerUploadBatchSize
+        + ", debuggerMaxPayloadSize="
+        + this.debuggerMaxPayloadSize
+        + ", debuggerVerifyByteCode="
+        + this.debuggerVerifyByteCode
+        + ", debuggerInstrumentTheWorld="
+        + this.debuggerInstrumentTheWorld
+        + ", debuggerExcludeFile='"
+        + this.debuggerExcludeFile
+        + '\''
+        + '}';
+  }
 }

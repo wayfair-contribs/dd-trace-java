@@ -71,4 +71,18 @@ public class CrashTrackingFeatureConfig extends AbstractFeatureConfig {
     result.put(LANGUAGE_TAG_KEY, LANGUAGE_TAG_VALUE);
     return Collections.unmodifiableMap(result);
   }
+
+  @Override
+  public String toString() {
+    return "CrashTrackingFeatureConfig{"
+        + "generalConfig="
+        + this.generalConfig
+        + ", tracerConfig="
+        + this.tracerConfig
+        + ", crashTrackingAgentless="
+        + this.crashTrackingAgentless
+        + ", crashTrackingTags="
+        + this.crashTrackingTags
+        + '}';
+  }
 }

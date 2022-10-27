@@ -241,4 +241,62 @@ public class ProfilingFeatureConfig extends AbstractFeatureConfig {
     result.put(RUNTIME_VERSION_TAG, this.generalConfig.getRuntimeVersion());
     return Collections.unmodifiableMap(result);
   }
+
+  @Override
+  public String toString() {
+    return "ProfilingFeatureConfig{"
+        + "generalConfig="
+        + this.generalConfig
+        + ", tracerConfig="
+        + this.tracerConfig
+        + ", profilingEnabled="
+        + this.profilingEnabled
+        + ", profilingAgentless="
+        + this.profilingAgentless
+        + ", profilingLegacyTracingIntegrationEnabled="
+        + this.profilingLegacyTracingIntegrationEnabled
+        + ", profilingUrl='"
+        + this.profilingUrl
+        + '\''
+        + ", profilingTags="
+        + this.profilingTags
+        + ", profilingStartDelay="
+        + this.profilingStartDelay
+        + ", profilingStartForceFirst="
+        + this.profilingStartForceFirst
+        + ", profilingUploadPeriod="
+        + this.profilingUploadPeriod
+        + ", profilingTemplateOverrideFile='"
+        + this.profilingTemplateOverrideFile
+        + '\''
+        + ", profilingUploadTimeout="
+        + this.profilingUploadTimeout
+        + ", profilingUploadCompression='"
+        + this.profilingUploadCompression
+        + '\''
+        + ", profilingProxyHost='"
+        + this.profilingProxyHost
+        + '\''
+        + ", profilingProxyPort="
+        + this.profilingProxyPort
+        + ", profilingProxyUsername='"
+        + this.profilingProxyUsername
+        + '\''
+        + ", profilingProxyPassword='"
+        + this.profilingProxyPassword
+        + '\''
+        + ", profilingExceptionSampleLimit="
+        + this.profilingExceptionSampleLimit
+        + ", profilingExceptionHistogramTopItems="
+        + this.profilingExceptionHistogramTopItems
+        + ", profilingExceptionHistogramMaxCollectionSize="
+        + this.profilingExceptionHistogramMaxCollectionSize
+        + ", profilingExcludeAgentThreads="
+        + this.profilingExcludeAgentThreads
+        + ", profilingHotspotsEnabled="
+        + this.profilingHotspotsEnabled
+        + ", profilingUploadSummaryOn413Enabled="
+        + this.profilingUploadSummaryOn413Enabled
+        + '}';
+  }
 }
